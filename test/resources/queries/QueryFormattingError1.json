@@ -5,7 +5,7 @@
       "AND":
       [
         {"LT": {"something_avg": 99}},
-        {"IS": {"sections_dept": "aanb"}}
+        {"IS": {"something_dept": "aanb"}}
       ]
     },
     "OPTIONS": {
