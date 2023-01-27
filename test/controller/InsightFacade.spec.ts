@@ -2,7 +2,7 @@ import {
 	IInsightFacade,
 	InsightDatasetKind,
 	InsightError,
-	InsightResult,
+	InsightResult, NotFoundError,
 	ResultTooLargeError,
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
@@ -22,11 +22,18 @@ describe("InsightFacade", function () {
 
 	// Declare datasets used in tests. You should add more datasets like this!
 	let sections: string;
+	// SYED: Additional sections added for testing
+	let sectionsTextFile: string;
+	let sectionsEmptyFile: string;
+	let sectionsInvalidSection: string;
 
 	before(function () {
 		// This block runs once and loads the datasets.
 		sections = getContentFromArchives("pair.zip");
-
+		// SYED: Instantiating sections
+		sectionsTextFile = getContentFromArchives("textFile.rtf");
+		sectionsEmptyFile = getContentFromArchives("pairEmpty.zip");
+		sectionsInvalidSection = getContentFromArchives("pairInvalidSection.zip");
 		// Just in case there is anything hanging around from a previous run of the test suite
 		clearDisk();
 	});
@@ -54,10 +61,254 @@ describe("InsightFacade", function () {
 			clearDisk();
 		});
 
-		// This is a unit test. You should create more like this!
-		it("should reject with  an empty dataset id", function () {
-			const result = facade.addDataset("", sections, InsightDatasetKind.Sections);
-			return expect(result).to.eventually.be.rejectedWith(InsightError);
+
+		describe("addDataset tests", function () {
+
+
+			describe("addDataset_ID_errors", function () {
+
+				it("should reject with an empty dataset id", function () {
+					const result = facade.addDataset("", sections, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+
+				it("should reject with an whitespace id", function () {
+					const result = facade.addDataset(" ", sections, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+
+				it("should reject because of an _ in the id", function () {
+					const result = facade.addDataset("qwerty_123", sections, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+
+			});
+
+			describe("addDataset_content_errors", function () {
+
+				it("should reject due to a non-zip source file", function () {
+					// let sections_text: string;
+					// sections_text = getContentFromArchives("textFile.rtf");
+					const result = facade.addDataset("qwerty", sectionsTextFile, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+
+				it("should reject due to an empty zip source file", function () {
+
+					const result = facade.addDataset("qwerty", sectionsEmptyFile, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+				it("should reject due to one section that is invalid in the zip source file", function () {
+
+					const result = facade.addDataset("qwerty", sectionsInvalidSection, InsightDatasetKind.Sections);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+			});
+
+			describe("Other_addDataset_errors", function () {
+
+				it("should reject due to attempting to add a Rooms kind", function () {
+					const result = facade.addDataset("qwerty", sections, InsightDatasetKind.Rooms);
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+				it("should reject due to a duplicate add chai-as-promised V2", function () {
+					const result = facade.addDataset("qwerty", sections, InsightDatasetKind.Sections).then(
+						() => facade.addDataset("qwerty", sections, InsightDatasetKind.Sections));
+
+					expect(result).to.eventually.be.rejectedWith(InsightError);
+					// return expect(result2).to.eventually.be.rejectedWith(InsightError);
+				});
+			});
+
+			describe("addDataset_assertions", function () {
+
+				it("database should be successfully added", async function () {
+					const len = await facade.listDatasets();
+					expect(len.length).to.equals(0);
+					const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+					expect(result.length).to.equals(1);
+					expect(result[0]).to.equals("qwerty");
+					const len2 = await facade.listDatasets();
+					expect(len2.length).to.equals(1);
+				});
+
+
+				it("second database should be successfully added", async function () {
+					try {
+						const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+						const len0 = await facade.listDatasets();
+						expect(len0.length).to.equals(1);
+						const result2 = await facade.addDataset("qwerty2", sections, InsightDatasetKind.Sections);
+						expect(result2.length).to.equals(2);
+						const len1 = await facade.listDatasets();
+						expect(len1.length).to.equals(2);
+						expect(result2[0]).to.equals("qwerty");
+						expect(result2[1]).to.equals("qwerty2");
+
+					} catch (err) {
+						expect.fail("Should not have rejected!");
+						//  expect(err).to.be.instanceof(TooSimple);
+					}
+				});
+			});
+		});
+
+
+		describe("removeDataset", function () {
+
+			describe("removeDataset_errors", function () {
+
+				it("should reject since no dataset is added", function () {
+					const result = facade.removeDataset("asd");
+					return expect(result).to.eventually.be.rejectedWith(NotFoundError);
+				});
+
+				it("should reject since dataset was already removed", function () {
+					const result = facade.addDataset("qwerty", sections, InsightDatasetKind.Sections).then(
+						() => facade.removeDataset("qwerty")).then(
+						() => facade.removeDataset("qwerty"));
+					return expect(result).to.eventually.be.rejectedWith(NotFoundError);
+				});
+
+				it("should reject since ID is not valid - whitespace", function () {
+					const result = facade.removeDataset(" ");
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+				it("should reject since ID is not valid - underscore", function () {
+					const result = facade.removeDataset("asd_qwe");
+					return expect(result).to.eventually.be.rejectedWith(InsightError);
+				});
+
+
+			});
+
+
+			describe("removeDataset_assertions", function () {
+
+			// SYED: It works but make this more sophisticated
+				it("database removal, checking order of removal", async function () {
+					const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+					const result2 = await facade.addDataset("qwerty2", sections, InsightDatasetKind.Sections);
+					const result3 = await facade.listDatasets();
+					expect(result3.length).to.equals(2);
+					const result4 = await facade.addDataset("qwerty3", sections, InsightDatasetKind.Sections);
+					const result5 = await facade.listDatasets();
+					expect(result5.length).to.equals(3);
+					const result6 = await facade.removeDataset("qwerty2");
+					expect(result6).to.equals("qwerty2");
+					const result7 = await facade.listDatasets();
+					expect(result7.length).to.equals(2);
+					expect(result7[0]).to.equals("qwerty");
+					expect(result7[1]).to.equals("qwerty3");
+				});
+			});
+		});
+
+
+		describe("listDataset", function () {
+
+			it("list database when nothing has been added", async function () {
+				const result = await facade.listDatasets();
+				expect(result.length).to.equals(0);
+			});
+			// SYED: the async calls are not wrapped in try-catch
+			it("listDataset after databases are added. Check return values (ID,KIND,ROWS)", async function () {
+				// Adding one dataset
+				const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+				const result2 = await facade.listDatasets();
+				expect(result2.length).to.equals(1);
+				// Check the elements inside the first array element of return value
+				expect(result2[0].id).to.equals("qwerty");
+				expect(result2[0].kind).to.equals("sections");
+				expect(result2[0].numRows).to.equals(64612);
+				// Adding second dataset
+				const result4 = await facade.addDataset("qwerty2", sections, InsightDatasetKind.Sections);
+				const result3 = await facade.listDatasets();
+				// Check length and properties of returned array after two datasets added.
+				expect(result3.length).to.equals(2);
+				expect(result3[0].id).to.equals("qwerty");
+				expect(result3[1].id).to.equals("qwerty2");
+			});
+		});
+
+
+		describe("performQuery_errors_tested_manually", function () {
+
+			// SYED: This test failed in the dynamic set so trying a manual version here.
+			it("Result too large error - manual version - async version", async function () {
+				try {
+					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+					const result = await facade.performQuery({
+						WHERE: {
+							GT: {
+								sections_avg: 1
+							}
+						},
+						OPTIONS: {
+							COLUMNS: [
+								"sections_dept",
+								"sections_avg"
+							],
+							ORDER: "sections_avg"
+						}
+					});
+				}  catch (err) {
+					expect(err).to.be.instanceof(ResultTooLargeError);
+				}
+			});
+
+			it("should reject since incorrectly formatted query", function () {
+				const result = facade.addDataset("sections", sections, InsightDatasetKind.Sections).then(
+					() => facade.performQuery("asd"));
+
+				return expect(result).to.eventually.be.rejectedWith(InsightError);
+			});
+		});
+
+
+		describe("performQuery_asserts", function () {
+			it("testing that performQuery returns the correct order", async function () {
+				try {
+					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+					const result2 = await facade.performQuery({
+						WHERE: {
+							GT: {
+								sections_avg: 98.5
+							}
+						},
+						OPTIONS: {
+							COLUMNS: [
+								"sections_dept",
+								"sections_avg"
+							],
+							ORDER: "sections_avg"
+						}
+					});
+
+					expect(result2[2]).to.deep.equals({
+						sections_dept: "epse",
+						sections_avg: 98.58
+					});
+
+					expect(result2[5]).to.deep.equals({
+						sections_dept: "nurs",
+						sections_avg: 98.71
+					});
+
+					expect(result2.length).equals(17);
+
+				} catch (err) {
+					expect.fail("it shouldnt throw error");
+				}
+			});
 		});
 	});
 
@@ -66,7 +317,7 @@ describe("InsightFacade", function () {
 	 * You should not need to modify it; instead, add additional files to the queries directory.
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
-	describe("PerformQuery", () => {
+	describe("PerformQuery Dynamic Folder Test Suite", () => {
 		before(function () {
 			console.info(`Before: ${this.test?.parent?.title}`);
 
@@ -86,18 +337,25 @@ describe("InsightFacade", function () {
 
 		type PQErrorKind = "ResultTooLargeError" | "InsightError";
 
+
 		folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 			"Dynamic InsightFacade PerformQuery tests",
 			(input) => facade.performQuery(input),
 			"./test/resources/queries",
 			{
 				assertOnResult: (actual, expected) => {
-					// TODO add an assertion!
+					// SYED: Assertion to check equality
+					expect(actual).to.deep.equal(expected);
 				},
 				errorValidator: (error): error is PQErrorKind =>
 					error === "ResultTooLargeError" || error === "InsightError",
 				assertOnError: (actual, expected) => {
-					// TODO add an assertion!
+					// SYED: Assertion to check if actual error is of the expected type
+					if (expected === "InsightError") {
+						expect(actual).to.be.an.instanceOf(InsightError);
+					} else {
+						expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+					}
 				},
 			}
 		);
