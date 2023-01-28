@@ -1,17 +1,17 @@
 {
 	"title": "Result too large error",
 	"input": {
-		WHERE: {
-			GT: {
-				sections_avg: 1
+		"WHERE": {
+			"GT": {
+				"sections_avg": 1
 			}
 		},
-		OPTIONS: {
-			COLUMNS: [
+		"OPTIONS": {
+			"COLUMNS": [
 				"sections_dept",
 				"sections_avg"
 			],
-			ORDER: "sections_avg"
+			"ORDER": "sections_avg"
 		}
 	},
 	"errorExpected": true,
