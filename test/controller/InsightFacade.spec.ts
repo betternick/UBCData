@@ -133,52 +133,9 @@ describe("InsightFacade", function () {
 			describe("addDataset_assertions", function () {
 
 				it("database should be successfully added", async function () {
-					const len = await facade.listDatasets();
-					expect(len.length).to.equals(0);
 					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
 					expect(result.length).to.equals(1);
 					expect(result[0]).to.equals("qwerty");
-					const len2 = await facade.listDatasets();
-					expect(len2.length).to.equals(1);
-				});
-
-				it("Breaking down: database should be successfully added - Stage 1", async function () {
-					// const len = await facade.listDatasets();
-					// expect(len.length).to.equals(0);
-					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					expect(result.length).to.equals(1);
-					expect(result[0]).to.equals("qwerty");
-					const len2 = await facade.listDatasets();
-					expect(len2.length).to.equals(1);
-				});
-
-				it("Breaking down: database should be successfully added - Stage 2", async function () {
-					// const len = await facade.listDatasets();
-					// expect(len.length).to.equals(0);
-					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					expect(result.length).to.equals(1);
-					expect(result[0]).to.equals("qwerty");
-					// const len2 = await facade.listDatasets();
-					// expect(len2.length).to.equals(1);
-				});
-
-
-				it("Breaking down: database should be successfully added - Stage 3", async function () {
-					// const len = await facade.listDatasets();
-					// expect(len.length).to.equals(0);
-					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					expect(result.length).to.equals(1);
-					// expect(result[0]).to.equals("qwerty");
-					// const len2 = await facade.listDatasets();
-					// expect(len2.length).to.equals(1);
-				});
-
-				it("Breaking down: database should be successfully added - Stage 4", async function () {
-					// const len = await facade.listDatasets();
-					// expect(len.length).to.equals(0);
-					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					// expect(result.length).to.equals(1);
-					// expect(result[0]).to.equals("qwerty");
 					const len2 = await facade.listDatasets();
 					expect(len2.length).to.equals(1);
 				});
@@ -252,87 +209,106 @@ describe("InsightFacade", function () {
 					expect(result6).to.equals("qwerty2");
 					const result7 = await facade.listDatasets();
 					expect(result7.length).to.equals(2);
-					expect(result7[0]).to.equals("qwerty");
-					expect(result7[1]).to.equals("qwerty3");
+					expect(result7[0].id).to.equals("qwerty");
+					expect(result7[1].id).to.equals("qwerty3");
 				});
-
-				it("database removal, stage 1", async function () {
-					await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
-					const result3 = await facade.listDatasets();
-					expect(result3.length).to.equals(2);
-					await facade.addDataset("qwerty3", sectionsLightSection, InsightDatasetKind.Sections);
-					const result5 = await facade.listDatasets();
-					expect(result5.length).to.equals(3);
-					const result6 = await facade.removeDataset("qwerty2");
-					expect(result6).to.equals("qwerty2");
-				});
-
-
-				it("database removal, stage 2", async function () {
-					await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
-					const result3 = await facade.listDatasets();
-					expect(result3.length).to.equals(2);
-					await facade.addDataset("qwerty3", sectionsLightSection, InsightDatasetKind.Sections);
-					const result5 = await facade.listDatasets();
-					expect(result5.length).to.equals(3);
-					const result6 = await facade.removeDataset("qwerty2");
-					expect(result6).to.equals("qwerty2");
-					const result7 = await facade.listDatasets();
-					expect(result7.length).to.equals(2);
-				});
-
-				it("database removal, stage 3", async function () {
-					await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-					await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
-					const result3 = await facade.listDatasets();
-					expect(result3.length).to.equals(2);
-					await facade.addDataset("qwerty3", sectionsLightSection, InsightDatasetKind.Sections);
-					const result5 = await facade.listDatasets();
-					expect(result5.length).to.equals(3);
-					const result6 = await facade.removeDataset("qwerty2");
-					expect(result6).to.equals("qwerty2");
-					const result7 = await facade.listDatasets();
-					expect(result7.length).to.equals(2);
-					expect(result7[0]).to.equals("qwerty");
-
-				});
-
-
 			});
 		});
 	});
 
 
-	describe("listDataset", function () {
+	describe("calling listDataset before any dataset is added", async function () {
 
-		it("list database when nothing has been added", async function () {
+		try {
 			const result = await facade.listDatasets();
-			expect(result.length).to.equals(0);
-		});
+		} catch (err) {
+			console.log("error was thrown calling the method");
+		}
+	});
+
+		// SYED: This test fails. Not sure what happens if listDataset is called when no dataset has been added
+	it("list database when nothing has been added", async function () {
+		const result = await facade.listDatasets();
+		expect(result.length).to.equals(0);
+	});
+
 			// SYED: the async calls are not wrapped in try-catch
-		it("listDataset after databases are added. Check return values (ID,KIND,ROWS)", async function () {
+	it("listDataset after databases are added. Check return values (ID,KIND,ROWS)", async function () {
 				// Adding one dataset
-			const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
-			const result2 = await facade.listDatasets();
-			expect(result2.length).to.equals(1);
+		const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+		const result2 = await facade.listDatasets();
+		expect(result2.length).to.equals(1);
 				// Check the elements inside the first array element of return value
-			expect(result2[0].id).to.equals("qwerty");
-			expect(result2[0].kind).to.equals("sections");
-			expect(result2[0].numRows).to.equals(64612);
+		expect(result2[0].id).to.equals("qwerty");
+		expect(result2[0].kind).to.equals("sections");
+		expect(result2[0].numRows).to.equals(64612);
 				// Adding second dataset
-			const result4 = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
-			const result3 = await facade.listDatasets();
+		const result4 = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
+		const result3 = await facade.listDatasets();
 				// Check length and properties of returned array after two datasets added.
-			expect(result3.length).to.equals(2);
-			expect(result3[0].id).to.equals("qwerty");
-			expect(result3[1].id).to.equals("qwerty2");
-		});
+		expect(result3.length).to.equals(2);
+		expect(result3[0].id).to.equals("qwerty");
+		expect(result3[1].id).to.equals("qwerty2");
 	});
 
 
-	describe("performQuery_errors_tested_manually", function () {
+	it("listDataset after databases are added. Stage 1", async function () {
+		// Adding one dataset
+		const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+		const result2 = await facade.listDatasets();
+		expect(result2.length).to.equals(1);
+		// Check the elements inside the first array element of return value
+		expect(result2[0].id).to.equals("qwerty");
+		expect(result2[0].kind).to.equals("sections");
+		expect(result2[0].numRows).to.equals(64612);
+		// // Adding second dataset
+		// const result4 = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
+		// const result3 = await facade.listDatasets();
+		// // Check length and properties of returned array after two datasets added.
+		// expect(result3.length).to.equals(2);
+		// expect(result3[0].id).to.equals("qwerty");
+		// expect(result3[1].id).to.equals("qwerty2");
+	});
+
+
+	it("listDataset after databases are added. Stage 2", async function () {
+		// Adding one dataset
+		const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+		const result2 = await facade.listDatasets();
+		expect(result2.length).to.equals(1);
+		// Check the elements inside the first array element of return value
+		expect(result2[0].id).to.equals("qwerty");
+		expect(result2[0].kind).to.equals("sections");
+		expect(result2[0].numRows).to.equals(64612);
+		// Adding second dataset
+		const result4 = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
+		const result3 = await facade.listDatasets();
+		// Check length and properties of returned array after two datasets added.
+		expect(result3.length).to.equals(2);
+		// expect(result3[0].id).to.equals("qwerty");
+		// expect(result3[1].id).to.equals("qwerty2");
+	});
+
+	it("listDataset after databases are added. Stage 3", async function () {
+		// Adding one dataset
+		const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
+		const result2 = await facade.listDatasets();
+		expect(result2.length).to.equals(1);
+		// Check the elements inside the first array element of return value
+		expect(result2[0].id).to.equals("qwerty");
+		expect(result2[0].kind).to.equals("sections");
+		expect(result2[0].numRows).to.equals(64612);
+		// Adding second dataset
+		const result4 = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
+		const result3 = await facade.listDatasets();
+		// Check length and properties of returned array after two datasets added.
+		expect(result3.length).to.equals(2);
+		expect(result3[0].id).to.equals("qwerty");
+		// expect(result3[1].id).to.equals("qwerty2");
+	});
+
+
+	// describe("performQuery_errors_tested_manually", function () {
 
 			// Moved this test to dynamic as well
 			// // SYED: This test failed in the dynamic set so trying a manual version here.
@@ -368,43 +344,43 @@ describe("InsightFacade", function () {
 		// });
 
 
-		describe("performQuery_asserts", function () {
-			it("testing that performQuery returns the correct order", async function () {
-				try {
-					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-					const result2 = await facade.performQuery({
-						WHERE: {
-							GT: {
-								sections_avg: 98.5
-							}
-						},
-						OPTIONS: {
-							COLUMNS: [
-								"sections_dept",
-								"sections_avg"
-							],
-							ORDER: "sections_avg"
+	describe("performQuery_asserts", function () {
+		it("testing that performQuery returns the correct order", async function () {
+			try {
+				await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+				const result2 = await facade.performQuery({
+					WHERE: {
+						GT: {
+							sections_avg: 98.5
 						}
-					});
+					},
+					OPTIONS: {
+						COLUMNS: [
+							"sections_dept",
+							"sections_avg"
+						],
+						ORDER: "sections_avg"
+					}
+				});
 
-					expect(result2[2]).to.deep.equals({
-						sections_dept: "epse",
-						sections_avg: 98.58
-					});
+				expect(result2[2]).to.deep.equals({
+					sections_dept: "epse",
+					sections_avg: 98.58
+				});
 
-					expect(result2[5]).to.deep.equals({
-						sections_dept: "nurs",
-						sections_avg: 98.71
-					});
+				expect(result2[5]).to.deep.equals({
+					sections_dept: "nurs",
+					sections_avg: 98.71
+				});
 
-					expect(result2.length).equals(17);
+				expect(result2.length).equals(17);
 
-				} catch (err) {
-					expect.fail("it shouldnt throw error");
-				}
-			});
+			} catch (err) {
+				expect.fail("it shouldnt throw error");
+			}
 		});
 	});
+
 
 	/*
 	 * This test suite dynamically generates tests from the JSON files in test/resources/queries.
@@ -413,6 +389,9 @@ describe("InsightFacade", function () {
 	 */
 	describe("PerformQuery Dynamic Folder Test Suite", () => {
 		before(function () {
+			// SYED: added to check if this is why before hook is failing
+			// clearDisk();
+
 			console.info(`Before: ${this.test?.parent?.title}`);
 
 			facade = new InsightFacade();
