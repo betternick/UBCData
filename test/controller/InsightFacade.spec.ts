@@ -244,23 +244,23 @@ describe("InsightFacade", function () {
 
 			describe("addDataset_assertions", function () {
 
-
-				// it("database should be successfully added - with try-catch block", async function () {
-				// 	try {
-				// 		const result = await facade.addDataset("qwerty", sectionsLightSection,
-				// 			InsightDatasetKind.Sections);
-				// 		expect(result.length).to.equals(1);
-				// 		expect(result[0]).to.equals("qwerty");
-				// 		const len2 = await facade.listDatasets();
-				// 		expect(len2.length).to.equals(1);
-				// 	} catch (err) {
-				// 		expect.fail("Should not have rejected!");
-				// 	}
-				// });
+				it("database should be successfully added - with try-catch block", async function () {
+					try {
+						const result = await facade.addDataset("qwerty", sectionsLightSection,
+							InsightDatasetKind.Sections);
+						expect(result.length).to.equal(1);
+						expect(result[0]).to.equal("qwerty");
+						const len2 = await facade.listDatasets();
+						expect(len2.length).to.equal(1);
+					} catch (err) {
+						expect.fail("Should not have rejected!");
+					}
+				});
 
 
 				it("database should be successfully added", async function () {
-					const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
+					const result = await facade.addDataset("qwerty", sectionsLightSection,
+						InsightDatasetKind.Sections);
 					expect(result.length).to.equals(1);
 					expect(result[0]).to.equals("qwerty");
 					const len2 = await facade.listDatasets();
@@ -403,12 +403,12 @@ describe("InsightFacade", function () {
 			// });
 
 			// Syed: moved this to dynamic
-		// 	it("should reject since incorrectly formatted query", function () {
-		// 		const result = facade.addDataset("sections", sections, InsightDatasetKind.Sections).then(
-		// 			() => facade.performQuery("asd"));
+		// it("should reject since incorrectly formatted query", function () {
+		// 	const result = facade.addDataset("sections", sections, InsightDatasetKind.Sections).then(
+		// 		() => facade.performQuery({"asd"}));
 		//
-		// 		return expect(result).to.eventually.be.rejectedWith(InsightError);
-		// 	});
+		// 	return expect(result).to.eventually.be.rejectedWith(InsightError);
+		// });
 		// });
 
 
@@ -473,7 +473,54 @@ describe("InsightFacade", function () {
 				}
 			});
 
-			it("testing that performQuery returns the correct order - just function", async function () {
+			// it("testing that performQuery returns the correct order - just function", async function () {
+			// 	try {
+			// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+			// 		const result2 = await facade.performQuery({
+			// 			WHERE: {
+			// 				GT: {
+			// 					sections_avg: 98.75
+			// 				}
+			// 			},
+			// 			OPTIONS: {
+			// 				COLUMNS: [
+			// 					"sections_dept",
+			// 					"sections_avg"
+			// 				],
+			// 				ORDER: "sections_avg"
+			// 			}
+			// 		});
+			// 	} catch (err) {
+			// 		expect.fail("it shouldnt throw error");
+			// 	}
+			// });
+			//
+			// it("testing that performQuery returns the correct order - just expect length", async function () {
+			// 	try {
+			// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+			// 		const result2 = await facade.performQuery({
+			// 			WHERE: {
+			// 				GT: {
+			// 					sections_avg: 98.75
+			// 				}
+			// 			},
+			// 			OPTIONS: {
+			// 				COLUMNS: [
+			// 					"sections_dept",
+			// 					"sections_avg"
+			// 				],
+			// 				ORDER: "sections_avg"
+			// 			}
+			// 		});
+			//
+			// 		expect(result2.length).to.equals(8);
+			// 	} catch (err) {
+			// 		expect.fail("it shouldnt throw error");
+			// 	}
+			// });
+			//
+			//
+			it("testing that performQuery returns the correct result with UNORDERED query", async function () {
 				try {
 					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
 					const result2 = await facade.performQuery({
@@ -486,55 +533,7 @@ describe("InsightFacade", function () {
 							COLUMNS: [
 								"sections_dept",
 								"sections_avg"
-							],
-							ORDER: "sections_avg"
-						}
-					});
-				} catch (err) {
-					expect.fail("it shouldnt throw error");
-				}
-			});
-
-			it("testing that performQuery returns the correct order - just expect length", async function () {
-				try {
-					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-					const result2 = await facade.performQuery({
-						WHERE: {
-							GT: {
-								sections_avg: 98.75
-							}
-						},
-						OPTIONS: {
-							COLUMNS: [
-								"sections_dept",
-								"sections_avg"
-							],
-							ORDER: "sections_avg"
-						}
-					});
-
-					expect(result2.length).to.equals(8);
-				} catch (err) {
-					expect.fail("it shouldnt throw error");
-				}
-			});
-
-
-			it("testing that performQuery returns the correct order - to have deep members", async function () {
-				try {
-					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-					const result2 = await facade.performQuery({
-						WHERE: {
-							GT: {
-								sections_avg: 98.75
-							}
-						},
-						OPTIONS: {
-							COLUMNS: [
-								"sections_dept",
-								"sections_avg"
-							],
-							ORDER: "sections_avg"
+							]
 						}
 					});
 

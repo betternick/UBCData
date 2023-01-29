@@ -1,16 +1,8 @@
 {
-  "title": "testing a query dynamically - GT",
+  "title": "testing a query dynamically - Combination of everything",
   "input": {
     "WHERE": {
-
-
-
       "NOT":{
-
-
-
-
-
         "OR": [
           {
             "AND": [
