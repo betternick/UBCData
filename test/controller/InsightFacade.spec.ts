@@ -159,6 +159,8 @@ describe("InsightFacade", function () {
 		});
 
 		beforeEach(function () {
+			// SYED: adding the below to see if maybe fixes cause for flaky tests
+			clearDisk();
 			// This section resets the insightFacade instance
 			// This runs before each test
 			console.info(`BeforeTest: ${this.currentTest?.title}`);
@@ -244,18 +246,18 @@ describe("InsightFacade", function () {
 
 			describe("addDataset_assertions", function () {
 
-				it("database should be successfully added - with try-catch block", async function () {
-					try {
-						const result = await facade.addDataset("qwerty", sectionsLightSection,
-							InsightDatasetKind.Sections);
-						expect(result.length).to.equal(1);
-						expect(result[0]).to.equal("qwerty");
-						const len2 = await facade.listDatasets();
-						expect(len2.length).to.equal(1);
-					} catch (err) {
-						expect.fail("Should not have rejected!");
-					}
-				});
+				// it("database should be successfully added - with try-catch block", async function () {
+				// 	try {
+				// 		const result = await facade.addDataset("qwerty", sectionsLightSection,
+				// 			InsightDatasetKind.Sections);
+				// 		expect(result.length).to.equal(1);
+				// 		expect(result[0]).to.equal("qwerty");
+				// 		const len2 = await facade.listDatasets();
+				// 		expect(len2.length).to.equal(1);
+				// 	} catch (err) {
+				// 		expect.fail("Should not have rejected!");
+				// 	}
+				// });
 
 
 				it("database should be successfully added", async function () {
@@ -591,6 +593,8 @@ describe("InsightFacade", function () {
 	 */
 	describe("PerformQuery Dynamic Folder Test Suite", () => {
 		before(function () {
+			// SYED: added the below to see if fixes flakiness
+			clearDisk();
 			console.info(`Before: ${this.test?.parent?.title}`);
 
 			facade = new InsightFacade();
