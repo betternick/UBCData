@@ -10,7 +10,7 @@
     },
     "OPTIONS": {
       "COLUMNS": [
-        "sections_dept",
+        "something_dept",
         "sections_avg"
       ],
       "ORDER": "sections_avg"
