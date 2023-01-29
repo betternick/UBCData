@@ -1,5 +1,5 @@
 {
-  "title": "testing a query dynamically - Combination of everything",
+  "title": "testing a query dynamically - Combination of everything - UNORDERED",
   "input": {
 	  "WHERE": {
 		  "NOT": {
@@ -31,8 +31,7 @@
 			  "sections_dept",
 			  "sections_id",
 			  "sections_avg"
-		  ],
-		  "ORDER": "sections_dept"
+		  ]
 	  }
   },
   "errorExpected": false,

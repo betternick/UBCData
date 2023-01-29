@@ -614,6 +614,7 @@ describe("InsightFacade", function () {
 		type PQErrorKind = "ResultTooLargeError" | "InsightError";
 
 
+		// SYED: Folder test for ORDERED queries
 		folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 			"Dynamic InsightFacade PerformQuery tests",
 			(input) => facade.performQuery(input),
@@ -638,5 +639,34 @@ describe("InsightFacade", function () {
 				},
 			}
 		);
+
+
+		// SYED: Folder test for UNORDERED queries
+		folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+			"Dynamic InsightFacade PerformQuery tests",
+			(input) => facade.performQuery(input),
+			"./test/resources/unorderedQueries",
+			{
+
+
+				assertOnResult: (actual, expected: any) => {
+					// SYED: Assertion to check equality
+
+					expect(actual).to.have.deep.members(expected);
+				},
+				errorValidator: (error): error is PQErrorKind =>
+					error === "ResultTooLargeError" || error === "InsightError",
+				assertOnError: (actual, expected) => {
+					// SYED: Assertion to check if actual error is of the expected type
+					if (expected === "InsightError") {
+						expect(actual).to.be.an.instanceOf(InsightError);
+					} else {
+						expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+					}
+				},
+			}
+		);
+
+
 	});
 });
