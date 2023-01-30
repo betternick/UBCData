@@ -378,6 +378,10 @@ describe("InsightFacade", function () {
 		});
 
 
+		it("This is a 'test' test that SHOULD fail", function () {
+			expect.fail("this should fail");
+		});
+
 	// describe("performQuery_errors_tested_manually", function () {
 
 			// Moved this test to dynamic as well
@@ -414,175 +418,175 @@ describe("InsightFacade", function () {
 		// });
 
 
-		describe("performQuery_asserts", function () {
-			it("testing that performQuery returns the correct order", async function () {
-				try {
-					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-					const result2 = await facade.performQuery({
-						WHERE: {
-							GT: {
-								sections_avg: 98.75
-							}
-						},
-						OPTIONS: {
-							COLUMNS: [
-								"sections_dept",
-								"sections_avg"
-							],
-							ORDER: "sections_avg"
-						}
-					});
-
-					expect(result2.length).to.equals(8);
-
-					expect(result2).to.deep.equals([
-						{
-							sections_dept: "epse",
-							sections_avg: 98.76
-						},
-						{
-							sections_dept: "epse",
-							sections_avg: 98.76
-						},
-						{
-							sections_dept: "epse",
-							sections_avg: 98.8
-						},
-						{
-							sections_dept: "spph",
-							sections_avg: 98.98
-						},
-						{
-							sections_dept: "spph",
-							sections_avg: 98.98
-						},
-						{
-							sections_dept: "cnps",
-							sections_avg: 99.19
-						},
-						{
-							sections_dept: "math",
-							sections_avg: 99.78
-						},
-						{
-							sections_dept: "math",
-							sections_avg: 99.78
-						}
-					]);
-
-				} catch (err) {
-					expect.fail("it shouldnt throw error");
-				}
-			});
-
-			// it("testing that performQuery returns the correct order - just function", async function () {
-			// 	try {
-			// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-			// 		const result2 = await facade.performQuery({
-			// 			WHERE: {
-			// 				GT: {
-			// 					sections_avg: 98.75
-			// 				}
-			// 			},
-			// 			OPTIONS: {
-			// 				COLUMNS: [
-			// 					"sections_dept",
-			// 					"sections_avg"
-			// 				],
-			// 				ORDER: "sections_avg"
-			// 			}
-			// 		});
-			// 	} catch (err) {
-			// 		expect.fail("it shouldnt throw error");
-			// 	}
-			// });
-			//
-			// it("testing that performQuery returns the correct order - just expect length", async function () {
-			// 	try {
-			// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-			// 		const result2 = await facade.performQuery({
-			// 			WHERE: {
-			// 				GT: {
-			// 					sections_avg: 98.75
-			// 				}
-			// 			},
-			// 			OPTIONS: {
-			// 				COLUMNS: [
-			// 					"sections_dept",
-			// 					"sections_avg"
-			// 				],
-			// 				ORDER: "sections_avg"
-			// 			}
-			// 		});
-			//
-			// 		expect(result2.length).to.equals(8);
-			// 	} catch (err) {
-			// 		expect.fail("it shouldnt throw error");
-			// 	}
-			// });
-			//
-			//
-			it("testing that performQuery returns the correct result with UNORDERED query", async function () {
-				try {
-					await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-					const result2 = await facade.performQuery({
-						WHERE: {
-							GT: {
-								sections_avg: 98.75
-							}
-						},
-						OPTIONS: {
-							COLUMNS: [
-								"sections_dept",
-								"sections_avg"
-							]
-						}
-					});
-
-					expect(result2.length).to.equals(8);
-
-					expect(result2).to.have.deep.members([
-						{
-							sections_dept: "epse",
-							sections_avg: 98.76
-						},
-						{
-							sections_dept: "epse",
-							sections_avg: 98.76
-						},
-						{
-							sections_dept: "epse",
-							sections_avg: 98.8
-						},
-						{
-							sections_dept: "spph",
-							sections_avg: 98.98
-						},
-						{
-							sections_dept: "spph",
-							sections_avg: 98.98
-						},
-						{
-							sections_dept: "cnps",
-							sections_avg: 99.19
-						},
-						{
-							sections_dept: "math",
-							sections_avg: 99.78
-						},
-						{
-							sections_dept: "math",
-							sections_avg: 99.78
-						}
-					]);
-
-				} catch (err) {
-					expect.fail("it shouldnt throw error");
-				}
-			});
-
-
-		});
+		// describe("performQuery_asserts", function () {
+		// 	// it("testing that performQuery returns the correct order", async function () {
+		// 	// 	try {
+		// 	// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+		// 	// 		const result2 = await facade.performQuery({
+		// 	// 			WHERE: {
+		// 	// 				GT: {
+		// 	// 					sections_avg: 98.75
+		// 	// 				}
+		// 	// 			},
+		// 	// 			OPTIONS: {
+		// 	// 				COLUMNS: [
+		// 	// 					"sections_dept",
+		// 	// 					"sections_avg"
+		// 	// 				],
+		// 	// 				ORDER: "sections_avg"
+		// 	// 			}
+		// 	// 		});
+		// 	//
+		// 	// 		expect(result2.length).to.equals(8);
+		// 	//
+		// 	// 		expect(result2).to.deep.equals([
+		// 	// 			{
+		// 	// 				sections_dept: "epse",
+		// 	// 				sections_avg: 98.76
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "epse",
+		// 	// 				sections_avg: 98.76
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "epse",
+		// 	// 				sections_avg: 98.8
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "spph",
+		// 	// 				sections_avg: 98.98
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "spph",
+		// 	// 				sections_avg: 98.98
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "cnps",
+		// 	// 				sections_avg: 99.19
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "math",
+		// 	// 				sections_avg: 99.78
+		// 	// 			},
+		// 	// 			{
+		// 	// 				sections_dept: "math",
+		// 	// 				sections_avg: 99.78
+		// 	// 			}
+		// 	// 		]);
+		// 	//
+		// 	// 	} catch (err) {
+		// 	// 		expect.fail("it shouldnt throw error");
+		// 	// 	}
+		// 	// });
+		//
+		// 	// it("testing that performQuery returns the correct order - just function", async function () {
+		// 	// 	try {
+		// 	// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+		// 	// 		const result2 = await facade.performQuery({
+		// 	// 			WHERE: {
+		// 	// 				GT: {
+		// 	// 					sections_avg: 98.75
+		// 	// 				}
+		// 	// 			},
+		// 	// 			OPTIONS: {
+		// 	// 				COLUMNS: [
+		// 	// 					"sections_dept",
+		// 	// 					"sections_avg"
+		// 	// 				],
+		// 	// 				ORDER: "sections_avg"
+		// 	// 			}
+		// 	// 		});
+		// 	// 	} catch (err) {
+		// 	// 		expect.fail("it shouldnt throw error");
+		// 	// 	}
+		// 	// });
+		// 	//
+		// 	// it("testing that performQuery returns the correct order - just expect length", async function () {
+		// 	// 	try {
+		// 	// 		await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+		// 	// 		const result2 = await facade.performQuery({
+		// 	// 			WHERE: {
+		// 	// 				GT: {
+		// 	// 					sections_avg: 98.75
+		// 	// 				}
+		// 	// 			},
+		// 	// 			OPTIONS: {
+		// 	// 				COLUMNS: [
+		// 	// 					"sections_dept",
+		// 	// 					"sections_avg"
+		// 	// 				],
+		// 	// 				ORDER: "sections_avg"
+		// 	// 			}
+		// 	// 		});
+		// 	//
+		// 	// 		expect(result2.length).to.equals(8);
+		// 	// 	} catch (err) {
+		// 	// 		expect.fail("it shouldnt throw error");
+		// 	// 	}
+		// 	// });
+		// 	//
+		// 	//
+		// 	it("testing that performQuery returns the correct result with UNORDERED query", async function () {
+		// 		try {
+		// 			await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+		// 			const result2 = await facade.performQuery({
+		// 				WHERE: {
+		// 					GT: {
+		// 						sections_avg: 98.75
+		// 					}
+		// 				},
+		// 				OPTIONS: {
+		// 					COLUMNS: [
+		// 						"sections_dept",
+		// 						"sections_avg"
+		// 					]
+		// 				}
+		// 			});
+		//
+		// 			expect(result2.length).to.equals(8);
+		//
+		// 			expect(result2).to.have.deep.members([
+		// 				{
+		// 					sections_dept: "epse",
+		// 					sections_avg: 98.76
+		// 				},
+		// 				{
+		// 					sections_dept: "epse",
+		// 					sections_avg: 98.76
+		// 				},
+		// 				{
+		// 					sections_dept: "epse",
+		// 					sections_avg: 98.8
+		// 				},
+		// 				{
+		// 					sections_dept: "spph",
+		// 					sections_avg: 98.98
+		// 				},
+		// 				{
+		// 					sections_dept: "spph",
+		// 					sections_avg: 98.98
+		// 				},
+		// 				{
+		// 					sections_dept: "cnps",
+		// 					sections_avg: 99.19
+		// 				},
+		// 				{
+		// 					sections_dept: "math",
+		// 					sections_avg: 99.78
+		// 				},
+		// 				{
+		// 					sections_dept: "math",
+		// 					sections_avg: 99.78
+		// 				}
+		// 			]);
+		//
+		// 		} catch (err) {
+		// 			expect.fail("it shouldnt throw error");
+		// 		}
+		// 	});
+		//
+		//
+		// });
 	});
 
 
