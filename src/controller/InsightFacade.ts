@@ -27,31 +27,34 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 
-		// Step 1) Check query type. If query is not a JSON file, reject
-		if (!this.checkIfJSON(query)) {
-			// reject
-			// TODO: reject
-		};  // else continue
+		// Step 1) check is the query is a JSON object
+		try {
+			JSON.parse(query as string);
+		} catch (error) {
+			// object not properly formatted
+			return Promise.reject(new InsightError("Not a valid JSON object"));
+		}
 
 		// Step 2) parse the query
 		let queryObject = JSON.parse(query as string);
 
-		// Step 3) check is the query is valid
-		if (!this.checkIfValid(queryObject)){
-			// reject
-			// TODO: reject
-		};  // else continue
+		// Step 3) get the datasetID
+		let datasetID: string;
+		try {
+			datasetID = this.getDatasetID(queryObject);
+		} catch (error) {
+			// datasetID is invalid (has an _)
+			return Promise.reject(error);
+		}
 
 		// Step 4) perform actions
-		// depending on properties of query (AKA which step of
-		// the AST this function is on), perform appropriate action
 		let where = "WHERE", options = "OPTIONS";
-		let order = "ORDER", columns = "COLUMNS";
-		let is = "IS", not = "NOT", and = "AND", or = "OR";
-		let lt = "LT", gt = "GT", eq = "EQ";
-		let avg = "avg", pass = "pass", fail = "fail", audit = "audit", year = "year";
-		let dept = "dept", id = "id", instructor = "instructor", title = "title", uuid = "uuid";
-		let idstring = "idstring", inputstring = "inputstring";
+		// let order = "ORDER", columns = "COLUMNS";
+		// let is = "IS", not = "NOT", and = "AND", or = "OR";
+		// let lt = "LT", gt = "GT", eq = "EQ";
+		// let avg = "avg", pass = "pass", fail = "fail", audit = "audit", year = "year";
+		// let dept = "dept", id = "id", instructor = "instructor", title = "title", uuid = "uuid";
+		// let idstring = "idstring", inputstring = "inputstring";
 
 		// catch first level of query (OPTIONS or WHERE)
 		if (Object.prototype.hasOwnProperty.call(queryObject, where) ||
@@ -60,38 +63,57 @@ export default class InsightFacade implements IInsightFacade {
 			// check that query object has BOTH OPTIONS or WHERE
 			if (Object.prototype.hasOwnProperty.call(queryObject, where)){
 				if (Object.prototype.hasOwnProperty.call(queryObject, options)) {
-					// TODO: handle where and options
+
+					// handleWhere
+					try {
+						(this.handleWhere(queryObject.WHERE, datasetID));
+					} catch (error) {
+						return Promise.reject(error);
+					}
+
+					// handleOptions
+					try {
+						(this.handleOptions(queryObject.OPTIONS, datasetID));
+					} catch (error) {
+						return Promise.reject(error);
+					}
 				}
 			}
-			// TODO: At this point, there is a WHERE, but no OPTIONS (or vice versa), so reject
+			// At this point, there is a WHERE block, but no OPTIONS block (or vice versa), so reject
+			return Promise.reject(new InsightError("query missing WHERE or OPTIONS block"));
 		}
 
-		// catch other levels?
-
-		// TODO: if the code gets to this point, something is invalid, so reject
-		return Promise.reject("Not implemented.");
+		// At this point, there is no WHERE and no OPTIONS block, so reject
+		return Promise.reject(new InsightError("query missing WHERE and OPTIONS blocks"));
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
 	}
 
-	// PRIVATE MEMBER FUNCTIONS
-	private checkIfJSON(input: unknown): boolean {
-		// TODO: implement this function
-		// if query is a JSON file, return true. If query is NOT a JSON, return false
-		return false;
+
+	// ------------------ PRIVATE MEMBER HELPER FUNCTIONS ------------------
+
+	// finds the first dataset ID from a query
+	// throws InsightError if dataset ID violates rules (includes _)
+	private getDatasetID(query: JSON){
+		// TODO: return the dataset ID as a string or return an InsightError if iD includes _
+		return "";
 	}
 
-	// Given a JSON object, check that it is valid. It is invalid if:
-	// - references more than one data set
-	// - has multiple WHERE, OPTIONS, or COLUMNS blocks
-	private checkIfValid(input: JSON): boolean {
-		// TODO: implement this function
-		// Probably need to do this recursively???
-		// if query is valid, return true. If query is NOT valid, return false
-		return false;
+	// function that handles the WHERE section of the query
+	// Linda - this is recursive
+	private handleWhere(whereQuery: JSON, datasetID: string){
+		// TODO: code this!
+		// if any dataset ID's found in the where block do not match the datasetID parameter,
+		// throw InsightError("multiple datasets referenced")
 	}
 
-
+	// function that handles the OPTIONS section of the query
+	// Linda - is this recursive?
+	private handleOptions(optionsQuery: JSON, datasetID: string){
+		// TODO: code this!
+		// if any dataset ID's found in the where block do not match the datasetID parameter,
+		// throw InsightError("multiple datasets referenced")
+	}
 }
