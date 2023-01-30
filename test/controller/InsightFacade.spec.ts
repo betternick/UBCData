@@ -217,24 +217,13 @@ describe("InsightFacade", function () {
 			});
 		});
 
-
-		describe("calling listDataset before any dataset is added", async function () {
-
-			try {
-				const result = await facade.listDatasets();
-			} catch (err) {
-				console.log("error was thrown calling the method");
-			}
-		});
-
-		// SYED: This test fails. Not sure what happens if listDataset is called when no dataset has been added
-		it("list database when nothing has been added", async function () {
+		it("list dataset when nothing has been added", async function () {
 			const result = await facade.listDatasets();
 			expect(result.length).to.equals(0);
 		});
 
 			// SYED: the async calls are not wrapped in try-catch
-		it("listDataset after databases are added. Check return values (ID,KIND,ROWS)", async function () {
+		it("listDataset after datasets are added. Check return values (ID,KIND,ROWS)", async function () {
 				// Adding one dataset
 			const result = await facade.addDataset("qwerty", sections, InsightDatasetKind.Sections);
 			const result2 = await facade.listDatasets();
