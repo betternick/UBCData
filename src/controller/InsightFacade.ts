@@ -28,18 +28,21 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 
 		// Step 1) Check query type. If query is not a JSON file, reject
-		checkIfJSON(query);
-		// checks if the given query is a JSON file
-		function checkIfJSON(queryInput: unknown) {
-			// TODO: implement this function
-			// if query is a JSON file, return. If query is NOT a JSON, reject
-			return;
-		}
+		if (!this.checkIfJSON(query)) {
+			// reject
+			// TODO: reject
+		};  // else continue
 
 		// Step 2) parse the query
 		let queryObject = JSON.parse(query as string);
 
-		// Step 3) perform actions
+		// Step 3) check is the query is valid
+		if (!this.checkIfValid(queryObject)){
+			// reject
+			// TODO: reject
+		};  // else continue
+
+		// Step 4) perform actions
 		// depending on properties of query (AKA which step of
 		// the AST this function is on), perform appropriate action
 		let where = "WHERE", options = "OPTIONS";
@@ -72,4 +75,23 @@ export default class InsightFacade implements IInsightFacade {
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
 	}
+
+	// PRIVATE MEMBER FUNCTIONS
+	private checkIfJSON(input: unknown): boolean {
+		// TODO: implement this function
+		// if query is a JSON file, return true. If query is NOT a JSON, return false
+		return false;
+	}
+
+	// Given a JSON object, check that it is valid. It is invalid if:
+	// - references more than one data set
+	// - has multiple WHERE, OPTIONS, or COLUMNS blocks
+	private checkIfValid(input: JSON): boolean {
+		// TODO: implement this function
+		// Probably need to do this recursively???
+		// if query is valid, return true. If query is NOT valid, return false
+		return false;
+	}
+
+
 }
