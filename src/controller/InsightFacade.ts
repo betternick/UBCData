@@ -19,6 +19,10 @@ export default class InsightFacade implements IInsightFacade {
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 
+		if (!this.checkIdAndKind(id,kind)) {
+			throw new InsightError("ID and kind failed check");
+		}
+
 		// TO DO: CheckParams: Check if add dataset params (ID, content, kind) are acceptable
 
 		// TO DO: unZip: read zip file. check that not empty
@@ -45,4 +49,25 @@ export default class InsightFacade implements IInsightFacade {
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
 	}
+
+	// Helper functions for addDataset
+	private checkIdAndKind (id: string, kind: InsightDatasetKind): boolean {
+
+		if (id.includes("_")){
+			return false;
+		};
+		if (id.includes(" ")){
+			return false;
+		};
+		// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
+		if (id.replace(/\s+/g, "").length === 0){
+			return false;
+		};
+		if (kind !== "sections"){
+			return false;
+		};
+		return true;
+	}
+
+
 }
