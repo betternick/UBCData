@@ -19,20 +19,19 @@ export default class InsightFacade implements IInsightFacade {
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 
+		// Step 1): CheckParams: Check if add dataset params (ID and kind) are acceptable.
 		if (!this.checkIdAndKind(id,kind)) {
-			throw new InsightError("ID and kind failed check");
+			throw new InsightError("ID and kind check failed");
 		}
 
-		// TO DO: CheckParams: Check if add dataset params (ID, content, kind) are acceptable
+		// Step 2): unZip: read zip file. check that not empty
 
-		// TO DO: unZip: read zip file. check that not empty
+		// Step 3): makeDataset: add valid sections to array
 
-		// TO DO: makeDataset: add valid sections to array
-
-		// TO DO: createDataset: add the dataset created in prev step to insightFacade object. Update insight
+		// Step 4): createDataset: add the dataset created in prev step to insightFacade object. Update insight
 		// facade object with info about added dataset.
 
-		// TO DO: diskWrite: write this object to data folder for persistence.
+		// Step 5): diskWrite: write this object to data folder for persistence.
 
 
 		return Promise.reject("Not implemented.");
@@ -50,13 +49,10 @@ export default class InsightFacade implements IInsightFacade {
 		return Promise.reject("Not implemented.");
 	}
 
-	// Helper functions for addDataset
+	// ---------PRIVATE HELPER FUNCTIONS FOR addDataset FAMILY------------------
+	// SYED: Checks that ID param observes rules for naming and kind == sections.
 	private checkIdAndKind (id: string, kind: InsightDatasetKind): boolean {
-
 		if (id.includes("_")){
-			return false;
-		};
-		if (id.includes(" ")){
 			return false;
 		};
 		// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
