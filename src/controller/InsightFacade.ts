@@ -26,7 +26,7 @@ export default class InsightFacade implements IInsightFacade {
 
 		// Step 2): unZip: read zip file. check that not empty
 
-		// Step 3): makeDataset: add valid sections to array
+		// Step 3): makeDataset: add valid sections to array. if valid sections are zero, throw error.
 
 		// Step 4): createDataset: add the dataset created in prev step to insightFacade object. Update insight
 		// facade object with info about added dataset.
@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	// ---------PRIVATE HELPER FUNCTIONS FOR addDataset FAMILY------------------
-	// SYED: Checks that ID param observes rules for naming and kind == sections.
+	// SYED: Checks that ID param observes rules for naming and kind is of type "sections".
 	private checkIdAndKind (id: string, kind: InsightDatasetKind): boolean {
 		if (id.includes("_")){
 			return false;
