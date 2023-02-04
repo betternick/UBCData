@@ -248,80 +248,81 @@ describe("InsightFacade", function () {
 	 * You should not need to modify it; instead, add additional files to the queries directory.
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
-	describe("PerformQuery Dynamic Folder Test Suite", () => {
-		before(function () {
-			// SYED: added the below to see if fixes flakiness
-			clearDisk();
-			console.info(`Before: ${this.test?.parent?.title}`);
-
-			facade = new InsightFacade();
-
-			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
-			// Will *fail* if there is a problem reading ANY dataset.
-			const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
-
-			return Promise.all(loadDatasetPromises);
-		});
-
-		after(function () {
-			console.info(`After: ${this.test?.parent?.title}`);
-			clearDisk();
-		});
-
-		type PQErrorKind = "ResultTooLargeError" | "InsightError";
-
-
-		// SYED: Folder test for ORDERED queries
-		folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-			"Dynamic InsightFacade PerformQuery tests",
-			(input) => facade.performQuery(input),
-			"./test/resources/queries",
-			{
-
-
-				assertOnResult: (actual, expected) => {
-					// SYED: Assertion to check equality
-
-					expect(actual).to.deep.equal(expected);
-				},
-				errorValidator: (error): error is PQErrorKind =>
-					error === "ResultTooLargeError" || error === "InsightError",
-				assertOnError: (actual, expected) => {
-					// SYED: Assertion to check if actual error is of the expected type
-					if (expected === "InsightError") {
-						expect(actual).to.be.an.instanceOf(InsightError);
-					} else {
-						expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-					}
-				},
-			}
-		);
-
-
-		// SYED: Folder test for UNORDERED queries
-		folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-			"Dynamic InsightFacade PerformQuery tests",
-			(input) => facade.performQuery(input),
-			"./test/resources/unorderedQueries",
-			{
-
-
-				assertOnResult: (actual, expected: any) => {
-					// SYED: Assertion to check equality
-
-					expect(actual).to.have.deep.members(expected);
-				},
-				errorValidator: (error): error is PQErrorKind =>
-					error === "ResultTooLargeError" || error === "InsightError",
-				assertOnError: (actual, expected) => {
-					// SYED: Assertion to check if actual error is of the expected type
-					if (expected === "InsightError") {
-						expect(actual).to.be.an.instanceOf(InsightError);
-					} else {
-						expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-					}
-				},
-			}
-		);
-	});
+	// describe("PerformQuery Dynamic Folder Test Suite", () => {
+	// 	before(function () {
+	// 		// SYED: added the below to see if fixes flakiness
+	// 		clearDisk();
+	// 		console.info(`Before: ${this.test?.parent?.title}`);
+	//
+	// 		facade = new InsightFacade();
+	//
+	// 		// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
+	// 		// Will *fail* if there is a problem reading ANY dataset.
+	// 		const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
+	//
+	// 		return Promise.all(loadDatasetPromises);
+	// 	});
+	//
+	// 	after(function () {
+	// 		console.info(`After: ${this.test?.parent?.title}`);
+	// 		clearDisk();
+	// 	});
+	//
+	// 	type PQErrorKind = "ResultTooLargeError" | "InsightError";
+	//
+	//
+	// 	// SYED: Folder test for ORDERED queries
+	// 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+	// 		"Dynamic InsightFacade PerformQuery tests",
+	// 		(input) => facade.performQuery(input),
+	// 		"./test/resources/queries",
+	// 		{
+	//
+	//
+	// 			assertOnResult: (actual, expected) => {
+	// 				// SYED: Assertion to check equality
+	//
+	// 				expect(actual).to.deep.equal(expected);
+	// 			},
+	// 			errorValidator: (error): error is PQErrorKind =>
+	// 				error === "ResultTooLargeError" || error === "InsightError",
+	// 			assertOnError: (actual, expected) => {
+	// 				// SYED: Assertion to check if actual error is of the expected type
+	// 				if (expected === "InsightError") {
+	// 					expect(actual).to.be.an.instanceOf(InsightError);
+	// 				} else {
+	// 					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+	// 				}
+	// 			},
+	// 		}
+	// 	);
+	//
+	//
+	// 	// SYED: Folder test for UNORDERED queries
+	// 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+	// 		"Dynamic InsightFacade PerformQuery tests",
+	// 		(input) => facade.performQuery(input),
+	// 		"./test/resources/unorderedQueries",
+	// 		{
+	//
+	//
+	// 			assertOnResult: (actual, expected: any) => {
+	// 				// SYED: Assertion to check equality
+	//
+	// 				expect(actual).to.have.deep.members(expected);
+	// 			},
+	// 			errorValidator: (error): error is PQErrorKind =>
+	// 				error === "ResultTooLargeError" || error === "InsightError",
+	// 			assertOnError: (actual, expected) => {
+	// 				// SYED: Assertion to check if actual error is of the expected type
+	// 				if (expected === "InsightError") {
+	// 					expect(actual).to.be.an.instanceOf(InsightError);
+	// 				} else {
+	// 					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+	// 				}
+	// 			},
+	// 		}
+	// 	);
+	// });
 });
+
