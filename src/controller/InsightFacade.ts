@@ -5,17 +5,11 @@ import {
 	InsightError,
 	InsightResult,
 	NotFoundError,
+	Dataset,
 } from "./IInsightFacade";
 
 import {checkIdAndKind, readContent} from "./helperFunctionsAddDataset";
 
-
-interface Dataset {
-	id: string;
-	kind: InsightDatasetKind;
-	numRows: number;
-	datasetArray: JSON[];
-}
 
 // const map = new Map<string, Dataset>();
 
@@ -54,7 +48,7 @@ export default class InsightFacade implements IInsightFacade {
 				// try {
 				if (!checkIdAndKind(id,kind,InsightFacade.map)) {
 					reject(new InsightError("ID and kind check failed"));
-				};
+				}
 				// } catch (err){
 				// 	reject(err);
 				// }
