@@ -7,8 +7,7 @@ import {
 	NotFoundError,
 } from "./IInsightFacade";
 
-import {checkIdAndKind, readContent} from "./testDatasetExperimental3";
-import {getContentFromArchives} from "../../test/TestUtil";
+import {checkIdAndKind, readContent} from "./helperFunctionsAddDataset";
 
 
 interface Dataset {
@@ -18,7 +17,8 @@ interface Dataset {
 	datasetArray: JSON[];
 }
 
-const map = new Map<string, Dataset>();
+// const map = new Map<string, Dataset>();
+
 // const map = new Map();
 
 // map1.set("a", 1);
@@ -32,7 +32,11 @@ const map = new Map<string, Dataset>();
  *
  */
 export default class InsightFacade implements IInsightFacade {
+
+	public static map: Map<string, Dataset>;
+
 	constructor() {
+		InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
 	}
 
@@ -41,22 +45,24 @@ export default class InsightFacade implements IInsightFacade {
 			function (resolve, reject) {
 
 				let keys: string[];
+
 		// Step 1): CheckParams: Check if add dataset params (ID and kind) are acceptable.
 		// 		let key2 = [...map.keys()];
 		// 		let check = key2.includes(id);
 		// 		console.log(check);
-				try {
-					if (!checkIdAndKind(id,kind,map)) {
-						reject(new InsightError("ID and kind check failed"));
-					};
-				} catch (err){
-					reject(err);
-				}
+
+				// try {
+				if (!checkIdAndKind(id,kind,InsightFacade.map)) {
+					reject(new InsightError("ID and kind check failed"));
+				};
+				// } catch (err){
+				// 	reject(err);
+				// }
 
 
 				let myDataset: Dataset = {
 					id: id,
-					kind: kind,
+					kind: InsightDatasetKind.Sections,
 					numRows: 0,
 					datasetArray: [],
 				};
@@ -64,8 +70,8 @@ export default class InsightFacade implements IInsightFacade {
 		// let arrray: any = [];
 				readContent(content,myDataset.datasetArray).then((length) => {
 					myDataset.numRows = length;
-					map.set(id, myDataset);
-					keys = [...map.keys()];
+					InsightFacade.map.set(id, myDataset);
+					keys = [...InsightFacade.map.keys()];
 
 					resolve(keys);
 
@@ -112,12 +118,12 @@ export default class InsightFacade implements IInsightFacade {
 					reject(new InsightError("ID cannot have only whitespaces"));
 				};
 
-				if (!map.has(id)){
+				if (!InsightFacade.map.has(id)){
 					// console.log("it NO has id!");
 					reject(new NotFoundError("Dataset doesn't exist"));
 				}
 
-				map.delete(id);
+				InsightFacade.map.delete(id);
 				resolve(id);
 		// return Promise.reject("Not implemented.");
 			});
@@ -134,7 +140,7 @@ export default class InsightFacade implements IInsightFacade {
 
 				let array: InsightDataset[] = [];
 	// ref: https://www.hackinbits.com/articles/js/how-to-iterate-a-map-in-javascript---map-part-2
-				map.forEach(function(value, key) {
+				InsightFacade.map.forEach(function(value, key) {
 
 					let thing: InsightDataset = {
 						id: "a",

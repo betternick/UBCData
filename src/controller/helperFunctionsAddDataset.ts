@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import {getContentFromArchives} from "../../test/TestUtil";
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
+import InsightFacade from "./InsightFacade";
 
 let daq = getContentFromArchives("pair.zip");
 let dats = getContentFromArchives("pairLight.zip");
@@ -19,18 +20,22 @@ function checkIdAndKind (id: string, kind: InsightDatasetKind, map: any): boolea
 	if (map.has(id)){
 		// console.log("it has the id!");
 		throw new InsightError("ID already exists");
+		return false;
 	}
 
 	if (id.includes("_")){
 		throw new InsightError("_ is not allowed");
-	};
+		return false;
+	}
 	// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
 	if (id.replace(/\s+/g, "").length === 0){
 		throw new InsightError("ID only has whitespace");
-	};
+		return false;
+	}
 	if (kind !== "sections"){
-		throw new InsightError("kind must only be of type sections");;
-	};
+		throw new InsightError("kind must only be of type sections");
+		return false;
+	}
 	return true;
 }
 
@@ -48,10 +53,17 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 			// if (unzip === null || unzip === undefined) {
 			// 	throw new InsightError("unzip was null?");
 			// };
-				let hun = unzip.folder(/course/);
+				let hun: any;
+				try {
+					hun = unzip.folder(/course/);
+				} catch (e) {
+					reject(new InsightError("No courses folder?"));
+				}
+				// let hun = unzip.folder(/course/);
 
 				if (hun.length === 0 || hun[0].name !== "courses/") {
-					throw new InsightError("No courses folder?");
+					reject(new InsightError("No courses folder?"));
+					// throw new InsightError("No courses folder?");
 				}
 				unzip.folder("courses")?.forEach(function (relativePath, file) {
 					promisesArray.push(file.async("string"));
@@ -95,7 +107,8 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 				// resolve("f");
 				.catch(function (err: any) {
 				// console.error(`there is an error in readContent function?? ${err}`);
-					throw new InsightError("there is an error in readContent function???");
+				// 	throw new InsightError("there is an error in readContent function???");
+					reject(new InsightError("there is an error in readContent function???"));
 				});
 
 		});

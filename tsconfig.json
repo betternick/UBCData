@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"noImplicitAny": true,
+//		"noImplicitThis": false, //remove this later
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"sourceMap": true,
