@@ -89,7 +89,7 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		return new Promise(
 			(resolve, reject) => {
-				// Step 1) check is the query is a JSON object
+				// Step 1) check if the query is a JSON object
 				try {
 					JSON.parse(query as string);
 				} catch (error) {
@@ -103,6 +103,7 @@ export default class InsightFacade implements IInsightFacade {
 				// Step 3) get the datasetID
 				let datasetID: string;
 				datasetID = this.getDatasetID(queryParsed);
+				let datasetToQuery = InsightFacade.map.get(datasetID);
 
 				// Step 4) check if a dataset with datasetID has been added
 				// TODO
@@ -110,6 +111,7 @@ export default class InsightFacade implements IInsightFacade {
 
 				// Step 5) perform actions
 				let where = "WHERE", options = "OPTIONS";
+				let results: InsightResult[] = [];
 
 				// catch first level of query (OPTIONS or WHERE)
 				if (Object.prototype.hasOwnProperty.call(queryParsed, where) ||
@@ -119,25 +121,27 @@ export default class InsightFacade implements IInsightFacade {
 					if (Object.prototype.hasOwnProperty.call(queryParsed, where) &&
 						Object.prototype.hasOwnProperty.call(queryParsed, options)) {
 
-						// this is a Query Object that stores all of the important info for the query
 						let queryObject = new QueryContainer();
-
-						try {
-							queryObject.populateWhere(queryParsed.get(where), datasetID);
-						} catch (error) {
-							reject(error);
-						}
 
 						// handleOptions
 						try {
-							queryObject.populateOptions(queryParsed.get(options), datasetID);
+							queryObject.handleOptions(queryParsed.get(options), datasetID);
 						} catch (error) {
 							reject(error);
 						}
 
-						// At this point, queryObject has all neccessary info for the query
-						// start gathering the data out of the dataset
-						// TODO
+						// handleWhere
+						try {
+							// LINDA -not sure why, but IntelliJ seems to think InsightFacade.map.get(datasetID) can be type
+							// Dataset or Undefined -> so parameter to handleWhere is datasetToQuery as Dataset to skirt this issue
+							results = queryObject.handleWhere(queryParsed.get(where), datasetID,
+															  datasetToQuery as Dataset);
+						} catch (error) {
+							reject(error);
+						}
+
+						resolve(results);
+
 					}
 					// At this point, there is a WHERE block, but no OPTIONS block (or vice versa), so reject
 					reject(new InsightError("query missing WHERE or OPTIONS block"));

@@ -1,8 +1,9 @@
-import {InsightError} from "../controller/IInsightFacade";
+import {Dataset, InsightError, InsightResult} from "../controller/IInsightFacade";
 
 export class QueryContainer {
 	public columns: string[];
 	public order: string;
+
 	constructor() {
 		this.columns = [];
 		this.order = "";
@@ -18,10 +19,12 @@ export class QueryContainer {
 
 	// handles the WHERE block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
+	// otherwise, returns the InsightResult[] that corresponds to the query
 	// found in the WHERE block do not match the datasetID parameter
 	// LINDA - this is recursive
-	public populateWhere(query: JSON, datasetID: string) {
+	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
 		// recursively traverse JSON object: ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
+		let resultArray: InsightResult[] = [];
 		for (let k in query) {
 			if (k === "OR"){
 				// TODO: recurse, but keeping in mind the or structure
@@ -37,23 +40,38 @@ export class QueryContainer {
 				// TODO: check that id matches datasetID and store info
 			} else if (k === "EQ") {
 				// TODO: check that id matches datasetID and store info
+			} else {
+				// WHERE body is empty -> return all entries
+
+				// for each dataset
+				let courseResultArray = dataset.datasetArray[0];
+				let insResult: InsightResult;
+				for (let course in courseResultArray) {
+					// TODO
+				}
+
 			}
 		}
+		return resultArray;
 	}
 
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
-	public populateOptions(query: string, datasetID: string) {
-		if (!this.singleDatasetIDInColumns(query, datasetID)) {
+	public handleOptions(query: string, datasetID: string) {
+		if (!this.singleDatasetID(query, datasetID)) {
 			return new InsightError("multiple data set IDs referenced");
 		}
-		this.order = JSON.parse(query).order;
-		this.columns = JSON.parse(query).columns;
+		let orderSection = JSON.parse(query).order;
+		this.order = this.returnIdentifier(JSON.stringify(orderSection));
+		let columnsSection = JSON.parse(query);
+		for (let i in columnsSection){
+			this.columns.push(this.returnIdentifier(i));
+		}
 	}
 
-	// checks whether only a single ID is referenced in columns
-	public singleDatasetIDInColumns(query: string, datasetID: string): boolean{
+	// checks whether only a single ID is referenced
+	public singleDatasetID(query: string, datasetID: string): boolean{
 		for (let i = 0; i < query.length; i++) {
 			if (query[i] === "_"){
 				let indexStartOfID = query.lastIndexOf('"', i) + 1;
@@ -64,6 +82,14 @@ export class QueryContainer {
 			}
 		}
 		return true;
+	}
+
+	public returnIdentifier(query: string): string {
+		const indexUnderscore = query.indexOf("_");
+		const indexEndOfIdentifier = query.indexOf('"', indexUnderscore) - 1;
+		let result: string;
+		result = query.substring(indexUnderscore + 1, indexEndOfIdentifier);
+		return result;
 	}
 
 }
