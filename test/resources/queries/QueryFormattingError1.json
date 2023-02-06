@@ -1,0 +1,22 @@
+{
+  "title": "Query formatting issue - non-existent id referenced",
+  "input": {
+    "WHERE": {
+      "AND":
+      [
+        {"LT": {"something_avg": 99}},
+        {"IS": {"something_dept": "aanb"}}
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "something_dept",
+        "sections_avg"
+      ],
+      "ORDER": "sections_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+
