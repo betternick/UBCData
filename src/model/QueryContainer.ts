@@ -25,6 +25,8 @@ export class QueryContainer {
 	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
 		// recursively traverse JSON object: ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 		let resultArray: InsightResult[] = [];
+		let uuid = "id", id = "Course", title = "Title", instructor = "Professor", dept = "Subject",
+			year = "Year", avg = "Avg", pass = "Pass", fail = "Fail", audit = "Audit";
 		for (let k in query) {
 			if (k === "OR"){
 				// TODO: recurse, but keeping in mind the or structure
@@ -50,12 +52,12 @@ export class QueryContainer {
 				let insResult: InsightResult;
 				// for each course in the dataset
 				for (let course in courseResultArray) {
-					// for each column in the query
+					// for each column option in the query
 					for (let column in this.columns) {
-							// TODO: extract info from the course based on the required columns and add it
-							//  to the insight result array
-							// LINDA -> for reference:
-							// An insightResult = {"sections_dept": "chem", "sections_avg": 94.5}
+						// TODO: extract info from the course based on the required columns and add it
+						//  to the insight result array
+						// LINDA -> for reference:
+						// An insightResult = {"sections_dept": "chem", "sections_avg": 94.5}
 					}
 				}
 			}
