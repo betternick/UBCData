@@ -8,6 +8,8 @@ import {
 	Dataset,
 } from "./IInsightFacade";
 
+import {QueryContainer} from "../model/QueryContainer";
+
 import {checkIdAndKind, readContent} from "./helperFunctionsAddDataset";
 
 /**
@@ -118,17 +120,17 @@ export default class InsightFacade implements IInsightFacade {
 						Object.prototype.hasOwnProperty.call(queryParsed, options)) {
 
 						// this is a Query Object that stores all of the important info for the query
-						let queryObject = new Query();
+						let queryObject = new QueryContainer();
 
 						try {
-							queryObject.handleWhere(queryParsed.get(where), datasetID);
+							queryObject.populateWhere(queryParsed.get(where), datasetID);
 						} catch (error) {
 							reject(error);
 						}
 
 						// handleOptions
 						try {
-							queryObject.handleOptions(queryParsed.get(options), datasetID);
+							queryObject.populateOptions(queryParsed.get(options), datasetID);
 						} catch (error) {
 							reject(error);
 						}

@@ -1,6 +1,11 @@
-class Query{
+import {InsightError} from "../controller/IInsightFacade";
 
+export class QueryContainer {
+	public columns: string[];
+	public order: string;
 	constructor() {
+		this.columns = [];
+		this.order = "";
 		console.log("Query Object created");
 	}
 
@@ -15,7 +20,7 @@ class Query{
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the WHERE block do not match the datasetID parameter
 	// LINDA - this is recursive
-	public handleWhere(query: JSON, datasetID: string) {
+	public populateWhere(query: JSON, datasetID: string) {
 		// recursively traverse JSON object: ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 		for (let k in query) {
 			if (k === "OR"){
@@ -39,9 +44,26 @@ class Query{
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
-	// Linda- I don't think this is recursive
-	public handleOptions(query: JSON, datasetID: string) {
-		// TODO
+	public populateOptions(query: string, datasetID: string) {
+		if (!this.singleDatasetIDInColumns(query, datasetID)) {
+			return new InsightError("multiple data set IDs referenced");
+		}
+		this.order = JSON.parse(query).order;
+		this.columns = JSON.parse(query).columns;
+	}
+
+	// checks whether only a single ID is referenced in columns
+	public singleDatasetIDInColumns(query: string, datasetID: string): boolean{
+		for (let i = 0; i < query.length; i++) {
+			if (query[i] === "_"){
+				let indexStartOfID = query.lastIndexOf('"', i) + 1;
+				let result = query.substring(indexStartOfID, i);
+				if (result !== datasetID) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }
