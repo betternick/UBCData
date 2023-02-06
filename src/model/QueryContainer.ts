@@ -42,14 +42,22 @@ export class QueryContainer {
 				// TODO: check that id matches datasetID and store info
 			} else {
 				// WHERE body is empty -> return all entries
+				// LINDA -> move this into its own method for cleanliness and single purpose principle
+				// LINDA -> do the same thing with other options above
 
-				// for each dataset
+				// for the dataset array
 				let courseResultArray = dataset.datasetArray[0];
 				let insResult: InsightResult;
+				// for each course in the dataset
 				for (let course in courseResultArray) {
-					// TODO
+					// for each column in the query
+					for (let column in this.columns) {
+							// TODO: extract info from the course based on the required columns and add it
+							//  to the insight result array
+							// LINDA -> for reference:
+							// An insightResult = {"sections_dept": "chem", "sections_avg": 94.5}
+					}
 				}
-
 			}
 		}
 		return resultArray;
