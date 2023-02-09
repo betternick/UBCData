@@ -121,7 +121,9 @@ export default class InsightFacade implements IInsightFacade {
 				let datasetID = this.getDatasetID(query);
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 
-				// Step 4) check if a dataset with datasetID has been added // TODO
+				if (datasetToQuery === null) {
+					reject(new InsightError("the dataset you are looking for has not been added"));
+				}
 
 				// catch first level of query (OPTIONS or WHERE)
 				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
@@ -132,12 +134,7 @@ export default class InsightFacade implements IInsightFacade {
 						let queryObject = new QueryContainer();
 
 						// handleOptions
-						let indexOptions: number = -1;
-						for (let i = 0; i < queryParsed.length; i++) {
-							if (queryParsed[i][0] === "OPTIONS") {
-								indexOptions = i;
-							}
-						}
+						let indexOptions = this.getIndex(queryParsed, "OPTIONS");
 						try {
 							queryObject.handleOptions(queryParsed[indexOptions][1], datasetID);
 						} catch (error) {
@@ -145,12 +142,7 @@ export default class InsightFacade implements IInsightFacade {
 						}
 
 						// handleWhere
-						let indexWhere: number = -1;
-						for (let x = 0; x < queryParsed.length; x++) {
-							if (queryParsed[x][0] === "WHERE") {
-								indexWhere = x;
-							}
-						}
+						let indexWhere = this.getIndex(queryParsed, "WHERE");
 						try {
 							let results = queryObject.handleWhere(queryParsed[indexWhere][1],datasetID,
 								datasetToQuery as Dataset);
@@ -201,77 +193,16 @@ export default class InsightFacade implements IInsightFacade {
 		result = queryString.substring(indexStartOfID, indexUnderscore);
 		return result;
 	}
+
+	public getIndex(queryParsed: string | any, item: string): number {
+		let index: number = -1;
+		for (let x = 0; x < queryParsed.length; x++) {
+			if (queryParsed[x][0] === item) {
+				index = x;
+			}
+		}
+		return index;
+	}
 }
 
-// SYED: I use the following to test and debug code. will remove at the end.
-//
-// let facade = new InsightFacade();
-// let sectionsLightSection = getContentFromArchives("Pair3CoursesOnly.zip");
-// let sectionsSingle = getContentFromArchives("singleCourse.zip");
 
-// let sections = getContentFromArchives("Pair.zip");
-// facade.addDataset("Heavy sections 2",sections,InsightDatasetKind.Sections).then((fg)=>{
-// 	// console.log(fg);
-// 	console.log(InsightFacade.map);
-// });
-
-// console.log(InsightFacade.map);
-
-// console.log(InsightFacade.map);
-//
-// facade.addDataset("Light sections THREE",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
-// 	console.log(fg);
-// 	// console.log(InsightFacade.map);
-// });
-
-// facade.addDataset("Light sections ONE",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
-// 	console.log(fg);
-// 	// console.log(InsightFacade.map);
-// });
-// //
-// console.log(InsightFacade.map);
-// facade.removeDataset("Heavy sections").then(() => {
-// 	console.log(InsightFacade.map);
-// });
-
-// console.log(InsightFacade.map);
-//
-// facade.removeDataset("Light sections TWO").then(() => {
-// 	facade.removeDataset("Light sections ONE").then(() => {
-// 		console.log(InsightFacade.map);
-// 	});
-// });
-
-// deleteDatasetFromPersistence("Heavy sections");
-// deleteDatasetFromPersistence("Light sections");
-
-// );
-
-// let facade = new InsightFacade();
-// let f;
-// facade.listDatasets().then((res)=>{
-// 	f = res;
-// });
-// console.log("hey");
-// console.log(f);
-// let res = loadDatasetFromPersistence(InsightFacade.map);
-// console.log(res);
-
-// let facade = new InsightFacade();
-// console.log(InsightFacade.map);
-//
-// facade.removeDataset("TWOO").then(() => {
-// 	console.log(InsightFacade.map);
-// }
-// );
-
-// async function test333() {
-// 	let facade = new InsightFacade();
-// 	const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
-// 	expect(result.length).to.equals(1);
-// 	expect(result[0]).to.equals("qwerty");
-// 	const len2 = await facade.listDatasets();
-// 	expect(len2.length).to.equals(1);
-// };
-//
-// test333();
