@@ -108,16 +108,10 @@ function checkFileExistsCreateFile(): Promise<boolean> {
 			console.log("file already exists");
 			resolve(true);
 		} else {
-			// let savedDataStructure: {[datasetArray: string]: string[]} = {
-			// 	array: ["a", "b"],
-			// }; // TypeScript may also ask for the new cast syntax
-
 			const aPersistFileTemplate = {
 				fileArray: [],
 			};
-
-			// let jsonStringWrite = JSON.stringify(savedDataStructure);
-			fs.writeJson(persistFile, aPersistFileTemplate)
+			fs.outputJson(persistFile, aPersistFileTemplate)
 				.then(() => {
 					console.log("File didn't exist but successfuly created!");
 					resolve(true);
@@ -131,10 +125,8 @@ function checkFileExistsCreateFile(): Promise<boolean> {
 }
 
 
-function addToPersistFolder(data: Dataset): Promise<boolean> {
-
+function addToPersistFolder(data: Dataset): Promise<any> {
 	return new Promise(function (resolve, reject) {
-
 		checkFileExistsCreateFile()
 			.then(() => {
 				fs.readJson(persistFile)
@@ -143,20 +135,48 @@ function addToPersistFolder(data: Dataset): Promise<boolean> {
 						//	in-node-js
 						jsonObj.fileArray.push(data);
 						console.log(jsonObj); // => 0.1.3
-						fs.writeJson(persistFile, jsonObj).then(() => {
-							resolve(true);
-						});
+						fs.writeJson(persistFile, jsonObj)
+							.then(() => {
+								resolve(true);
+							}).catch((err) => {
+								throw new InsightError(err);
+							});
+					}).catch((err) => {
+						throw new InsightError(err);
 					});
 			})
 			.catch((err) => {
 				console.error(err);
-				reject(false);
+				reject(err);
 			});
 	});
 }
 
 
-export {readContent, checkIdAndKind, checkValidSection, checkFileExistsCreateFile, addToPersistFolder};
+function loadDatasetFromPersistence(map: Map<string, Dataset>): boolean {
+
+	if (fs.existsSync(persistFile)) {
+
+		const jsonObj = fs.readJsonSync(persistFile);
+		let arraySize = jsonObj.fileArray.size;
+		// console.log("what");
+		// console.log(arraySize);
+		// console.log(jsonObj.fileArray[0]);
+		// console.log(jsonObj.fileArray[0]);
+
+
+		for (const element of jsonObj.fileArray) {
+			map.set(element.id,element);
+		};
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+export {readContent, checkIdAndKind, checkValidSection, checkFileExistsCreateFile, addToPersistFolder,
+	loadDatasetFromPersistence};
 
 
 // let myDataset: Dataset = {
@@ -165,8 +185,8 @@ export {readContent, checkIdAndKind, checkValidSection, checkFileExistsCreateFil
 // 	numRows: 1,
 // 	datasetArray: [],
 // };
-
-
+//
+// addToPersistFolder(myDataset);
 // let sections = getContentFromArchives("Pair3CoursesOnly.zip");
 // let facade = new InsightFacade();
 // facade.addDataset("fgh",sections,InsightDatasetKind.Sections).then(() =>{

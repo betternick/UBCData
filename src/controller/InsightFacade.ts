@@ -1,14 +1,15 @@
 import {
+	Dataset,
 	IInsightFacade,
 	InsightDataset,
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
 	NotFoundError,
-	Dataset,
 } from "./IInsightFacade";
 
-import {checkIdAndKind, readContent} from "./helperFunctionsAddDataset";
+import {addToPersistFolder, checkIdAndKind, loadDatasetFromPersistence, readContent} from "./helperFunctionsAddDataset";
+import {getContentFromArchives} from "../../test/TestUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -18,9 +19,14 @@ import {checkIdAndKind, readContent} from "./helperFunctionsAddDataset";
 export default class InsightFacade implements IInsightFacade {
 	public static map: Map<string, Dataset>;
 
+	public static persistDir = "./data";
+	public static persistFile = "./data/persistFile.json";
+
 	constructor() {
 		InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
+
+		loadDatasetFromPersistence(InsightFacade.map);
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -54,15 +60,16 @@ export default class InsightFacade implements IInsightFacade {
 
 					// ref: https://linuxhint.com/convert-map-keys-to-array-javascript/
 					keys = [...InsightFacade.map.keys()];
-					resolve(keys);
+					// resolve(keys);
+					// Step 5): diskWrite: write this object to data folder for persistence.
+					addToPersistFolder(myDataset)
+						.then(() => {
+							resolve(keys);
+						});
 				})
 				.catch((err) => {
 					reject(new InsightError(err));
 				});
-			// Step 5): diskWrite: write this object to data folder for persistence.
-			// 		resolve(keys);
-			// 		resolve(keys);
-			// 		console.log(keys);
 		});
 	}
 
@@ -109,3 +116,25 @@ export default class InsightFacade implements IInsightFacade {
 		});
 	}
 }
+
+// let facade = new InsightFacade();
+// let sectionsLightSection = getContentFromArchives("Pair3CoursesOnly.zip");
+// let sections = getContentFromArchives("Pair.zip");
+// facade.addDataset("TWOO",sections,InsightDatasetKind.Sections).then((fg)=>{
+// 	// console.log(fg);
+// 	// console.log(InsightFacade.map);
+// });
+
+
+// let facade = new InsightFacade();
+// let f;
+// facade.listDatasets().then((res)=>{
+// 	f = res;
+// });
+// console.log("hey");
+// console.log(f);
+// let res = loadDatasetFromPersistence(InsightFacade.map);
+// console.log(res);
+
+// console.log(InsightFacade.map);
+
