@@ -34,7 +34,7 @@ export default class InsightFacade implements IInsightFacade {
 				checkIdAndKind(id, kind, InsightFacade.map);
 			} catch (err: any) {
 				reject(new InsightError(err));
-			};
+			}
 
 			// if (!checkIdAndKind(id, kind, InsightFacade.map)) {
 			// 	reject(new InsightError("ID and kind check failed"));
@@ -87,68 +87,60 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
-		return new Promise(
-			(resolve, reject) => {
-				// Step 1) check if the query is a JSON object
-				try {
-					JSON.parse(query as string);
-				} catch (error) {
-					// object not properly formatted
-					reject(new InsightError("Not a valid JSON object"));
-				}
-
-				// Step 2) parse the query
-				let queryParsed = JSON.parse(query as string);
-
-				// Step 3) get the datasetID
-				let datasetID: string;
-				datasetID = this.getDatasetID(queryParsed);
+		return new Promise((resolve, reject) => {
+			// Step 1) check if the query is a JSON object
+			if (typeof query !== "object") {
+				reject(new InsightError("Not a valid JSON object"));
+			} else if (query == null) {
+				reject(new InsightError("query is null?"));
+			} else {
+				let queryParsed = Object.entries(query); // queryParsed has type "Object"
+				let datasetID = this.getDatasetID(query);
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 
-				// Step 4) check if a dataset with datasetID has been added
-				// TODO
-
-
-				// Step 5) perform actions
-				let where = "WHERE", options = "OPTIONS";
-				let results: InsightResult[] = [];
+				// Step 4) check if a dataset with datasetID has been added // TODO
 
 				// catch first level of query (OPTIONS or WHERE)
-				if (Object.prototype.hasOwnProperty.call(queryParsed, where) ||
-					Object.prototype.hasOwnProperty.call(queryParsed, options)) {
-
+				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
+					Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
 					// check that query object has BOTH OPTIONS and WHERE
-					if (Object.prototype.hasOwnProperty.call(queryParsed, where) &&
-						Object.prototype.hasOwnProperty.call(queryParsed, options)) {
-
+					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+						Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
 						let queryObject = new QueryContainer();
 
 						// handleOptions
+						let indexOptions: number = -1;
+						for (let i = 0; i < queryParsed.length; i++) {
+							if (queryParsed[i][0] === "OPTIONS") {
+								indexOptions = i;
+							}
+						}
 						try {
-							queryObject.handleOptions(queryParsed.get(options), datasetID);
+							queryObject.handleOptions(queryParsed[indexOptions][1], datasetID);
 						} catch (error) {
 							reject(error);
 						}
 
 						// handleWhere
+						let indexWhere: number = -1;
+						for (let x = 0; x < queryParsed.length; x++) {
+							if (queryParsed[x][0] === "WHERE") {
+								indexWhere = x;
+							}
+						}
 						try {
-							// LINDA -not sure why, but IntelliJ seems to think InsightFacade.map.get(datasetID) can be type
-							// Dataset or Undefined -> so parameter to handleWhere is datasetToQuery as Dataset to skirt this issue
-							results = queryObject.handleWhere(queryParsed.get(where), datasetID,
-															  datasetToQuery as Dataset);
+							let results = queryObject.handleWhere(queryParsed[indexWhere][1],datasetID,
+								datasetToQuery as Dataset);
+							resolve(results);
 						} catch (error) {
 							reject(error);
 						}
-
-						resolve(results);
-
 					}
-					// At this point, there is a WHERE block, but no OPTIONS block (or vice versa), so reject
 					reject(new InsightError("query missing WHERE or OPTIONS block"));
 				}
-				// At this point, there is no WHERE and no OPTIONS block, so reject
-				reject(new InsightError("query missing WHERE and OPTIONS blocks"));
-			});
+			}
+			reject(new InsightError("query missing WHERE and OPTIONS blocks"));
+		});
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
@@ -173,15 +165,15 @@ export default class InsightFacade implements IInsightFacade {
 	// ------------------  HELPER FUNCTIONS ------------------
 
 	// determines if the ID is valid
-	public datasetIDValid(datasetID: string): boolean{
-		return !(datasetID.includes("_"));
+	public datasetIDValid(datasetID: string): boolean {
+		return !datasetID.includes("_");
 	}
 
 	// finds the first dataset ID from a query
-	public getDatasetID(query: JSON): string{
+	public getDatasetID(query: object): string {
 		const queryString = JSON.stringify(query);
 		const indexUnderscore = queryString.indexOf("_");
-		const indexStartOfID = queryString.lastIndexOf("{", indexUnderscore) + 2;
+		const indexStartOfID = queryString.lastIndexOf('"', indexUnderscore) + 1;
 		let result: string;
 		result = queryString.substring(indexStartOfID, indexUnderscore);
 		return result;
