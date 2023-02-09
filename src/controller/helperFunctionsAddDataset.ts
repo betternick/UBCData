@@ -1,7 +1,14 @@
 import JSZip from "jszip";
 import {getContentFromArchives} from "../../test/TestUtil";
-import {InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {Dataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import InsightFacade from "./InsightFacade";
+
+
+import fs from "fs-extra";
+
+
+const persistDir = "./data";
+const persistFile = "./data/persistFile.json";
 
 // SYED: Checks that ID param observes rules for naming and kind is of type "sections".
 function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): boolean {
@@ -90,4 +97,81 @@ function checkValidSection(element: JSON): boolean {
 	return result;
 }
 
-export {readContent, checkIdAndKind, checkValidSection};
+// let savedDataStructure: {[datasetArray: string]: string[]} = {}; // TypeScript may also ask for the new cast syntax
+// let jsonStringWrite = JSON.stringify(savedDataStructure);
+
+function checkFileExistsCreateFile(): Promise<boolean> {
+	return new Promise(function (resolve, reject) {
+
+		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
+		if (fs.existsSync(persistFile)) {
+			console.log("file already exists");
+			resolve(true);
+		} else {
+			// let savedDataStructure: {[datasetArray: string]: string[]} = {
+			// 	array: ["a", "b"],
+			// }; // TypeScript may also ask for the new cast syntax
+
+			const aPersistFileTemplate = {
+				fileArray: [],
+			};
+
+			// let jsonStringWrite = JSON.stringify(savedDataStructure);
+			fs.writeJson(persistFile, aPersistFileTemplate)
+				.then(() => {
+					console.log("File didn't exist but successfuly created!");
+					resolve(true);
+				})
+				.catch((err) => {
+					console.error(err);
+					reject(false);
+				});
+		}
+	});
+}
+
+
+function addToPersistFolder(data: Dataset): Promise<boolean> {
+
+	return new Promise(function (resolve, reject) {
+
+		checkFileExistsCreateFile()
+			.then(() => {
+				fs.readJson(persistFile)
+					.then((jsonObj) => {
+						//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
+						//	in-node-js
+						jsonObj.fileArray.push(data);
+						console.log(jsonObj); // => 0.1.3
+						fs.writeJson(persistFile, jsonObj).then(() => {
+							resolve(true);
+						});
+					});
+			})
+			.catch((err) => {
+				console.error(err);
+				reject(false);
+			});
+	});
+}
+
+
+export {readContent, checkIdAndKind, checkValidSection, checkFileExistsCreateFile, addToPersistFolder};
+
+
+// let myDataset: Dataset = {
+// 	id: "sampleID",
+// 	kind: InsightDatasetKind.Sections,
+// 	numRows: 1,
+// 	datasetArray: [],
+// };
+
+
+// let sections = getContentFromArchives("Pair3CoursesOnly.zip");
+// let facade = new InsightFacade();
+// facade.addDataset("fgh",sections,InsightDatasetKind.Sections).then(() =>{
+// 	console.log(InsightFacade.map.entries());
+// }
+// );
+
+// saveToFolder(myDataset);

@@ -50,6 +50,8 @@ export default class InsightFacade implements IInsightFacade {
 				.then((length) => {
 					myDataset.numRows = length;
 					InsightFacade.map.set(id, myDataset);
+
+
 					// ref: https://linuxhint.com/convert-map-keys-to-array-javascript/
 					keys = [...InsightFacade.map.keys()];
 					resolve(keys);
