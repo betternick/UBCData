@@ -9,26 +9,28 @@ const persistDir = "./data";
 const persistFile = "./data/persistFile.json";
 
 // SYED: Checks that ID param observes rules for naming and kind is of type "sections".
-function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): boolean {
-	if (map.has(id)) {
-		throw new InsightError("ID already exists");
-		// return false;
-	}
+function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): Promise<any> {
+	return new Promise(function (resolve, reject) {
+		if (map.has(id)) {
+			reject(new InsightError("ID already exists"));
+			// return false;
+		}
 
-	if (id.includes("_")) {
-		throw new InsightError("_ is not allowed");
-		// return false;
-	}
-	// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
-	if (id.replace(/\s+/g, "").length === 0) {
-		throw new InsightError("ID only has whitespace");
-		// return false;
-	}
-	if (kind !== "sections") {
-		throw new InsightError("kind must only be of type sections");
-		// return false;
-	}
-	return true;
+		if (id.includes("_")) {
+			reject(new InsightError("_ is not allowed"));
+			// return false;
+		}
+		// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
+		if (id.replace(/\s+/g, "").length === 0) {
+			reject(new InsightError("ID only has whitespace"));
+			// return false;
+		}
+		if (kind !== "sections") {
+			reject(new InsightError("kind must only be of type sections"));
+			// return false;
+		}
+		resolve(true);
+	});
 }
 
 function readContent(content: any, dataset: JSON[]): Promise<number> {
@@ -95,10 +97,8 @@ function checkValidSection(element: JSON): boolean {
 	return result;
 }
 
-// let savedDataStructure: {[datasetArray: string]: string[]} = {}; // TypeScript may also ask for the new cast syntax
-// let jsonStringWrite = JSON.stringify(savedDataStructure);
-
-function checkFileExistsCreateFile(): Promise<boolean> {
+// Changed checkFile function to be synchronous
+function checkFileExistsElseCreateFile(): Promise<boolean> {
 	return new Promise(function (resolve, reject) {
 		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
 		if (fs.existsSync(persistFile)) {
@@ -108,106 +108,127 @@ function checkFileExistsCreateFile(): Promise<boolean> {
 			const aPersistFileTemplate = {
 				fileArray: [],
 			};
-			fs.outputJson(persistFile, aPersistFileTemplate)
-				.then(() => {
-					console.log("File didn't exist but successfuly created!");
-					resolve(true);
-				})
-				.catch((err) => {
-					console.error(err);
-					reject(false);
-				});
+			fs.outputJsonSync(persistFile, aPersistFileTemplate);
+			console.log("File didn't exist but successfuly created!");
+			resolve(true);
 		}
+		reject("checkFileExists promise rejectedd");
 	});
 }
 
-function addToPersistFolder(data: Dataset): Promise<any> {
+// function checkFileExistsCreateFile(): Promise<boolean> {
+// 	return new Promise(function (resolve, reject) {
+// 		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
+// 		if (fs.existsSync(persistFile)) {
+// 			console.log("file already exists");
+// 			resolve(true);
+// 		} else {
+// 			const aPersistFileTemplate = {
+// 				fileArray: [],
+// 			};
+// 			fs.outputJson(persistFile, aPersistFileTemplate)
+// 				.then(() => {
+// 					console.log("File didn't exist but successfuly created!");
+// 					resolve(true);
+// 				})
+// 				.catch((err) => {
+// 					console.error(err);
+// 					reject(false);
+// 				});
+// 		}
+// 	});
+// }
+
+// This is an Asynchronous function
+function addToPersistFolder(data: Dataset, keys: string[]): Promise<any> {
 	return new Promise(function (resolve, reject) {
-		checkFileExistsCreateFile()
+		checkFileExistsElseCreateFile()
 			.then(() => {
-				fs.readJson(persistFile)
-					.then((jsonObj) => {
-						//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
-						//	in-node-js
-						jsonObj.fileArray.push(data);
-						console.log(jsonObj); // => 0.1.3
-						fs.writeJson(persistFile, jsonObj)
-							.then(() => {
-								resolve(true);
-							})
-							.catch((err) => {
-								throw new InsightError(err);
-							});
-					})
-					.catch((err) => {
-						throw new InsightError(err);
-					});
+				return fs.readJson(persistFile);
 			})
+			// .then()
+			// fs.readJson(persistFile)
+			.then((jsonObj) => {
+				//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
+				//	in-node-js
+				// Note to self: trash code. made it as an extra check to ensure ID doesn't already exist. The following
+				// caused the second dataset test to fail in weird ways when run as a suite. I don't know why. Error
+				// happened to go away when I implemented sync checkFileExistsElseCreateFile. code doesn't run right
+				// anyway. Leaving it here as an example of local test failure for debugging in case a similar issue
+				// crops up on autotest.
+				// if (jsonObj.fileArray.size > 0) {
+				// 	console.log(jsonObj.fileArray.size);
+				// 	console.log("whaaat");
+				// 	for (const element of jsonObj.fileArray) {
+				// 		if (element.id === data.id) {
+				// 			console.log("yooooo");
+				// 			throw new InsightError("Tried to write dataset to file that already exists");
+				// 		}
+				// 	}
+				// }
+				jsonObj.fileArray.push(data);
+				console.log(jsonObj);
+				console.log("Testing addTopersistfolder func");
+				return fs.writeJson(persistFile, jsonObj);
+			})
+			.then(() => {
+				resolve(keys);
+			})
+			// .catch((err) => {
+			// 	throw new InsightError(err + "could not write data back to JSON disk file");
+			// });
+
 			.catch((err) => {
-				console.error(err);
-				reject(err);
+				reject(new InsightError(err + "could not read json file from disk"));
 			});
+		// })
+		// .catch((err) => {
+		// 	console.error(err);
+		// 	reject(new InsightError(err + "read/write from persistence folder failed"));
+		// });
 	});
 }
 
-function loadDatasetFromPersistence(map: Map<string, Dataset>): boolean {
-	if (fs.existsSync(persistFile)) {
-		const jsonObj = fs.readJsonSync(persistFile);
+// This is a synchronous function
+function loadDatasetFromPersistence(map: Map<string, Dataset>): Promise<boolean> {
+	return new Promise(function (resolve, reject) {
+		if (fs.existsSync(persistFile)) {
+			console.log("Upon new facade: file does exist");
+			const jsonObj = fs.readJsonSync(persistFile);
 
-		for (const element of jsonObj.fileArray) {
-			map.set(element.id, element);
+			for (const element of jsonObj.fileArray) {
+				map.set(element.id, element);
+			}
+			resolve(true);
+		} else {
+			console.log("Upon new facade: no file existed");
+			resolve(false);
 		}
-		return true;
-	} else {
-		return false;
-	}
+		reject("loadDatasetfrompersistence file exists didn't work");
+	});
 }
 
+// This is a synchronous function
 function deleteDatasetFromPersistence(id: string): boolean {
 	if (!fs.existsSync(persistFile)) {
 		return false;
 	}
-
 	try {
 		const jsonObj = fs.readJsonSync(persistFile);
 		let indexOfElement: number = -1;
-		// let flag = 0;
-		// console.log("working 1");
 		for (const element of jsonObj.fileArray) {
 			if (element.id === id) {
-				//
-				// console.log(indexOfElement);
 				indexOfElement = jsonObj.fileArray.indexOf(element);
-				// console.log(indexOfElement);
-
 				break;
-
-				// jsonObj.fileArray.remove(indexOfElement);
-				// console.log("working 4");
-				// flag = 1;
-
-				// console.log("working 5");
 			}
 		}
-
 		if (indexOfElement !== -1) {
-			// console.log("working 6");
-			// console.log(jsonObj.fileArray[1]);
 			jsonObj.fileArray.splice(indexOfElement, 1);
-
 			fs.writeJSONSync(persistFile, jsonObj);
-			// console.log("working 7");
-			// console.log(jsonObj.fileArray);
 			return true;
 		}
-
 		return false;
-		// if (flag === 1){
-		//
-		// }
-		// return true;
 	} catch (err) {
-		// return false;
 		throw new InsightError("Could not sync-read data file for delete");
 	}
 }
@@ -216,7 +237,7 @@ export {
 	readContent,
 	checkIdAndKind,
 	checkValidSection,
-	checkFileExistsCreateFile,
+	checkFileExistsElseCreateFile,
 	addToPersistFolder,
 	loadDatasetFromPersistence,
 	deleteDatasetFromPersistence,

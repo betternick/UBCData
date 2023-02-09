@@ -15,7 +15,8 @@ import {
 	loadDatasetFromPersistence,
 	readContent,
 } from "./helperFunctionsAddDataset";
-import {getContentFromArchives} from "../../test/TestUtil";
+import {clearDisk, getContentFromArchives} from "../../test/TestUtil";
+import {expect} from "chai";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -31,19 +32,19 @@ export default class InsightFacade implements IInsightFacade {
 	constructor() {
 		InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
-		loadDatasetFromPersistence(InsightFacade.map);
+		loadDatasetFromPersistence(InsightFacade.map)
+			.then((p) => {
+				console.log("datasets loaded upon new facade object" + p);
+			})
+			.catch(() => {
+				throw new InsightError("wasn't able to load/make file upon new facade object");
+			});
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		return new Promise(function (resolve, reject) {
 			let keys: string[];
 			let throwFlag = 0;
-
-			try {
-				checkIdAndKind(id, kind, InsightFacade.map);
-			} catch (err: any) {
-				reject(new InsightError(err));
-			}
 
 			let myDataset: Dataset = {
 				id: id,
@@ -52,7 +53,11 @@ export default class InsightFacade implements IInsightFacade {
 				datasetArray: [],
 			};
 
-			readContent(content, myDataset.datasetArray)
+			checkIdAndKind(id, kind, InsightFacade.map)
+				.then(() => {
+					return readContent(content, myDataset.datasetArray);
+				})
+
 				.then((length) => {
 					myDataset.numRows = length;
 					InsightFacade.map.set(id, myDataset);
@@ -61,9 +66,10 @@ export default class InsightFacade implements IInsightFacade {
 					keys = [...InsightFacade.map.keys()];
 					// resolve(keys);
 					// Step 5): diskWrite: write this object to data folder for persistence.
-					addToPersistFolder(myDataset).then(() => {
-						resolve(keys);
-					});
+					return addToPersistFolder(myDataset, keys);
+				})
+				.then((keysParam) => {
+					resolve(keysParam);
 				})
 				.catch((err) => {
 					reject(new InsightError(err));
@@ -125,29 +131,41 @@ export default class InsightFacade implements IInsightFacade {
 	}
 }
 
+// SYED: I use the following to test and debug code. will remove at the end.
+//
 // let facade = new InsightFacade();
 // let sectionsLightSection = getContentFromArchives("Pair3CoursesOnly.zip");
+// let sectionsSingle = getContentFromArchives("singleCourse.zip");
+
 // let sections = getContentFromArchives("Pair.zip");
-// facade.addDataset("Heavy sections",sections,InsightDatasetKind.Sections).then((fg)=>{
+// facade.addDataset("Heavy sections 2",sections,InsightDatasetKind.Sections).then((fg)=>{
 // 	// console.log(fg);
 // 	console.log(InsightFacade.map);
 // });
 
 // console.log(InsightFacade.map);
 
-// facade.addDataset("Light sections",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
+// console.log(InsightFacade.map);
+//
+// facade.addDataset("Light sections THREE",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
+// 	console.log(fg);
+// 	// console.log(InsightFacade.map);
+// });
+
+// facade.addDataset("Light sections ONE",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
 // 	console.log(fg);
 // 	// console.log(InsightFacade.map);
 // });
 // //
+// console.log(InsightFacade.map);
 // facade.removeDataset("Heavy sections").then(() => {
 // 	console.log(InsightFacade.map);
 // });
 
 // console.log(InsightFacade.map);
 //
-// facade.removeDataset("Light sections").then(() => {
-// 	facade.removeDataset("Heavy sections").then(() => {
+// facade.removeDataset("Light sections TWO").then(() => {
+// 	facade.removeDataset("Light sections ONE").then(() => {
 // 		console.log(InsightFacade.map);
 // 	});
 // });
@@ -174,3 +192,14 @@ export default class InsightFacade implements IInsightFacade {
 // 	console.log(InsightFacade.map);
 // }
 // );
+
+// async function test333() {
+// 	let facade = new InsightFacade();
+// 	const result = await facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Sections);
+// 	expect(result.length).to.equals(1);
+// 	expect(result[0]).to.equals("qwerty");
+// 	const len2 = await facade.listDatasets();
+// 	expect(len2.length).to.equals(1);
+// };
+//
+// test333();
