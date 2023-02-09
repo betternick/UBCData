@@ -18,37 +18,36 @@ use(chaiAsPromised);
 // describe("InsightFacade", function () {
 let facade: IInsightFacade;
 
-	// Declare datasets used in tests. You should add more datasets like this!
+// Declare datasets used in tests. You should add more datasets like this!
 let sections: string;
-	// SYED: Additional sections added for testing
+// SYED: Additional sections added for testing
 let sectionsTextFile: string;
 let sectionsEmptyFile: string;
 let sectionsInvalidSection: string;
-	// SYED: The following section only has the first 15 courses from pair
+// SYED: The following section only has the first 15 courses from pair
 let sectionsLightSection: string;
 let flag: number;
 
-
 before(function () {
-		// This block runs once and loads the datasets.
+	// This block runs once and loads the datasets.
 	flag = 0;
 	sections = getContentFromArchives("pair.zip");
-		// SYED: Instantiating sections
+	// SYED: Instantiating sections
 	// sectionsTextFile = getContentFromArchives("textFile.rtf");
 	sectionsEmptyFile = getContentFromArchives("pairEmpty.zip");
 	sectionsInvalidSection = getContentFromArchives("pairInvalidSection.zip");
 	sectionsLightSection = getContentFromArchives("pairLight.zip");
-		// Just in case there is anything hanging around from a previous run of the test suite
+	// Just in case there is anything hanging around from a previous run of the test suite
 	clearDisk();
 });
 
-	// describe("Add/Remove/List Dataset", function () {
-	// 	before(function () {
-	// 		console.info(`Before: ${this.test?.parent?.title}`);
-	// 	});
+// describe("Add/Remove/List Dataset", function () {
+// 	before(function () {
+// 		console.info(`Before: ${this.test?.parent?.title}`);
+// 	});
 
 beforeEach(function () {
-			// SYED: adding the below to see if maybe fixes cause for flaky tests
+	// SYED: adding the below to see if maybe fixes cause for flaky tests
 	if (flag === 0) {
 		clearDisk();
 		// This section resets the insightFacade instance
@@ -63,15 +62,15 @@ after(function () {
 });
 
 afterEach(function () {
-			// This section resets the data directory (removing any cached data)
-			// This runs after each test, which should make each test independent of the previous one
+	// This section resets the data directory (removing any cached data)
+	// This runs after each test, which should make each test independent of the previous one
 	if (flag === 0) {
 		console.info(`AfterTest: ${this.currentTest?.title}`);
 		clearDisk();
 	}
 });
 
-		// describe("addDataset tests", function () {
+// describe("addDataset tests", function () {
 // describe("addDataset_ID_errors", function () {
 // 	it("should reject with an empty dataset id", function () {
 // 		const result = facade.addDataset("", sectionsLightSection, InsightDatasetKind.Sections);
@@ -234,25 +233,25 @@ afterEach(function () {
 // 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 // 	 */
 
-	type PQErrorKind = "ResultTooLargeError" | "InsightError";
+type PQErrorKind = "ResultTooLargeError" | "InsightError";
 describe("PerformQuery Dynamic Folder Test Suite", function () {
 	before(function () {
 		flag = 1;
-			// SYED: added the below to see if fixes flakiness
+		// SYED: added the below to see if fixes flakiness
 		clearDisk();
 		console.info(`Before: ${this.test?.parent?.title}`);
 		facade = new InsightFacade();
-			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
-			// Will *fail* if there is a problem reading ANY dataset.
-			// const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
-			// return Promise.all(loadDatasetPromises);
+		// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
+		// Will *fail* if there is a problem reading ANY dataset.
+		// const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
+		// return Promise.all(loadDatasetPromises);
 		facade.addDataset("sections", sections, InsightDatasetKind.Sections);
 	});
 	after(function () {
 		// console.info(`After: ${this.test?.parent?.title}`);
 		clearDisk();
 	});
-		// SYED: Folder test for ORDERED queries
+	// SYED: Folder test for ORDERED queries
 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 		"Dynamic InsightFacade PerformQuery tests",
 		(input) => facade.performQuery(input),
@@ -264,7 +263,7 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 			errorValidator: (error): error is PQErrorKind =>
 				error === "ResultTooLargeError" || error === "InsightError",
 			assertOnError: (actual, expected) => {
-					// SYED: Assertion to check if actual error is of the expected type
+				// SYED: Assertion to check if actual error is of the expected type
 				if (expected === "InsightError") {
 					expect(actual).to.be.an.instanceOf(InsightError);
 				} else {
@@ -273,20 +272,20 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 			},
 		}
 	);
-		// SYED: Folder test for UNORDERED queries
+	// SYED: Folder test for UNORDERED queries
 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 		"Dynamic InsightFacade PerformQuery tests",
 		(input) => facade.performQuery(input),
 		"./test/resources/unorderedQueries",
 		{
 			assertOnResult: (actual, expected: any) => {
-					// SYED: Assertion to check equality
+				// SYED: Assertion to check equality
 				expect(actual).to.have.deep.members(expected);
 			},
 			errorValidator: (error): error is PQErrorKind =>
 				error === "ResultTooLargeError" || error === "InsightError",
 			assertOnError: (actual, expected) => {
-					// SYED: Assertion to check if actual error is of the expected type
+				// SYED: Assertion to check if actual error is of the expected type
 				if (expected === "InsightError") {
 					expect(actual).to.be.an.instanceOf(InsightError);
 				} else {
