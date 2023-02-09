@@ -8,7 +8,13 @@ import {
 	NotFoundError,
 } from "./IInsightFacade";
 
-import {addToPersistFolder, checkIdAndKind, loadDatasetFromPersistence, readContent} from "./helperFunctionsAddDataset";
+import {
+	addToPersistFolder,
+	checkIdAndKind,
+	deleteDatasetFromPersistence,
+	loadDatasetFromPersistence,
+	readContent,
+} from "./helperFunctionsAddDataset";
 import {getContentFromArchives} from "../../test/TestUtil";
 
 /**
@@ -25,7 +31,6 @@ export default class InsightFacade implements IInsightFacade {
 	constructor() {
 		InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
-
 		loadDatasetFromPersistence(InsightFacade.map);
 	}
 
@@ -38,11 +43,7 @@ export default class InsightFacade implements IInsightFacade {
 				checkIdAndKind(id, kind, InsightFacade.map);
 			} catch (err: any) {
 				reject(new InsightError(err));
-			};
-
-			// if (!checkIdAndKind(id, kind, InsightFacade.map)) {
-			// 	reject(new InsightError("ID and kind check failed"));
-			// }
+			}
 
 			let myDataset: Dataset = {
 				id: id,
@@ -51,21 +52,18 @@ export default class InsightFacade implements IInsightFacade {
 				datasetArray: [],
 			};
 
-			// let arrray: any = [];
 			readContent(content, myDataset.datasetArray)
 				.then((length) => {
 					myDataset.numRows = length;
 					InsightFacade.map.set(id, myDataset);
 
-
 					// ref: https://linuxhint.com/convert-map-keys-to-array-javascript/
 					keys = [...InsightFacade.map.keys()];
 					// resolve(keys);
 					// Step 5): diskWrite: write this object to data folder for persistence.
-					addToPersistFolder(myDataset)
-						.then(() => {
-							resolve(keys);
-						});
+					addToPersistFolder(myDataset).then(() => {
+						resolve(keys);
+					});
 				})
 				.catch((err) => {
 					reject(new InsightError(err));
@@ -88,8 +86,12 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			InsightFacade.map.delete(id);
-			resolve(id);
-			// return Promise.reject("Not implemented.");
+
+			if (deleteDatasetFromPersistence(id)) {
+				resolve(id);
+			} else {
+				reject(new InsightError("Could not delete dataset from data diretory"));
+			}
 		});
 	}
 
@@ -120,11 +122,20 @@ export default class InsightFacade implements IInsightFacade {
 // let facade = new InsightFacade();
 // let sectionsLightSection = getContentFromArchives("Pair3CoursesOnly.zip");
 // let sections = getContentFromArchives("Pair.zip");
-// facade.addDataset("TWOO",sections,InsightDatasetKind.Sections).then((fg)=>{
+// facade.addDataset("Heavy sections",sections,InsightDatasetKind.Sections).then((fg)=>{
 // 	// console.log(fg);
-// 	// console.log(InsightFacade.map);
+// 	console.log(InsightFacade.map);
 // });
 
+// facade.addDataset("Light sections",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
+// 	console.log(fg);
+// 	// console.log(InsightFacade.map);
+// });
+// //
+// facade.removeDataset("Heavy sections").then(() => {
+// 	console.log(InsightFacade.map);
+// }
+// );
 
 // let facade = new InsightFacade();
 // let f;
@@ -136,5 +147,10 @@ export default class InsightFacade implements IInsightFacade {
 // let res = loadDatasetFromPersistence(InsightFacade.map);
 // console.log(res);
 
+// let facade = new InsightFacade();
 // console.log(InsightFacade.map);
-
+//
+// facade.removeDataset("TWOO").then(() => {
+// 	console.log(InsightFacade.map);
+// }
+// );

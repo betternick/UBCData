@@ -3,9 +3,7 @@ import {getContentFromArchives} from "../../test/TestUtil";
 import {Dataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import InsightFacade from "./InsightFacade";
 
-
 import fs from "fs-extra";
-
 
 const persistDir = "./data";
 const persistFile = "./data/persistFile.json";
@@ -102,7 +100,6 @@ function checkValidSection(element: JSON): boolean {
 
 function checkFileExistsCreateFile(): Promise<boolean> {
 	return new Promise(function (resolve, reject) {
-
 		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
 		if (fs.existsSync(persistFile)) {
 			console.log("file already exists");
@@ -124,7 +121,6 @@ function checkFileExistsCreateFile(): Promise<boolean> {
 	});
 }
 
-
 function addToPersistFolder(data: Dataset): Promise<any> {
 	return new Promise(function (resolve, reject) {
 		checkFileExistsCreateFile()
@@ -138,10 +134,12 @@ function addToPersistFolder(data: Dataset): Promise<any> {
 						fs.writeJson(persistFile, jsonObj)
 							.then(() => {
 								resolve(true);
-							}).catch((err) => {
+							})
+							.catch((err) => {
 								throw new InsightError(err);
 							});
-					}).catch((err) => {
+					})
+					.catch((err) => {
 						throw new InsightError(err);
 					});
 			})
@@ -152,32 +150,51 @@ function addToPersistFolder(data: Dataset): Promise<any> {
 	});
 }
 
-
 function loadDatasetFromPersistence(map: Map<string, Dataset>): boolean {
-
 	if (fs.existsSync(persistFile)) {
-
 		const jsonObj = fs.readJsonSync(persistFile);
-		let arraySize = jsonObj.fileArray.size;
-		// console.log("what");
-		// console.log(arraySize);
-		// console.log(jsonObj.fileArray[0]);
-		// console.log(jsonObj.fileArray[0]);
-
 
 		for (const element of jsonObj.fileArray) {
-			map.set(element.id,element);
-		};
+			map.set(element.id, element);
+		}
 		return true;
 	} else {
 		return false;
 	}
 }
 
+function deleteDatasetFromPersistence(id: string): boolean {
+	if (fs.existsSync(persistFile)) {
+		const jsonObj = fs.readJsonSync(persistFile);
 
-export {readContent, checkIdAndKind, checkValidSection, checkFileExistsCreateFile, addToPersistFolder,
-	loadDatasetFromPersistence};
+		let indexOfElement;
+		let flag = 0;
+		for (const element of jsonObj.fileArray) {
+			if (element.id === id) {
+				indexOfElement = jsonObj.fileArray.indexOf(element);
+				flag = 1;
+				break;
+			}
+		}
 
+		if (flag === 1) {
+			jsonObj.fileArray.pop(indexOfElement);
+		}
+		return true;
+	} else {
+		return false;
+	}
+}
+
+export {
+	readContent,
+	checkIdAndKind,
+	checkValidSection,
+	checkFileExistsCreateFile,
+	addToPersistFolder,
+	loadDatasetFromPersistence,
+	deleteDatasetFromPersistence,
+};
 
 // let myDataset: Dataset = {
 // 	id: "sampleID",
