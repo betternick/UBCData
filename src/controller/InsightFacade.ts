@@ -87,10 +87,16 @@ export default class InsightFacade implements IInsightFacade {
 
 			InsightFacade.map.delete(id);
 
-			if (deleteDatasetFromPersistence(id)) {
-				resolve(id);
-			} else {
-				reject(new InsightError("Could not delete dataset from data diretory"));
+			let deleted: boolean;
+			try {
+				deleted = deleteDatasetFromPersistence(id);
+				if (deleted === true) {
+					resolve(id);
+				} else {
+					reject(new NotFoundError("Tried to delete Dataset from disk but not found"));
+				}
+			} catch (err) {
+				reject(new InsightError("Synchronous read/write failed: could not delete dataset"));
 			}
 		});
 	}
@@ -127,6 +133,8 @@ export default class InsightFacade implements IInsightFacade {
 // 	console.log(InsightFacade.map);
 // });
 
+// console.log(InsightFacade.map);
+
 // facade.addDataset("Light sections",sectionsLightSection,InsightDatasetKind.Sections).then((fg)=>{
 // 	console.log(fg);
 // 	// console.log(InsightFacade.map);
@@ -134,7 +142,19 @@ export default class InsightFacade implements IInsightFacade {
 // //
 // facade.removeDataset("Heavy sections").then(() => {
 // 	console.log(InsightFacade.map);
-// }
+// });
+
+// console.log(InsightFacade.map);
+//
+// facade.removeDataset("Light sections").then(() => {
+// 	facade.removeDataset("Heavy sections").then(() => {
+// 		console.log(InsightFacade.map);
+// 	});
+// });
+
+// deleteDatasetFromPersistence("Heavy sections");
+// deleteDatasetFromPersistence("Light sections");
+
 // );
 
 // let facade = new InsightFacade();

@@ -164,25 +164,51 @@ function loadDatasetFromPersistence(map: Map<string, Dataset>): boolean {
 }
 
 function deleteDatasetFromPersistence(id: string): boolean {
-	if (fs.existsSync(persistFile)) {
-		const jsonObj = fs.readJsonSync(persistFile);
+	if (!fs.existsSync(persistFile)) {
+		return false;
+	}
 
-		let indexOfElement;
-		let flag = 0;
+	try {
+		const jsonObj = fs.readJsonSync(persistFile);
+		let indexOfElement: number = -1;
+		// let flag = 0;
+		// console.log("working 1");
 		for (const element of jsonObj.fileArray) {
 			if (element.id === id) {
+				//
+				// console.log(indexOfElement);
 				indexOfElement = jsonObj.fileArray.indexOf(element);
-				flag = 1;
+				// console.log(indexOfElement);
+
 				break;
+
+				// jsonObj.fileArray.remove(indexOfElement);
+				// console.log("working 4");
+				// flag = 1;
+
+				// console.log("working 5");
 			}
 		}
 
-		if (flag === 1) {
-			jsonObj.fileArray.pop(indexOfElement);
+		if (indexOfElement !== -1) {
+			// console.log("working 6");
+			// console.log(jsonObj.fileArray[1]);
+			jsonObj.fileArray.splice(indexOfElement, 1);
+
+			fs.writeJSONSync(persistFile, jsonObj);
+			// console.log("working 7");
+			// console.log(jsonObj.fileArray);
+			return true;
 		}
-		return true;
-	} else {
+
 		return false;
+		// if (flag === 1){
+		//
+		// }
+		// return true;
+	} catch (err) {
+		// return false;
+		throw new InsightError("Could not sync-read data file for delete");
 	}
 }
 
