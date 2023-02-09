@@ -8,6 +8,8 @@ import {
 	NotFoundError,
 } from "./IInsightFacade";
 
+import {QueryContainer} from "../model/QueryContainer";
+
 import {
 	addToPersistFolder,
 	checkIdAndKind,
@@ -108,7 +110,60 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject("Not implemented.");
+		return new Promise((resolve, reject) => {
+			// Step 1) check if the query is a JSON object
+			if (typeof query !== "object") {
+				reject(new InsightError("Not a valid JSON object"));
+			} else if (query == null) {
+				reject(new InsightError("query is null?"));
+			} else {
+				let queryParsed = Object.entries(query); // queryParsed has type "Object"
+				let datasetID = this.getDatasetID(query);
+				let datasetToQuery = InsightFacade.map.get(datasetID);
+
+				// Step 4) check if a dataset with datasetID has been added // TODO
+
+				// catch first level of query (OPTIONS or WHERE)
+				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
+					Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
+					// check that query object has BOTH OPTIONS and WHERE
+					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+						Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
+						let queryObject = new QueryContainer();
+
+						// handleOptions
+						let indexOptions: number = -1;
+						for (let i = 0; i < queryParsed.length; i++) {
+							if (queryParsed[i][0] === "OPTIONS") {
+								indexOptions = i;
+							}
+						}
+						try {
+							queryObject.handleOptions(queryParsed[indexOptions][1], datasetID);
+						} catch (error) {
+							reject(error);
+						}
+
+						// handleWhere
+						let indexWhere: number = -1;
+						for (let x = 0; x < queryParsed.length; x++) {
+							if (queryParsed[x][0] === "WHERE") {
+								indexWhere = x;
+							}
+						}
+						try {
+							let results = queryObject.handleWhere(queryParsed[indexWhere][1],datasetID,
+								datasetToQuery as Dataset);
+							resolve(results);
+						} catch (error) {
+							reject(error);
+						}
+					}
+					reject(new InsightError("query missing WHERE or OPTIONS block"));
+				}
+			}
+			reject(new InsightError("query missing WHERE and OPTIONS blocks"));
+		});
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
@@ -128,6 +183,23 @@ export default class InsightFacade implements IInsightFacade {
 			});
 			resolve(array);
 		});
+	}
+
+	// ------------------  HELPER FUNCTIONS ------------------
+
+	// determines if the ID is valid
+	public datasetIDValid(datasetID: string): boolean {
+		return !datasetID.includes("_");
+	}
+
+	// finds the first dataset ID from a query
+	public getDatasetID(query: object): string {
+		const queryString = JSON.stringify(query);
+		const indexUnderscore = queryString.indexOf("_");
+		const indexStartOfID = queryString.lastIndexOf('"', indexUnderscore) + 1;
+		let result: string;
+		result = queryString.substring(indexStartOfID, indexUnderscore);
+		return result;
 	}
 }
 
