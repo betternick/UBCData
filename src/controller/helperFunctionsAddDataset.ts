@@ -1,7 +1,5 @@
 import JSZip from "jszip";
-import {getContentFromArchives} from "../../test/TestUtil";
 import {Dataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
-import InsightFacade from "./InsightFacade";
 
 import fs from "fs-extra";
 
@@ -98,25 +96,7 @@ function checkValidSection(element: JSON): boolean {
 }
 
 // Changed checkFile function to be synchronous
-function checkFileExistsElseCreateFile(): Promise<boolean> {
-	return new Promise(function (resolve, reject) {
-		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
-		if (fs.existsSync(persistFile)) {
-			console.log("file already exists");
-			resolve(true);
-		} else {
-			const aPersistFileTemplate = {
-				fileArray: [],
-			};
-			fs.outputJsonSync(persistFile, aPersistFileTemplate);
-			console.log("File didn't exist but successfuly created!");
-			resolve(true);
-		}
-		reject("checkFileExists promise rejectedd");
-	});
-}
-
-// function checkFileExistsCreateFile(): Promise<boolean> {
+// function checkFileExistsElseCreateFile(): Promise<boolean> {
 // 	return new Promise(function (resolve, reject) {
 // 		// ref: https://www.c-sharpcorner.com/article/how-to-check-if-a-file-exists-in-nodejs/
 // 		if (fs.existsSync(persistFile)) {
@@ -126,122 +106,173 @@ function checkFileExistsElseCreateFile(): Promise<boolean> {
 // 			const aPersistFileTemplate = {
 // 				fileArray: [],
 // 			};
-// 			fs.outputJson(persistFile, aPersistFileTemplate)
-// 				.then(() => {
-// 					console.log("File didn't exist but successfuly created!");
-// 					resolve(true);
-// 				})
-// 				.catch((err) => {
-// 					console.error(err);
-// 					reject(false);
-// 				});
+// 			fs.outputJsonSync(persistFile, aPersistFileTemplate);
+// 			console.log("File didn't exist but successfuly created!");
+// 			resolve(true);
 // 		}
+// 		reject("checkFileExists promise rejectedd");
 // 	});
 // }
+// ASYNC
+// function readDirectory(path: any, map: Map<string, Dataset>): Promise<any> {
+// 	// ref: https://www.geeksforgeeks.org/node-js-fs-promise-readdir-method/
+// 	return new Promise(function (resolve, reject) {
+// 		fs.ensureDir(path)
+// 			.then(() => {
+// 				return fs.promises.readdir(path);
+// 			})
+// 			.then((filenames) => {
+// 				for (let filename of filenames) {
+// 					console.log(filename);
+// 					const jsonObj = fs.readJsonSync(`${persistDir}/${filename}`);
+// 					map.set(jsonObj.fileArray[0].id, jsonObj.fileArray[0]);
+// 				}
+// 				resolve("directory read");
+// 			})
+// 			.catch((err) => {
+// 				console.log(err);
+// 				reject(new InsightError(err));
+// 			});
+// 	});
+// }
+// SYNC
+function readDirectory(path: any, map: Map<string, Dataset>) {
+	// ref: https://www.geeksforgeeks.org/node-js-fs-promise-readdir-method/
+	fs.ensureDirSync(path);
+	let filenames = fs.readdirSync(path);
+	for (let filename of filenames) {
+		console.log(filename);
+		const jsonObj = fs.readJsonSync(`${persistDir}/${filename}`);
+		map.set(jsonObj.fileArray[0].id, jsonObj.fileArray[0]);
+	}
+}
 
 // This is an Asynchronous function
 function addToPersistFolder(data: Dataset, keys: string[]): Promise<any> {
 	return new Promise(function (resolve, reject) {
-		checkFileExistsElseCreateFile()
+		const aPersistFileTemplate = {
+			fileArray: [],
+		};
+		fs.outputJson(`${persistDir}/${data.id}.json`, aPersistFileTemplate)
 			.then(() => {
-				return fs.readJson(persistFile);
+				console.log("File has been successfuly created!");
+				return fs.readJson(`${persistDir}/${data.id}.json`);
 			})
-			// .then()
-			// fs.readJson(persistFile)
 			.then((jsonObj) => {
 				//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
 				//	in-node-js
-				// Note to self: trash code. made it as an extra check to ensure ID doesn't already exist. The following
-				// caused the second dataset test to fail in weird ways when run as a suite. I don't know why. Error
-				// happened to go away when I implemented sync checkFileExistsElseCreateFile. code doesn't run right
-				// anyway. Leaving it here as an example of local test failure for debugging in case a similar issue
-				// crops up on autotest.
-				// if (jsonObj.fileArray.size > 0) {
-				// 	console.log(jsonObj.fileArray.size);
-				// 	console.log("whaaat");
-				// 	for (const element of jsonObj.fileArray) {
-				// 		if (element.id === data.id) {
-				// 			console.log("yooooo");
-				// 			throw new InsightError("Tried to write dataset to file that already exists");
-				// 		}
-				// 	}
-				// }
 				jsonObj.fileArray.push(data);
-				console.log(jsonObj);
-				console.log("Testing addTopersistfolder func");
-				return fs.writeJson(persistFile, jsonObj);
+				return fs.writeJson(`${persistDir}/${data.id}.json`, jsonObj);
 			})
 			.then(() => {
 				resolve(keys);
 			})
-			// .catch((err) => {
-			// 	throw new InsightError(err + "could not write data back to JSON disk file");
-			// });
-
 			.catch((err) => {
 				reject(new InsightError(err + "could not read json file from disk"));
 			});
-		// })
-		// .catch((err) => {
-		// 	console.error(err);
-		// 	reject(new InsightError(err + "read/write from persistence folder failed"));
-		// });
 	});
 }
 
+// 		checkFileExistsElseCreateFile()
+// 			.then(() => {
+// 				return fs.readJson(persistFile);
+// 			})
+// 			.then((jsonObj) => {
+// 				//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
+// 				//	in-node-js
+// 				jsonObj.fileArray.push(data);
+// 				console.log(jsonObj);
+// 				console.log("Testing addTopersistfolder func");
+// 				return fs.writeJson(persistFile, jsonObj);
+// 			})
+// 			.then(() => {
+// 				resolve(keys);
+// 			})
+// 			.catch((err) => {
+// 				reject(new InsightError(err + "could not read json file from disk"));
+// 			});
+// 	});
+// }
+
 // This is a synchronous function
-function loadDatasetFromPersistence(map: Map<string, Dataset>): Promise<boolean> {
+// function loadDatasetFromPersistence(map: Map<string, Dataset>): Promise<boolean> {
+// 	return new Promise(function (resolve, reject) {
+// 		if (fs.existsSync(persistFile)) {
+// 			console.log("Upon new facade: file does exist");
+// 			const jsonObj = fs.readJsonSync(persistFile);
+//
+// 			for (const element of jsonObj.fileArray) {
+// 				map.set(element.id, element);
+// 			}
+// 			resolve(true);
+// 		} else {
+// 			console.log("Upon new facade: no file existed");
+// 			resolve(false);
+// 		}
+// 		reject("loadDatasetfrompersistence file exists didn't work");
+// 	});
+// }
+
+// This is a synchronous function
+// function deleteDatasetFromPersistence(id: string): boolean {
+// 	if (!fs.existsSync(persistFile)) {
+// 		return false;
+// 	}
+// 	try {
+// 		const jsonObj = fs.readJsonSync(persistFile);
+// 		let indexOfElement: number = -1;
+// 		for (const element of jsonObj.fileArray) {
+// 			if (element.id === id) {
+// 				indexOfElement = jsonObj.fileArray.indexOf(element);
+// 				break;
+// 			}
+// 		}
+// 		if (indexOfElement !== -1) {
+// 			jsonObj.fileArray.splice(indexOfElement, 1);
+// 			fs.writeJSONSync(persistFile, jsonObj);
+// 			return true;
+// 		}
+// 		return false;
+// 	} catch (err) {
+// 		throw new InsightError("Could not sync-read data file for delete");
+// 	}
+// }
+
+function deleteDatasetFromPersistence(path: any, id: string): Promise<any> {
 	return new Promise(function (resolve, reject) {
-		if (fs.existsSync(persistFile)) {
-			console.log("Upon new facade: file does exist");
-			const jsonObj = fs.readJsonSync(persistFile);
-
-			for (const element of jsonObj.fileArray) {
-				map.set(element.id, element);
-			}
-			resolve(true);
-		} else {
-			console.log("Upon new facade: no file existed");
-			resolve(false);
-		}
-		reject("loadDatasetfrompersistence file exists didn't work");
+		fs.ensureDir(path)
+			.then(() => {
+				return fs.promises.readdir(path);
+			})
+			.then((filenames) => {
+				for (let filename of filenames) {
+					console.log(filename);
+					if (`${filename}` === `${id}.json`) {
+						fs.removeSync(`${persistDir}/${filename}`);
+						break;
+					}
+				}
+				resolve("file deleted");
+			})
+			.catch((err) => {
+				console.log(err);
+				reject(new InsightError("file removal no worky" + err));
+			});
 	});
-}
-
-// This is a synchronous function
-function deleteDatasetFromPersistence(id: string): boolean {
-	if (!fs.existsSync(persistFile)) {
-		return false;
-	}
-	try {
-		const jsonObj = fs.readJsonSync(persistFile);
-		let indexOfElement: number = -1;
-		for (const element of jsonObj.fileArray) {
-			if (element.id === id) {
-				indexOfElement = jsonObj.fileArray.indexOf(element);
-				break;
-			}
-		}
-		if (indexOfElement !== -1) {
-			jsonObj.fileArray.splice(indexOfElement, 1);
-			fs.writeJSONSync(persistFile, jsonObj);
-			return true;
-		}
-		return false;
-	} catch (err) {
-		throw new InsightError("Could not sync-read data file for delete");
-	}
 }
 
 export {
 	readContent,
 	checkIdAndKind,
 	checkValidSection,
-	checkFileExistsElseCreateFile,
+	// checkFileExistsElseCreateFile,
 	addToPersistFolder,
-	loadDatasetFromPersistence,
+	// loadDatasetFromPersistence,
 	deleteDatasetFromPersistence,
+	readDirectory,
 };
+
+// newfunc(persistDir);
 
 // let myDataset: Dataset = {
 // 	id: "sampleID",
@@ -257,5 +288,3 @@ export {
 // 	console.log(InsightFacade.map.entries());
 // }
 // );
-
-// saveToFolder(myDataset);

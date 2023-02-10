@@ -14,8 +14,7 @@ import {
 	addToPersistFolder,
 	checkIdAndKind,
 	deleteDatasetFromPersistence,
-	loadDatasetFromPersistence,
-	readContent,
+	readContent, readDirectory,
 } from "./helperFunctionsAddDataset";
 import {clearDisk, getContentFromArchives} from "../../test/TestUtil";
 import {expect} from "chai";
@@ -34,13 +33,7 @@ export default class InsightFacade implements IInsightFacade {
 	constructor() {
 		InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
-		loadDatasetFromPersistence(InsightFacade.map)
-			.then((p) => {
-				console.log("datasets loaded upon new facade object" + p);
-			})
-			.catch(() => {
-				throw new InsightError("wasn't able to load/make file upon new facade object");
-			});
+		readDirectory(InsightFacade.persistDir, InsightFacade.map);
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -90,22 +83,19 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			if (!InsightFacade.map.has(id)) {
+				console.log(InsightFacade.map.has(id));
 				reject(new NotFoundError("Dataset doesn't exist"));
 			}
 
 			InsightFacade.map.delete(id);
 
-			let deleted: boolean;
-			try {
-				deleted = deleteDatasetFromPersistence(id);
-				if (deleted === true) {
+			deleteDatasetFromPersistence(InsightFacade.persistDir, id)
+				.then(() => {
 					resolve(id);
-				} else {
-					reject(new NotFoundError("Tried to delete Dataset from disk but not found"));
-				}
-			} catch (err) {
-				reject(new InsightError("Synchronous read/write failed: could not delete dataset"));
-			}
+				})
+				.catch(() => {
+					reject(new InsightError("could not delete dataset"));
+				});
 		});
 	}
 
