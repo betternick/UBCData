@@ -25,7 +25,7 @@ function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): Promise
 			reject(new InsightError("ID only has whitespace"));
 			// return false;
 		}
-		if (kind !== "sections") {
+		if (kind !== InsightDatasetKind.Sections) {
 			reject(new InsightError("kind must only be of type sections"));
 			// return false;
 		}

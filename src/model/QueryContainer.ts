@@ -24,63 +24,89 @@ export class QueryContainer {
 	// LINDA - this is recursive
 	public handleWhere(query: object, datasetID: string, dataset: Dataset) {
 		let resultArray: InsightResult[] = [];
-		if (JSON.stringify(query) !== "{}") { // WHERE block is not empty
-			for (let courseSection in dataset.datasetArray) { // iterate through every course section in the dataset
+		if (JSON.stringify(query) !== "{}") {
+			// WHERE block is not empty
+			for (let courseSection in dataset.datasetArray) {
+				// iterate through every course section in the dataset
+				let section = JSON.stringify(dataset.datasetArray[courseSection]);
 				// recursively traverse JSON query object:
 				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 				for (let queryKey in query) {
 					if (queryKey === "OR") {
 						// console.log("got to OR"); TODO: recurse, but keeping in mind the or structure
+						// pretty sure I do something like this:
+						// for (item in OR)
+						// 		arr = handlewhere(item)
+						// 		concat(arr with resultArray)
+						for (let item in Object.values(query)[0]) {
+							// console.log("item: " +item);
+							// console.log(Object.values(query));
+							// console.log(Object.values(query)[0][item]);
+							// let arr = this.handleWhere(Object.values(query)[0][item], datasetID, dataset);
+							// resultArray.concat(arr);
+						}
 					} else if (queryKey === "AND") {
 						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
+						// pretty sure I do something like this:
+						// create # of arrays that match the total number of items in and
+						// for (item in AND)
+						// 		arr# = handlewhere(item)
+						// traverse arr1
+						// 		- for every item in arr 1, see if it's included in arr2/3/4...
+						//		- if yes, keep it. If not, remove it
+						//		- concat(arr1 with resultArray)
 					} else if (queryKey === "NOT") {
 						// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					} else if (queryKey === "IS") {
-						// console.log("got to IS"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "GT") {
-						// console.log("got to GT"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "LT") {
-						// console.log("got to LT"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "EQ") {
-						this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
-						let arr = Object.values(query);
-						let field = this.transformQueryToDatasetConvention(
-							this.returnIdentifier(JSON.stringify(arr[0])));
-						let value = this.returnValueToSearch(JSON.stringify(arr[0]));
-						let valueType = this.returnValueType(field);
-						let match = this.doesThisSectionMatch(
-							JSON.stringify(dataset.datasetArray[courseSection]),field,value,valueType);
-						if (match) {
-							let myInsightResult: InsightResult = {};
-							for (let col in this.columns) {
-								let keyCol = datasetID.concat("_",
-									this.transformDatasetToQueryConvention(this.columns[col]));
-								let val = this.getValue(JSON.stringify(dataset.datasetArray[courseSection]),
-									this.columns[col],this.returnValueType(this.columns[col]));
-								// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
-								// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
-								let keyVal: string | number;
-								if (this.returnValueType(this.columns[col]) === "number") {
-									keyVal = Number(val);
-								} else {
-									keyVal = val;
-								}
-								myInsightResult[keyCol] = keyVal;
-							}
-							resultArray.push(myInsightResult);
-						}
+					} else {
+						this.applyComparator(datasetID, query, section, resultArray, queryKey);
 					}
 				}
 			}
+			// sort the result array before returning it (if there was an order)
 			return resultArray;
 		} else {
 			// WHERE body is empty -> return all entries -> create test case that doesn't return too many results
 			let courseResultArray = dataset.datasetArray[0];
-			for (let course in courseResultArray) { // for each course in the dataset
-				for (let column in this.columns) { // for each column option in the query
+			for (let course in courseResultArray) {
+				// for each course in the dataset
+				for (let column in this.columns) {
+					// for each column option in the query
 				}
 			}
+			// sort the result array before returning it (if there was an order)
 			return resultArray;
+		}
+	}
+
+	private applyComparator(
+		datasetID: string,
+		query: object,
+		section: string,
+		resultArray: InsightResult[],
+		comparator: string
+	) {
+		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
+		let arr = Object.values(query);
+		let field = this.transformQueryToDatasetConvention(this.returnIdentifier(JSON.stringify(arr[0])));
+		let value = this.returnValueToSearch(JSON.stringify(arr[0]));
+		let valueType = this.returnValueType(field);
+		let match = this.doesThisSectionMatch(section, field, value, valueType, comparator);
+		if (match) {
+			let myInsightResult: InsightResult = {};
+			for (let col in this.columns) {
+				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
+				let val = this.getValue(section, this.columns[col], this.returnValueType(this.columns[col]));
+				// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
+				// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
+				let keyVal: string | number;
+				if (this.returnValueType(this.columns[col]) === "number") {
+					keyVal = Number(val);
+				} else {
+					keyVal = val;
+				}
+				myInsightResult[keyCol] = keyVal;
+			}
+			resultArray.push(myInsightResult);
 		}
 	}
 
@@ -137,10 +163,10 @@ export class QueryContainer {
 
 	// return value used during the search (ie. value we are looking for)
 	public returnValueToSearch(query: string) {
-		const indexUnderscore = query.indexOf(":");
-		const indexEndOfIdentifier = query.indexOf("}", indexUnderscore);
+		const indexStartOfIdentifier = query.indexOf(":");
+		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
 		let result: string;
-		result = query.substring(indexUnderscore + 2, indexEndOfIdentifier - 1);
+		result = query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 		return result;
 	}
 
@@ -159,16 +185,37 @@ export class QueryContainer {
 		}
 	}
 
-	public doesThisSectionMatch(courseSectionString: string, field: string, value: string, valueType: string): boolean {
-		let indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+	public doesThisSectionMatch(
+		courseSectionString: string,
+		field: string,
+		value: string,
+		valueType: string,
+		comparator: string
+	): boolean {
+		let indexStartOfValue: number;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
-			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue);
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue + 1) + 1;
 		} else {
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
 			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
-		return val === value;
+		if (comparator === "EQ") {
+			return val === value;
+		} else if (comparator === "GT") {
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return valAsNum > valueAsNum;
+		} else if (comparator === "LT") {
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return valAsNum < valueAsNum;
+		} else {
+			// comparator === "IS"
+			return val === value;
+		}
 	}
 
 	// transform field from naming convention in query to naming convention in dataset
