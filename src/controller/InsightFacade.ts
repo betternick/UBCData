@@ -126,11 +126,15 @@ export default class InsightFacade implements IInsightFacade {
 				}
 
 				// catch first level of query (OPTIONS or WHERE)
-				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
-					Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
+				if (
+					Object.prototype.hasOwnProperty.call(query, "WHERE") ||
+					Object.prototype.hasOwnProperty.call(query, "OPTIONS")
+				) {
 					// check that query object has BOTH OPTIONS and WHERE
-					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
-						Object.prototype.hasOwnProperty.call(query, "OPTIONS")) {
+					if (
+						Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
+					) {
 						let queryObject = new QueryContainer();
 
 						// handleOptions
@@ -144,8 +148,11 @@ export default class InsightFacade implements IInsightFacade {
 						// handleWhere
 						let indexWhere = this.getIndex(queryParsed, "WHERE");
 						try {
-							let results = queryObject.handleWhere(queryParsed[indexWhere][1],datasetID,
-								datasetToQuery as Dataset);
+							let results = queryObject.handleWhere(
+								queryParsed[indexWhere][1],
+								datasetID,
+								datasetToQuery as Dataset
+							);
 							resolve(results);
 						} catch (error) {
 							reject(error);
@@ -204,5 +211,3 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
-
-

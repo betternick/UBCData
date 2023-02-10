@@ -24,8 +24,10 @@ export class QueryContainer {
 	// LINDA - this is recursive
 	public handleWhere(query: object, datasetID: string, dataset: Dataset) {
 		let resultArray: InsightResult[] = [];
-		if (JSON.stringify(query) !== "{}") { // WHERE block is not empty
-			for (let courseSection in dataset.datasetArray) { // iterate through every course section in the dataset
+		if (JSON.stringify(query) !== "{}") {
+			// WHERE block is not empty
+			for (let courseSection in dataset.datasetArray) {
+				// iterate through every course section in the dataset
 				let section = JSON.stringify(dataset.datasetArray[courseSection]);
 				// recursively traverse JSON query object:
 				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
@@ -36,7 +38,7 @@ export class QueryContainer {
 						// for (item in OR)
 						// 		arr = handlewhere(item)
 						// 		concat(arr with resultArray)
-						for (let item in Object.values(query)[0]){
+						for (let item in Object.values(query)[0]) {
 							// console.log("item: " +item);
 							// console.log(Object.values(query));
 							// console.log(Object.values(query)[0][item]);
@@ -60,32 +62,39 @@ export class QueryContainer {
 					}
 				}
 			}
+			// sort the result array before returning it (if there was an order)
 			return resultArray;
 		} else {
 			// WHERE body is empty -> return all entries -> create test case that doesn't return too many results
 			let courseResultArray = dataset.datasetArray[0];
-			for (let course in courseResultArray) { // for each course in the dataset
-				for (let column in this.columns) { // for each column option in the query
+			for (let course in courseResultArray) {
+				// for each course in the dataset
+				for (let column in this.columns) {
+					// for each column option in the query
 				}
 			}
+			// sort the result array before returning it (if there was an order)
 			return resultArray;
 		}
 	}
 
-	private applyComparator(datasetID: string, query: object, section: string, resultArray: InsightResult[],
-		comparator: string) {
+	private applyComparator(
+		datasetID: string,
+		query: object,
+		section: string,
+		resultArray: InsightResult[],
+		comparator: string
+	) {
 		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
 		let arr = Object.values(query);
-		let field = this.transformQueryToDatasetConvention(
-			this.returnIdentifier(JSON.stringify(arr[0])));
+		let field = this.transformQueryToDatasetConvention(this.returnIdentifier(JSON.stringify(arr[0])));
 		let value = this.returnValueToSearch(JSON.stringify(arr[0]));
 		let valueType = this.returnValueType(field);
 		let match = this.doesThisSectionMatch(section, field, value, valueType, comparator);
 		if (match) {
 			let myInsightResult: InsightResult = {};
 			for (let col in this.columns) {
-				let keyCol = datasetID.concat("_",
-					this.transformDatasetToQueryConvention(this.columns[col]));
+				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
 				let val = this.getValue(section, this.columns[col], this.returnValueType(this.columns[col]));
 				// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
 				// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
@@ -99,11 +108,9 @@ export class QueryContainer {
 			}
 			resultArray.push(myInsightResult);
 		}
-
 	}
 
-
-// handles the OPTIONS block in a query
+	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: object, datasetID: string) {
@@ -178,8 +185,13 @@ export class QueryContainer {
 		}
 	}
 
-	public doesThisSectionMatch(courseSectionString: string, field: string, value: string, valueType: string,
-		comparator: string): boolean {
+	public doesThisSectionMatch(
+		courseSectionString: string,
+		field: string,
+		value: string,
+		valueType: string,
+		comparator: string
+	): boolean {
 		let indexStartOfValue: number;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
@@ -195,12 +207,13 @@ export class QueryContainer {
 		} else if (comparator === "GT") {
 			let valAsNum = Number(val);
 			let valueAsNum = Number(value);
-			return (valAsNum > valueAsNum);
+			return valAsNum > valueAsNum;
 		} else if (comparator === "LT") {
 			let valAsNum = Number(val);
 			let valueAsNum = Number(value);
-			return (valAsNum < valueAsNum);
-		} else { // comparator === "IS"
+			return valAsNum < valueAsNum;
+		} else {
+			// comparator === "IS"
 			return val === value;
 		}
 	}
