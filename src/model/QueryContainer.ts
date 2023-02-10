@@ -139,10 +139,10 @@ export class QueryContainer {
 
 	// return value used during the search (ie. value we are looking for)
 	public returnValueToSearch(query: string) {
-		const indexUnderscore = query.indexOf(":");
-		const indexEndOfIdentifier = query.indexOf("}", indexUnderscore);
+		const indexStartOfIdentifier = query.indexOf(":");
+		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
 		let result: string;
-		result = query.substring(indexUnderscore + 2, indexEndOfIdentifier - 1);
+		result = query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 		return result;
 	}
 
@@ -174,9 +174,13 @@ export class QueryContainer {
 		if (comparator === "EQ") {
 			return val === value;
 		} else if (comparator === "GT") {
-			return (val > value);
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return (valAsNum > valueAsNum);
 		} else if (comparator === "LT") {
-			return  (val < value);
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return (valAsNum < valueAsNum);
 		} else if (comparator === "IS") {
 			return false;
 		} else { // comparator === "NOT"
