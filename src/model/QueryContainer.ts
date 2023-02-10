@@ -26,6 +26,7 @@ export class QueryContainer {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") { // WHERE block is not empty
 			for (let courseSection in dataset.datasetArray) { // iterate through every course section in the dataset
+				let section = JSON.stringify(dataset.datasetArray[courseSection]);
 				// recursively traverse JSON query object:
 				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 				for (let queryKey in query) {
@@ -37,38 +38,8 @@ export class QueryContainer {
 						// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
 					} else if (queryKey === "IS") {
 						// console.log("got to IS"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "GT") {
-						// console.log("got to GT"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "LT") {
-						// console.log("got to LT"); TODO: check that id matches datasetID and store info
-					} else if (queryKey === "EQ") {
-						this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
-						let arr = Object.values(query);
-						let field = this.transformQueryToDatasetConvention(
-							this.returnIdentifier(JSON.stringify(arr[0])));
-						let value = this.returnValueToSearch(JSON.stringify(arr[0]));
-						let valueType = this.returnValueType(field);
-						let match = this.doesThisSectionMatch(
-							JSON.stringify(dataset.datasetArray[courseSection]),field,value,valueType);
-						if (match) {
-							let myInsightResult: InsightResult = {};
-							for (let col in this.columns) {
-								let keyCol = datasetID.concat("_",
-									this.transformDatasetToQueryConvention(this.columns[col]));
-								let val = this.getValue(JSON.stringify(dataset.datasetArray[courseSection]),
-									this.columns[col],this.returnValueType(this.columns[col]));
-								// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
-								// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
-								let keyVal: string | number;
-								if (this.returnValueType(this.columns[col]) === "number") {
-									keyVal = Number(val);
-								} else {
-									keyVal = val;
-								}
-								myInsightResult[keyCol] = keyVal;
-							}
-							resultArray.push(myInsightResult);
-						}
+					} else {
+						this.applyComparator(datasetID, query, section, resultArray, queryKey);
 					}
 				}
 			}
@@ -84,7 +55,38 @@ export class QueryContainer {
 		}
 	}
 
-	// handles the OPTIONS block in a query
+	private applyComparator(datasetID: string, query: object, section: string, resultArray: InsightResult[],
+		comparator: string) {
+		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
+		let arr = Object.values(query);
+		let field = this.transformQueryToDatasetConvention(
+			this.returnIdentifier(JSON.stringify(arr[0])));
+		let value = this.returnValueToSearch(JSON.stringify(arr[0]));
+		let valueType = this.returnValueType(field);
+		let match = this.doesThisSectionMatch(section, field, value, valueType, comparator);
+		if (match) {
+			let myInsightResult: InsightResult = {};
+			for (let col in this.columns) {
+				let keyCol = datasetID.concat("_",
+					this.transformDatasetToQueryConvention(this.columns[col]));
+				let val = this.getValue(section, this.columns[col], this.returnValueType(this.columns[col]));
+				// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
+				// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
+				let keyVal: string | number;
+				if (this.returnValueType(this.columns[col]) === "number") {
+					keyVal = Number(val);
+				} else {
+					keyVal = val;
+				}
+				myInsightResult[keyCol] = keyVal;
+			}
+			resultArray.push(myInsightResult);
+		}
+
+	}
+
+
+// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: object, datasetID: string) {
@@ -159,7 +161,8 @@ export class QueryContainer {
 		}
 	}
 
-	public doesThisSectionMatch(courseSectionString: string, field: string, value: string, valueType: string): boolean {
+	public doesThisSectionMatch(courseSectionString: string, field: string, value: string, valueType: string,
+		comparator: string): boolean {
 		let indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
