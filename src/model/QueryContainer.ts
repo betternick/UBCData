@@ -36,8 +36,6 @@ export class QueryContainer {
 						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
 					} else if (queryKey === "NOT") {
 						// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					} else if (queryKey === "IS") {
-						// console.log("got to IS"); TODO: check that id matches datasetID and store info
 					} else {
 						this.applyComparator(datasetID, query, section, resultArray, queryKey);
 					}
@@ -163,11 +161,13 @@ export class QueryContainer {
 
 	public doesThisSectionMatch(courseSectionString: string, field: string, value: string, valueType: string,
 		comparator: string): boolean {
-		let indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+		let indexStartOfValue: number;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
-			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue);
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue + 1) + 1;
 		} else {
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
 			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
@@ -181,10 +181,8 @@ export class QueryContainer {
 			let valAsNum = Number(val);
 			let valueAsNum = Number(value);
 			return (valAsNum < valueAsNum);
-		} else if (comparator === "IS") {
-			return false;
-		} else { // comparator === "NOT"
-			return false;
+		} else { // comparator === "IS"
+			return val === value;
 		}
 	}
 
