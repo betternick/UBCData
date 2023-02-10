@@ -171,7 +171,17 @@ export class QueryContainer {
 			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
-		return val === value;
+		if (comparator === "EQ") {
+			return val === value;
+		} else if (comparator === "GT") {
+			return (val > value);
+		} else if (comparator === "LT") {
+			return  (val < value);
+		} else if (comparator === "IS") {
+			return false;
+		} else { // comparator === "NOT"
+			return false;
+		}
 	}
 
 	// transform field from naming convention in query to naming convention in dataset
