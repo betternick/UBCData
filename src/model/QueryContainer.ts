@@ -1,4 +1,4 @@
-import {Dataset, InsightError, InsightResult} from "../controller/IInsightFacade";
+import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
 
 export class QueryContainer {
 	public columns: string[];
@@ -7,21 +7,12 @@ export class QueryContainer {
 	constructor() {
 		this.columns = [];
 		this.order = "";
-		console.log("Query Object created");
 	}
-
-	// let order = "ORDER", columns = "COLUMNS";
-	// let is = "IS", not = "NOT", and = "AND", or = "OR";
-	// let lt = "LT", gt = "GT", eq = "EQ";
-	// let avg = "avg", pass = "pass", fail = "fail", audit = "audit", year = "year";
-	// let dept = "dept", id = "id", instructor = "instructor", title = "title", uuid = "uuid";
-	// let idstring = "idstring", inputstring = "inputstring";
 
 	// handles the WHERE block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// otherwise, returns the InsightResult[] that corresponds to the query
 	// found in the WHERE block do not match the datasetID parameter
-	// LINDA - this is recursive
 	public handleWhere(query: object, datasetID: string, dataset: Dataset) {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") {
@@ -62,7 +53,6 @@ export class QueryContainer {
 					}
 				}
 			}
-			// sort the result array before returning it (if there was an order)
 			return resultArray;
 		} else {
 			// WHERE body is empty -> return all entries -> create test case that doesn't return too many results
@@ -73,7 +63,6 @@ export class QueryContainer {
 					// for each column option in the query
 				}
 			}
-			// sort the result array before returning it (if there was an order)
 			return resultArray;
 		}
 	}
@@ -107,6 +96,57 @@ export class QueryContainer {
 				myInsightResult[keyCol] = keyVal;
 			}
 			resultArray.push(myInsightResult);
+			if (resultArray.length > 4000) {
+				throw new ResultTooLargeError("Exceeded 4000 entries");
+			}
+		}
+	}
+
+	// sorts the array based on this.order
+	public handleSort (array: InsightResult[]): InsightResult[] {
+		// sorting array of arrays by string property value, dynamically: ref: https://stackoverflow.com/questions/
+		// 1129216/sort-array-of-objects-by-string-property-value
+		function dynamicSort(property: string) {
+			let sortOrder = 1;
+			return function (a: InsightResult, b: InsightResult) {
+				let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+				return result * sortOrder;
+			};
+		}
+		array.sort(dynamicSort(this.order));
+		return array;
+	}
+
+	public doesThisSectionMatch(
+		courseSectionString: string,
+		field: string,
+		value: string,
+		valueType: string,
+		comparator: string
+	): boolean {
+		let indexStartOfValue: number;
+		let indexEndOfValue: number;
+		if (valueType === "string") {
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue + 1) + 1;
+		} else {
+			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
+			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
+		}
+		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
+		if (comparator === "EQ") {
+			return val === value;
+		} else if (comparator === "GT") {
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return valAsNum > valueAsNum;
+		} else if (comparator === "LT") {
+			let valAsNum = Number(val);
+			let valueAsNum = Number(value);
+			return valAsNum < valueAsNum;
+		} else {
+			// comparator === "IS"
+			return val === value;
 		}
 	}
 
@@ -119,10 +159,10 @@ export class QueryContainer {
 		this.singleDatasetID(queryString, datasetID);
 
 		// if there is an ORDER section, extract the order
-		let indexOfOrderStart = queryString.indexOf("ORDER") + datasetID.length + 8;
-		let orderString = queryString.substring(indexOfOrderStart);
-		if (indexOfOrderStart !== 0) {
-			this.order = this.transformQueryToDatasetConvention(this.returnIdentifier(orderString));
+		if (queryString.includes("ORDER")) {
+			let indexOfOrderStart = queryString.indexOf("ORDER") + 8;
+			let indexOfOrderEnd = queryString.indexOf("\"", indexOfOrderStart);
+			this.order = queryString.substring(indexOfOrderStart, indexOfOrderEnd);
 		}
 
 		// creates a substring that contains only the columns
@@ -182,39 +222,6 @@ export class QueryContainer {
 		} else {
 			indexEndOfValue = str.indexOf(",", indexStartOfValue);
 			return str.substring(indexStartOfValue, indexEndOfValue);
-		}
-	}
-
-	public doesThisSectionMatch(
-		courseSectionString: string,
-		field: string,
-		value: string,
-		valueType: string,
-		comparator: string
-	): boolean {
-		let indexStartOfValue: number;
-		let indexEndOfValue: number;
-		if (valueType === "string") {
-			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
-			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue + 1) + 1;
-		} else {
-			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
-			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
-		}
-		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
-		if (comparator === "EQ") {
-			return val === value;
-		} else if (comparator === "GT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum > valueAsNum;
-		} else if (comparator === "LT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum < valueAsNum;
-		} else {
-			// comparator === "IS"
-			return val === value;
 		}
 	}
 

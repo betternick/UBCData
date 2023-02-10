@@ -116,37 +116,37 @@ export default class InsightFacade implements IInsightFacade {
 				}
 
 				// catch first level of query (OPTIONS or WHERE)
-				if (
-					Object.prototype.hasOwnProperty.call(query, "WHERE") ||
+				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
 					Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 				) {
 					// check that query object has BOTH OPTIONS and WHERE
-					if (
-						Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 					) {
 						let queryObject = new QueryContainer();
 
 						// handleOptions
-						let indexOptions = this.getIndex(queryParsed, "OPTIONS");
 						try {
-							queryObject.handleOptions(queryParsed[indexOptions][1], datasetID);
+							queryObject.handleOptions(queryParsed[this.getIndex(queryParsed, "OPTIONS")][1], datasetID);
 						} catch (error) {
 							reject(error);
 						}
 
 						// handleWhere
-						let indexWhere = this.getIndex(queryParsed, "WHERE");
+						let results: InsightResult[] = [];
 						try {
-							let results = queryObject.handleWhere(
-								queryParsed[indexWhere][1],
+							results = queryObject.handleWhere(
+								queryParsed[this.getIndex(queryParsed, "WHERE")][1],
 								datasetID,
 								datasetToQuery as Dataset
 							);
-							resolve(results);
 						} catch (error) {
 							reject(error);
 						}
+
+						// handleSort
+						results = queryObject.handleSort(results);
+						resolve(results);
 					}
 					reject(new InsightError("query missing WHERE or OPTIONS block"));
 				}
