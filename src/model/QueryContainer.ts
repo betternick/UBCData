@@ -32,8 +32,27 @@ export class QueryContainer {
 				for (let queryKey in query) {
 					if (queryKey === "OR") {
 						// console.log("got to OR"); TODO: recurse, but keeping in mind the or structure
+						// pretty sure I do something like this:
+						// for (item in OR)
+						// 		arr = handlewhere(item)
+						// 		concat(arr with resultArray)
+						for (let item in Object.values(query)[0]){
+							// console.log("item: " +item);
+							// console.log(Object.values(query));
+							// console.log(Object.values(query)[0][item]);
+							// let arr = this.handleWhere(Object.values(query)[0][item], datasetID, dataset);
+							// resultArray.concat(arr);
+						}
 					} else if (queryKey === "AND") {
 						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
+						// pretty sure I do something like this:
+						// create # of arrays that match the total number of items in and
+						// for (item in AND)
+						// 		arr# = handlewhere(item)
+						// traverse arr1
+						// 		- for every item in arr 1, see if it's included in arr2/3/4...
+						//		- if yes, keep it. If not, remove it
+						//		- concat(arr1 with resultArray)
 					} else if (queryKey === "NOT") {
 						// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
 					} else {
