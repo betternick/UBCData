@@ -94,6 +94,12 @@ export class QueryContainer {
 				} else {
 					keyVal = val;
 				}
+				if (keyCol === datasetID + "_year") {
+					keyVal = Number(keyVal);
+				}
+				if (keyCol === datasetID + "_uuid") {
+					keyVal = keyVal.toString();
+				}
 				myInsightResult[keyCol] = keyVal;
 			}
 			resultArray.push(myInsightResult);
@@ -145,8 +151,7 @@ export class QueryContainer {
 			let valAsNum = Number(val);
 			let valueAsNum = Number(value);
 			return valAsNum < valueAsNum;
-		} else {
-			// comparator === "IS"
+		} else { // comparator === "IS"
 			return val === value;
 		}
 	}
@@ -197,18 +202,14 @@ export class QueryContainer {
 	public returnIdentifier(query: string): string {
 		const indexUnderscore = query.indexOf("_");
 		const indexEndOfIdentifier = query.indexOf('"', indexUnderscore);
-		let result: string;
-		result = query.substring(indexUnderscore + 1, indexEndOfIdentifier);
-		return result;
+		return query.substring(indexUnderscore + 1, indexEndOfIdentifier);
 	}
 
 	// return value used during the search (ie. value we are looking for)
 	public returnValueToSearch(query: string) {
 		const indexStartOfIdentifier = query.indexOf(":");
 		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
-		let result: string;
-		result = query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
-		return result;
+		return query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 	}
 
 	// return value after identifier in a string
@@ -278,11 +279,11 @@ export class QueryContainer {
 		return field;
 	}
 
+
 	// returns the expects type for the field (number or string)
 	public returnValueType(field: string) {
 		if (
 			field === "id" ||
-			field === "Year" ||
 			field === "Avg" ||
 			field === "Pass" ||
 			field === "Fail" ||
