@@ -1,0 +1,40 @@
+{
+	"title": "Query-GT_All_Columns+2009",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_uuid": "3961"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg",
+				"sections_id",
+				"sections_audit",
+				"sections_pass",
+				"sections_year",
+				"sections_fail",
+				"sections_uuid",
+				"sections_title",
+				"sections_instructor"
+			],
+			"ORDER": "sections_pass"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "math",
+			"sections_avg": 90.57,
+			"sections_id": "420",
+			"sections_audit": 0,
+			"sections_pass": 7,
+			"sections_year": 2011,
+			"sections_fail": 0,
+			"sections_uuid": "3961",
+			"sections_title": "real analysis i",
+			"sections_instructor": "khosravi, mahta"
+		}
+	]
+}
