@@ -22,19 +22,22 @@ export class QueryContainer {
 				let section = JSON.stringify(dataset.datasetArray[courseSection]);
 				// recursively traverse JSON query object:
 				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
+
+				// console.log("query: ");
+				// console.log(query);
 				for (let queryKey in query) {
 					if (queryKey === "OR") {
+						// console.log("query[0]: ");
+						// console.log(Object.values(query)[0]);
+						// console.log("query[0][0]");
+						// console.log(Object.values(query)[0][0]);
 						// console.log("got to OR"); TODO: recurse, but keeping in mind the or structure
-						// pretty sure I do something like this:
-						// for (item in OR)
-						// 		arr = handlewhere(item)
-						// 		concat(arr with resultArray)
+
 						for (let item in Object.values(query)[0]) {
-							// console.log("item: " +item);
-							// console.log(Object.values(query));
-							// console.log(Object.values(query)[0][item]);
-							// let arr = this.handleWhere(Object.values(query)[0][item], datasetID, dataset);
-							// resultArray.concat(arr);
+							// let nextItem = Object.values(query)[0][item];
+							// let arr = this.handleWhere(nextItem, datasetID, dataset);
+							// resultArray = resultArray.concat(arr);
+
 						}
 					} else if (queryKey === "AND") {
 						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
