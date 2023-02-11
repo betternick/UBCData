@@ -18,8 +18,8 @@ export class QueryContainer {
 		if (JSON.stringify(query) !== "{}") {
 			// WHERE block is not empty
 
-				// recursively traverse JSON query object:
-				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
+			// recursively traverse JSON query object:
+			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
 					for (let item in Object.values(query)[0]) {
@@ -94,11 +94,16 @@ export class QueryContainer {
 				} else {
 					keyVal = val;
 				}
+				if (keyCol === datasetID + "_year") {
+					keyVal = Number(keyVal);
+				} else if (keyCol === datasetID + "_uuid") {
+					keyVal = keyVal.toString();
+				}
 				myInsightResult[keyCol] = keyVal;
 			}
 			resultArray.push(myInsightResult);
-			if (resultArray.length > 4000) {
-				throw new ResultTooLargeError("Exceeded 4000 entries");
+			if (resultArray.length > 5000) {
+				throw new ResultTooLargeError("Exceeded 5000 entries");
 			}
 		}
 	}
@@ -135,19 +140,12 @@ export class QueryContainer {
 			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
-		if (comparator === "EQ") {
+		if (comparator === "EQ" || comparator === "IS") {
 			return val === value;
 		} else if (comparator === "GT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum > valueAsNum;
-		} else if (comparator === "LT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum < valueAsNum;
-		} else {
-			// comparator === "IS"
-			return val === value;
+			return Number(val) > Number(value);
+		} else { // comparator === "LT"
+			return Number(val) < Number(value);
 		}
 	}
 
@@ -156,7 +154,6 @@ export class QueryContainer {
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: object, datasetID: string) {
 		let queryString: string = JSON.stringify(query);
-
 		this.singleDatasetID(queryString, datasetID);
 
 		// if there is an ORDER section, extract the order
@@ -165,7 +162,6 @@ export class QueryContainer {
 			let indexOfOrderEnd = queryString.indexOf("\"", indexOfOrderStart);
 			this.order = queryString.substring(indexOfOrderStart, indexOfOrderEnd);
 		}
-
 		// creates a substring that contains only the columns
 		let indexOfColumnsStart = queryString.indexOf("[") + 2;
 		let indexOfColumnsEnd = queryString.indexOf("]");
@@ -174,8 +170,12 @@ export class QueryContainer {
 		// extracts all the column identifiers and puts them into the columns array
 		while (columnsString.length !== 0) {
 			let indexStartOfNextColIden = columnsString.indexOf('"') + 3;
-			this.columns.push(this.transformQueryToDatasetConvention(this.returnIdentifier(columnsString)));
+			this.columns.push(this.returnIdentifier(columnsString));
 			columnsString = columnsString.substring(indexStartOfNextColIden);
+		}
+		this.columns.sort(); // sort columns alphabetically
+		for (let col in this.columns) {
+			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
 
@@ -197,18 +197,14 @@ export class QueryContainer {
 	public returnIdentifier(query: string): string {
 		const indexUnderscore = query.indexOf("_");
 		const indexEndOfIdentifier = query.indexOf('"', indexUnderscore);
-		let result: string;
-		result = query.substring(indexUnderscore + 1, indexEndOfIdentifier);
-		return result;
+		return query.substring(indexUnderscore + 1, indexEndOfIdentifier);
 	}
 
 	// return value used during the search (ie. value we are looking for)
 	public returnValueToSearch(query: string) {
 		const indexStartOfIdentifier = query.indexOf(":");
 		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
-		let result: string;
-		result = query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
-		return result;
+		return query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 	}
 
 	// return value after identifier in a string
@@ -261,7 +257,7 @@ export class QueryContainer {
 		} else if (field === "Title") {
 			field = "title";
 		} else if (field === "Professor") {
-			field = "Instructor";
+			field = "instructor";
 		} else if (field === "Subject") {
 			field = "dept";
 		} else if (field === "Year") {
@@ -278,11 +274,11 @@ export class QueryContainer {
 		return field;
 	}
 
+
 	// returns the expects type for the field (number or string)
 	public returnValueType(field: string) {
 		if (
 			field === "id" ||
-			field === "Year" ||
 			field === "Avg" ||
 			field === "Pass" ||
 			field === "Fail" ||
