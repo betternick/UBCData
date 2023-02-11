@@ -238,9 +238,9 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		facade = new InsightFacade();
 		// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
 		// Will *fail* if there is a problem reading ANY dataset.
-		// const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
-		// return Promise.all(loadDatasetPromises);
-		facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+		const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
+		return Promise.all(loadDatasetPromises);
+		// facade.addDataset("sections", sections, InsightDatasetKind.Sections).then()
 	});
 	after(function () {
 		// console.info(`After: ${this.test?.parent?.title}`);
