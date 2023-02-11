@@ -109,9 +109,10 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				let queryParsed = Object.entries(query); // queryParsed has type "Object"
 				let datasetID = this.getDatasetID(query);
+
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 
-				if (datasetToQuery === null) {
+				if (datasetToQuery === undefined) {
 					reject(new InsightError("the dataset you are looking for has not been added"));
 				}
 
