@@ -96,8 +96,7 @@ export class QueryContainer {
 				}
 				if (keyCol === datasetID + "_year") {
 					keyVal = Number(keyVal);
-				}
-				if (keyCol === datasetID + "_uuid") {
+				} else if (keyCol === datasetID + "_uuid") {
 					keyVal = keyVal.toString();
 				}
 				myInsightResult[keyCol] = keyVal;
@@ -141,18 +140,12 @@ export class QueryContainer {
 			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
-		if (comparator === "EQ") {
+		if (comparator === "EQ" || comparator === "IS") {
 			return val === value;
 		} else if (comparator === "GT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum > valueAsNum;
-		} else if (comparator === "LT") {
-			let valAsNum = Number(val);
-			let valueAsNum = Number(value);
-			return valAsNum < valueAsNum;
-		} else { // comparator === "IS"
-			return val === value;
+			return Number(val) > Number(value);
+		} else { // comparator === "LT"
+			return Number(val) < Number(value);
 		}
 	}
 
@@ -161,7 +154,6 @@ export class QueryContainer {
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: object, datasetID: string) {
 		let queryString: string = JSON.stringify(query);
-
 		this.singleDatasetID(queryString, datasetID);
 
 		// if there is an ORDER section, extract the order
@@ -170,7 +162,6 @@ export class QueryContainer {
 			let indexOfOrderEnd = queryString.indexOf("\"", indexOfOrderStart);
 			this.order = queryString.substring(indexOfOrderStart, indexOfOrderEnd);
 		}
-
 		// creates a substring that contains only the columns
 		let indexOfColumnsStart = queryString.indexOf("[") + 2;
 		let indexOfColumnsEnd = queryString.indexOf("]");
@@ -179,8 +170,12 @@ export class QueryContainer {
 		// extracts all the column identifiers and puts them into the columns array
 		while (columnsString.length !== 0) {
 			let indexStartOfNextColIden = columnsString.indexOf('"') + 3;
-			this.columns.push(this.transformQueryToDatasetConvention(this.returnIdentifier(columnsString)));
+			this.columns.push(this.returnIdentifier(columnsString));
 			columnsString = columnsString.substring(indexStartOfNextColIden);
+		}
+		this.columns.sort(); // sort columns alphabetically
+		for (let col in this.columns) {
+			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
 
