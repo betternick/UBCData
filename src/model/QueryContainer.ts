@@ -18,8 +18,8 @@ export class QueryContainer {
 		if (JSON.stringify(query) !== "{}") {
 			// WHERE block is not empty
 
-				// recursively traverse JSON query object:
-				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
+			// recursively traverse JSON query object:
+			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
 					for (let item in Object.values(query)[0]) {
@@ -97,8 +97,8 @@ export class QueryContainer {
 				myInsightResult[keyCol] = keyVal;
 			}
 			resultArray.push(myInsightResult);
-			if (resultArray.length > 4000) {
-				throw new ResultTooLargeError("Exceeded 4000 entries");
+			if (resultArray.length > 5000) {
+				throw new ResultTooLargeError("Exceeded 5000 entries");
 			}
 		}
 	}
@@ -261,7 +261,7 @@ export class QueryContainer {
 		} else if (field === "Title") {
 			field = "title";
 		} else if (field === "Professor") {
-			field = "Instructor";
+			field = "instructor";
 		} else if (field === "Subject") {
 			field = "dept";
 		} else if (field === "Year") {
