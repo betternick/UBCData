@@ -13,33 +13,24 @@ export class QueryContainer {
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// otherwise, returns the InsightResult[] that corresponds to the query
 	// found in the WHERE block do not match the datasetID parameter
-	public handleWhere(query: object, datasetID: string, dataset: Dataset) {
+	public handleWhere(query: object, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") {
 			// WHERE block is not empty
-			for (let courseSection in dataset.datasetArray) {
-				// iterate through every course section in the dataset
-				let section = JSON.stringify(dataset.datasetArray[courseSection]);
+
 				// recursively traverse JSON query object:
 				// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
-
-				// console.log("query: ");
-				// console.log(query);
-				for (let queryKey in query) {
-					if (queryKey === "OR") {
-						// console.log("query[0]: ");
-						// console.log(Object.values(query)[0]);
-						// console.log("query[0][0]");
-						// console.log(Object.values(query)[0][0]);
-						// console.log("got to OR"); TODO: recurse, but keeping in mind the or structure
-
-						for (let item in Object.values(query)[0]) {
-							// let nextItem = Object.values(query)[0][item];
-							// let arr = this.handleWhere(nextItem, datasetID, dataset);
-							// resultArray = resultArray.concat(arr);
-
-						}
-					} else if (queryKey === "AND") {
+			for (let queryKey in query) {
+				if (queryKey === "OR") {
+					for (let item in Object.values(query)[0]) {
+						let nextItem = Object.values(query)[0][item];
+						let arr = this.handleWhere(nextItem, datasetID, dataset);
+						resultArray = resultArray.concat(arr);
+					}
+				} else if (queryKey === "AND") {
+					for (let courseSection in dataset.datasetArray) {
+						// iterate through every course section in the dataset
+						let section = JSON.stringify(dataset.datasetArray[courseSection]);
 						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
 						// pretty sure I do something like this:
 						// create # of arrays that match the total number of items in and
@@ -49,14 +40,21 @@ export class QueryContainer {
 						// 		- for every item in arr 1, see if it's included in arr2/3/4...
 						//		- if yes, keep it. If not, remove it
 						//		- concat(arr1 with resultArray)
-					} else if (queryKey === "NOT") {
-						// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					} else {
+					}
+				} else if (queryKey === "NOT") {
+					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
+					for (let courseSection in dataset.datasetArray) {
+						// iterate through every course section in the dataset
+						let section = JSON.stringify(dataset.datasetArray[courseSection]);
+					}
+				} else {
+					for (let courseSection in dataset.datasetArray) {
+						// iterate through every course section in the dataset
+						let section = JSON.stringify(dataset.datasetArray[courseSection]);
 						this.applyComparator(datasetID, query, section, resultArray, queryKey);
 					}
 				}
 			}
-			return resultArray;
 		} else {
 			// WHERE body is empty -> return all entries -> create test case that doesn't return too many results
 			let courseResultArray = dataset.datasetArray[0];
@@ -66,8 +64,8 @@ export class QueryContainer {
 					// for each column option in the query
 				}
 			}
-			return resultArray;
 		}
+		return resultArray;
 	}
 
 	private applyComparator(

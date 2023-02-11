@@ -134,7 +134,7 @@ export default class InsightFacade implements IInsightFacade {
 						}
 
 						// handleWhere
-						let results: InsightResult[] = [];
+						let results: InsightResult[] = [] ;
 						try {
 							results = queryObject.handleWhere(
 								queryParsed[this.getIndex(queryParsed, "WHERE")][1],
