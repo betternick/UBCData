@@ -10,9 +10,8 @@ export class QueryContainer {
 	}
 
 	// handles the WHERE block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's
+	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
 	// otherwise, returns the InsightResult[] that corresponds to the query
-	// found in the WHERE block do not match the datasetID parameter
 	public handleWhere(query: object, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") {
@@ -95,7 +94,14 @@ export class QueryContainer {
 					keyVal = val;
 				}
 				if (keyCol === datasetID + "_year") {
-					keyVal = Number(keyVal);
+					// need to check if sections = overall, if yes, year = 1900
+					let sec = this.getValue(section, "Section", "string");
+					console.log("SECTION IS: " + sec);
+					if (sec === "overall") {
+						keyVal = 1900;
+					} else {
+						keyVal = Number(keyVal);
+					}
 				} else if (keyCol === datasetID + "_uuid") {
 					keyVal = keyVal.toString();
 				}
@@ -141,6 +147,9 @@ export class QueryContainer {
 		}
 		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
 		if (comparator === "EQ" || comparator === "IS") {
+			if (field === "id") {
+				val = "\"" + val + "\"";
+			}
 			return val === value;
 		} else if (comparator === "GT") {
 			return Number(val) > Number(value);
@@ -273,7 +282,6 @@ export class QueryContainer {
 		}
 		return field;
 	}
-
 
 	// returns the expects type for the field (number or string)
 	public returnValueType(field: string) {
