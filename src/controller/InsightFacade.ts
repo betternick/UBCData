@@ -107,49 +107,44 @@ export default class InsightFacade implements IInsightFacade {
 			} else if (query == null) {
 				reject(new InsightError("query is null?"));
 			} else {
-				let queryParsed = Object.entries(query); // queryParsed has type "Object"
 				let datasetID = this.getDatasetID(query);
-
 				let datasetToQuery = InsightFacade.map.get(datasetID);
-
 				if (datasetToQuery === undefined) {
 					reject(new InsightError("the dataset you are looking for has not been added"));
-				}
+				} else {
 
-				// catch first level of query (OPTIONS or WHERE)
-				if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
-					Object.prototype.hasOwnProperty.call(query, "OPTIONS")
-				) {
-					// check that query object has BOTH OPTIONS and WHERE
-					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+					let queryJSON = JSON.parse(JSON.stringify(query));
+					// catch first level of query (OPTIONS or WHERE)
+					if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 					) {
-						let queryObject = new QueryContainer();
+						// check that query object has BOTH OPTIONS and WHERE
+						if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
+							Object.prototype.hasOwnProperty.call(query, "OPTIONS")
+						) {
+							let queryObject = new QueryContainer();
 
-						// handleOptions
-						try {
-							queryObject.handleOptions(queryParsed[this.getIndex(queryParsed, "OPTIONS")][1], datasetID);
-						} catch (error) {
-							reject(error);
+							// handleOptions
+							try {
+								queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
+							} catch (error) {
+								reject(error);
+							}
+
+							// handleWhere
+							let results: InsightResult[] = [];
+							try {
+								results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
+							} catch (error) {
+								reject(error);
+							}
+
+							// handleSort
+							results = queryObject.handleSort(results);
+							resolve(results);
 						}
-
-						// handleWhere
-						let results: InsightResult[] = [] ;
-						try {
-							results = queryObject.handleWhere(
-								queryParsed[this.getIndex(queryParsed, "WHERE")][1],
-								datasetID,
-								datasetToQuery as Dataset
-							);
-						} catch (error) {
-							reject(error);
-						}
-
-						// handleSort
-						results = queryObject.handleSort(results);
-						resolve(results);
+						reject(new InsightError("query missing WHERE or OPTIONS block"));
 					}
-					reject(new InsightError("query missing WHERE or OPTIONS block"));
 				}
 			}
 			reject(new InsightError("query missing WHERE and OPTIONS blocks"));
