@@ -88,3 +88,7 @@ export function returnValueToSearch(query: string) {
 	const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
 	return query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 }
+
+export function insResultEquals (insRes1: InsightResult, insRes2: InsightResult) {
+	// todo
+}

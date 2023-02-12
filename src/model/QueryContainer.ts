@@ -1,6 +1,7 @@
 import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
 import {singleDatasetID, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
-	returnValueType, returnIdentifier, returnValueToSearch} from "../model/helperFunctionsQueryContainer";
+	returnValueType, returnIdentifier,
+	returnValueToSearch, insResultEquals} from "../model/helperFunctionsQueryContainer";
 
 export class QueryContainer {
 	public columns: string[];
@@ -38,14 +39,11 @@ export class QueryContainer {
 						temp = this.handleWhere(nextItem, datasetID, dataset);
 						// need to filter arr based on where arr[item] is included in temp.
 						// arr = arr.filter((item) => temp.includes(item));
-						// create a function that check equality of InsightResults
+						// create a function that check equality of InsightResults because above is not working
+						// idk why -> but I think making function will be easiest
 					}
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
-						let section = JSON.stringify(dataset.datasetArray[courseSection]);
-					}
 				} else {
 					for (let courseSection in dataset.datasetArray) {
 						// iterate through every course section in the dataset
