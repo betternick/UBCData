@@ -1,4 +1,6 @@
 import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {singleDatasetID, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
+	returnValueType, returnIdentifier, returnValueToSearch} from "../model/helperFunctionsQueryContainer";
 
 export class QueryContainer {
 	public columns: string[];
@@ -27,18 +29,16 @@ export class QueryContainer {
 						resultArray = resultArray.concat(arr);
 					}
 				} else if (queryKey === "AND") {
-					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
-						let section = JSON.stringify(dataset.datasetArray[courseSection]);
-						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
-						// pretty sure I do something like this:
-						// create # of arrays that match the total number of items in and
-						// for (item in AND)
-						// 		arr# = handlewhere(item)
-						// traverse arr1
-						// 		- for every item in arr 1, see if it's included in arr2/3/4...
-						//		- if yes, keep it. If not, remove it
-						//		- concat(arr1 with resultArray)
+					let arr: InsightResult[] = [];
+					let temp: InsightResult[] = [];
+					let firstItem = Object.values(query)[0][0];
+					arr = this.handleWhere(firstItem, datasetID, dataset);
+					for (let item in Object.values(query)[0]) {
+						let nextItem = Object.values(query)[0][item];
+						temp = this.handleWhere(nextItem, datasetID, dataset);
+						// need to filter arr based on where arr[item] is included in temp.
+						// arr = arr.filter((item) => temp.includes(item));
+						// create a function that check equality of InsightResults
 					}
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
@@ -74,21 +74,21 @@ export class QueryContainer {
 		resultArray: InsightResult[],
 		comparator: string
 	) {
-		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
+		singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
 		let arr = Object.values(query);
-		let field = this.transformQueryToDatasetConvention(this.returnIdentifier(JSON.stringify(arr[0])));
-		let value = this.returnValueToSearch(JSON.stringify(arr[0]));
-		let valueType = this.returnValueType(field);
+		let field = transformQueryToDatasetConvention(returnIdentifier(JSON.stringify(arr[0])));
+		let value = returnValueToSearch(JSON.stringify(arr[0]));
+		let valueType = returnValueType(field);
 		let match = this.doesThisSectionMatch(section, field, value, valueType, comparator);
 		if (match) {
 			let myInsightResult: InsightResult = {};
 			for (let col in this.columns) {
-				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
-				let val = this.getValue(section, this.columns[col], this.returnValueType(this.columns[col]));
+				let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
+				let val = this.getValue(section, this.columns[col], returnValueType(this.columns[col]));
 				// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
 				// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
 				let keyVal: string | number;
-				if (this.returnValueType(this.columns[col]) === "number") {
+				if (returnValueType(this.columns[col]) === "number") {
 					keyVal = Number(val);
 				} else {
 					keyVal = val;
@@ -96,7 +96,6 @@ export class QueryContainer {
 				if (keyCol === datasetID + "_year") {
 					// need to check if sections = overall, if yes, year = 1900
 					let sec = this.getValue(section, "Section", "string");
-					console.log("SECTION IS: " + sec);
 					if (sec === "overall") {
 						keyVal = 1900;
 					} else {
@@ -133,10 +132,10 @@ export class QueryContainer {
 		let indexStartOfValue: number;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
-			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexStartOfValue = section.indexOf("\"" + field + "\"") + field.length + 3;
 			indexEndOfValue = section.indexOf('"', indexStartOfValue + 1) + 1;
 		} else {
-			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexStartOfValue = section.indexOf("\"" + field + "\"") + field.length + 3;
 			indexEndOfValue = section.indexOf(",", indexStartOfValue);
 		}
 		let val: string = "";
@@ -168,7 +167,7 @@ export class QueryContainer {
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: object, datasetID: string) {
 		let queryString: string = JSON.stringify(query);
-		this.singleDatasetID(queryString, datasetID);
+		singleDatasetID(queryString, datasetID);
 
 		// if there is an ORDER section, extract the order
 		if (queryString.includes("ORDER")) {
@@ -184,47 +183,20 @@ export class QueryContainer {
 		// extracts all the column identifiers and puts them into the columns array
 		while (columnsString.length !== 0) {
 			let indexStartOfNextColIden = columnsString.indexOf('"') + 3;
-			this.columns.push(this.returnIdentifier(columnsString));
+			this.columns.push(returnIdentifier(columnsString));
 			columnsString = columnsString.substring(indexStartOfNextColIden);
 		}
 		this.columns.sort(); // sort columns alphabetically
 		for (let col in this.columns) {
-			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
+			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
 
-	// checks whether only a single ID is referenced
-	public singleDatasetID(query: string, datasetID: string) {
-		for (let i = 0; i < query.length; i++) {
-			if (query[i] === "_") {
-				let indexStartOfID = query.lastIndexOf('"', i) + 1;
-				let result = query.substring(indexStartOfID, i);
-				if (result !== datasetID) {
-					throw new InsightError("multiple datasets referenced");
-				}
-			}
-		}
-		return;
-	}
-
-	// returns the identifier after an underscore
-	public returnIdentifier(query: string): string {
-		const indexUnderscore = query.indexOf("_");
-		const indexEndOfIdentifier = query.indexOf('"', indexUnderscore);
-		return query.substring(indexUnderscore + 1, indexEndOfIdentifier);
-	}
-
-	// return value used during the search (ie. value we are looking for)
-	public returnValueToSearch(query: string) {
-		const indexStartOfIdentifier = query.indexOf(":");
-		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
-		return query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
-	}
 
 	// return value after identifier in a string
 	// Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
 	public getValue(str: string, identifier: string, type: string): string {
-		let indexStartOfValue = str.indexOf(identifier) + identifier.length + 2;
+		let indexStartOfValue = str.indexOf("\"" + identifier + "\"") + identifier.length + 3;
 		let indexEndOfValue: number;
 		if (type === "string") {
 			indexStartOfValue += 1;
@@ -233,67 +205,6 @@ export class QueryContainer {
 		} else {
 			indexEndOfValue = str.indexOf(",", indexStartOfValue);
 			return str.substring(indexStartOfValue, indexEndOfValue);
-		}
-	}
-
-	// transform field from naming convention in query to naming convention in dataset
-	private transformQueryToDatasetConvention(field: string): string {
-		if (field === "uuid") {
-			field = "id";
-		} else if (field === "id") {
-			field = "Course";
-		} else if (field === "title") {
-			field = "Title";
-		} else if (field === "instructor") {
-			field = "Professor";
-		} else if (field === "dept") {
-			field = "Subject";
-		} else if (field === "year") {
-			field = "Year";
-		} else if (field === "avg") {
-			field = "Avg";
-		} else if (field === "pass") {
-			field = "Pass";
-		} else if (field === "fail") {
-			field = "Fail";
-		} else {
-			field = "Audit";
-		}
-		return field;
-	}
-
-	// transform field from naming convention in dataset to naming convention in query
-	public transformDatasetToQueryConvention(field: string): string {
-		if (field === "id") {
-			field = "uuid";
-		} else if (field === "Course") {
-			field = "id";
-		} else if (field === "Title") {
-			field = "title";
-		} else if (field === "Professor") {
-			field = "instructor";
-		} else if (field === "Subject") {
-			field = "dept";
-		} else if (field === "Year") {
-			field = "year";
-		} else if (field === "Avg") {
-			field = "avg";
-		} else if (field === "Pass") {
-			field = "pass";
-		} else if (field === "Fail") {
-			field = "fail";
-		} else {
-			field = "audit";
-		}
-		return field;
-	}
-
-	// returns the expects type for the field (number or string)
-	public returnValueType(field: string) {
-		if (field === "id" || field === "Avg" || field === "Pass" || field === "Fail" || field === "Audit") {
-			return "number";
-		} else {
-			return "string";
 		}
 	}
 }
