@@ -145,9 +145,9 @@ export default class InsightFacade implements IInsightFacade {
 						}
 						reject(new InsightError("query missing WHERE or OPTIONS block"));
 					}
+					reject(new InsightError("query missing WHERE and OPTIONS blocks"));
 				}
 			}
-			reject(new InsightError("query missing WHERE and OPTIONS blocks"));
 		});
 	}
 
