@@ -1,0 +1,128 @@
+{
+	"title": "mCompEQ",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"sections_avg": 80.1
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "midw",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "midw",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "mech",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "mech",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "math",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "math",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "itst",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "itst",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "fnis",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "eosc",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "eosc",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "cpen",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "cohr",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "cohr",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "chin",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "biol",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "biol",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "basc",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "bahr",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "bahr",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "astr",
+			"sections_avg": 80.1
+		},
+		{
+			"sections_dept": "astr",
+			"sections_avg": 80.1
+		}
+	]
+}

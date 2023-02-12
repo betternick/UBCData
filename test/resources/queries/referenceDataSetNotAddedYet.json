@@ -1,0 +1,38 @@
+{
+	"title": "referenceDataSetNotAddedYet",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"AND": [
+						{
+							"GT": {
+								"sect ions_avg": 90
+							}
+						},
+						{
+							"IS": {
+								"sect ions_dept": "adhe"
+							}
+						}
+					]
+				},
+				{
+					"EQ": {
+						"sect ions_avg": 95
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sect ions_dept",
+				"sect ions_id",
+				"sect ions_avg"
+			],
+			"ORDER": "sect ions_avg"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

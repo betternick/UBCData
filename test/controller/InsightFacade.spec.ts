@@ -252,8 +252,9 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		(input) => facade.performQuery(input),
 		"./test/resources/queries",
 		{
-			assertOnResult: (actual, expected) => {
+			assertOnResult: (actual, expected: any) => {
 				expect(actual).to.deep.equal(expected);
+				// expect(actual).to.have.deep.members(expected);
 			},
 			errorValidator: (error): error is PQErrorKind =>
 				error === "ResultTooLargeError" || error === "InsightError",
