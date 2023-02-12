@@ -12,10 +12,9 @@ export class QueryContainer {
 	// handles the WHERE block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
 	// otherwise, returns the InsightResult[] that corresponds to the query
-	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
+	public handleWhere(query: object, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") {
-			let queryJSON = JSON.parse(JSON.stringify(query));
 			// WHERE block is not empty
 
 			// recursively traverse JSON query object:
@@ -50,8 +49,8 @@ export class QueryContainer {
 				} else {
 					for (let courseSection in dataset.datasetArray) {
 						// iterate through every course section in the dataset
-						let section = dataset.datasetArray[courseSection];
-						this.applyComparator(datasetID, queryJSON[queryKey], section, resultArray, queryKey);
+						let section = JSON.stringify(dataset.datasetArray[courseSection]);
+						this.applyComparator(datasetID, query, section, resultArray, queryKey);
 					}
 				}
 			}
@@ -70,37 +69,41 @@ export class QueryContainer {
 
 	private applyComparator(
 		datasetID: string,
-		query: JSON,
-		section: JSON,
+		query: object,
+		section: string,
 		resultArray: InsightResult[],
 		comparator: string
 	) {
 		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
-		// query = { sections_avg: 40}
-		let key = Object.keys(query)[0];   				    // something like: sections_avg
-		let value = Object.values(query)[0];   				// something like: 40
-		let identifier = this.transformQueryToDatasetConvention(this.returnIdentifier(key));	// something like: Avg
-
-		let match = this.doesThisSectionMatch(section, identifier, value, comparator);
+		let arr = Object.values(query);
+		let field = this.transformQueryToDatasetConvention(this.returnIdentifier(JSON.stringify(arr[0])));
+		let value = this.returnValueToSearch(JSON.stringify(arr[0]));
+		let valueType = this.returnValueType(field);
+		let match = this.doesThisSectionMatch(section, field, value, valueType, comparator);
 		if (match) {
 			let myInsightResult: InsightResult = {};
 			for (let col in this.columns) {
 				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
-				let valOfSection = this.getValue(section, this.columns[col]);
-
-				let keyVal: string | number = "";
+				let val = this.getValue(section, this.columns[col], this.returnValueType(this.columns[col]));
+				// To convert string to number: ref: https://stackoverflow.com/questions/23437476/in-
+				// typescript-how-to-check-if-a-string-is-numeric/23440948#23440948
+				let keyVal: string | number;
+				if (this.returnValueType(this.columns[col]) === "number") {
+					keyVal = Number(val);
+				} else {
+					keyVal = val;
+				}
 				if (keyCol === datasetID + "_year") {
 					// need to check if sections = overall, if yes, year = 1900
-					let sec = this.getValue(section, "Section");
+					let sec = this.getValue(section, "Section", "string");
+					console.log("SECTION IS: " + sec);
 					if (sec === "overall") {
 						keyVal = 1900;
 					} else {
-						keyVal = Number(valOfSection); 	// need to year to number
+						keyVal = Number(keyVal);
 					}
 				} else if (keyCol === datasetID + "_uuid") {
-					keyVal = valOfSection.toString();	// need to convert uuid to string
-				} else {
-					keyVal = valOfSection;
+					keyVal = keyVal.toString();
 				}
 				myInsightResult[keyCol] = keyVal;
 			}
@@ -125,47 +128,64 @@ export class QueryContainer {
 		return array.sort(dynamicSort(this.order));
 	}
 
-	public doesThisSectionMatch(section: JSON, identifier: string, value: string | number,
-		comparator: string): boolean {
-		let sectionJSON = JSON.parse(JSON.stringify(section));
-		let valOfSection = sectionJSON[identifier];
-		if (identifier === "id") {
-			valOfSection = valOfSection.toString();
+	public doesThisSectionMatch(section: string, field: string, value: string, valueType: string, comparator: string
+	): boolean {
+		let indexStartOfValue: number;
+		let indexEndOfValue: number;
+		if (valueType === "string") {
+			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexEndOfValue = section.indexOf('"', indexStartOfValue + 1) + 1;
+		} else {
+			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexEndOfValue = section.indexOf(",", indexStartOfValue);
 		}
-		if (identifier === "Year") {
-			if (sectionJSON["Section"] === "overall") {
-				valOfSection = 1900;
+		let val: string = "";
+		if (field === "Year") {
+			// need to check if sections = overall, if yes, year = 1900
+			let sec = this.getValue(section, "Section", "string");
+			if (sec === "overall") {
+				val = "1900";
 			} else {
-				valOfSection = Number(valOfSection);
+				val = section.substring(indexStartOfValue + 1, indexEndOfValue - 1);
 			}
+		} else {
+			val = section.substring(indexStartOfValue, indexEndOfValue);
 		}
-		if (comparator === "EQ") {
-			return valOfSection === value;
+		if (comparator === "EQ" || comparator === "IS") {
+			if (field === "id") {
+				val = "\"" + val + "\"";
+			}
+			return val === value;
 		} else if (comparator === "GT") {
-			return valOfSection > value;
-		} else if (comparator === "LT") {
-			return valOfSection < value;
-		} else { // comparator === "IS"
-			return valOfSection === value;
+			return Number(val) > Number(value);
+		} else { // comparator === "LT"
+			return Number(val) < Number(value);
 		}
 	}
 
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
-	public handleOptions(query: JSON, datasetID: string) {
-		let queryJSON = JSON.parse(JSON.stringify(query));
+	public handleOptions(query: object, datasetID: string) {
+		let queryString: string = JSON.stringify(query);
+		this.singleDatasetID(queryString, datasetID);
 
 		// if there is an ORDER section, extract the order
-		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
-			this.order = queryJSON.ORDER;
+		if (queryString.includes("ORDER")) {
+			let indexOfOrderStart = queryString.indexOf("ORDER") + 8;
+			let indexOfOrderEnd = queryString.indexOf("\"", indexOfOrderStart);
+			this.order = queryString.substring(indexOfOrderStart, indexOfOrderEnd);
 		}
 		// creates a substring that contains only the columns
-		let columnsJSON = queryJSON.COLUMNS;
+		let indexOfColumnsStart = queryString.indexOf("[") + 2;
+		let indexOfColumnsEnd = queryString.indexOf("]");
+		let columnsString = queryString.substring(indexOfColumnsStart, indexOfColumnsEnd);
 
 		// extracts all the column identifiers and puts them into the columns array
-		for (let col in columnsJSON) {
-			this.columns.push(this.returnIdentifier(columnsJSON[col]));
+		while (columnsString.length !== 0) {
+			let indexStartOfNextColIden = columnsString.indexOf('"') + 3;
+			this.columns.push(this.returnIdentifier(columnsString));
+			columnsString = columnsString.substring(indexStartOfNextColIden);
 		}
 		this.columns.sort(); // sort columns alphabetically
 		for (let col in this.columns) {
@@ -190,14 +210,30 @@ export class QueryContainer {
 	// returns the identifier after an underscore
 	public returnIdentifier(query: string): string {
 		const indexUnderscore = query.indexOf("_");
-		return query.substring(indexUnderscore + 1);
+		const indexEndOfIdentifier = query.indexOf('"', indexUnderscore);
+		return query.substring(indexUnderscore + 1, indexEndOfIdentifier);
+	}
+
+	// return value used during the search (ie. value we are looking for)
+	public returnValueToSearch(query: string) {
+		const indexStartOfIdentifier = query.indexOf(":");
+		const indexEndOfIdentifier = query.indexOf("}", indexStartOfIdentifier);
+		return query.substring(indexStartOfIdentifier + 1, indexEndOfIdentifier);
 	}
 
 	// return value after identifier in a string
 	// Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
-	public getValue(section: JSON, identifier: string): string | number {
-		let sectionJSON = JSON.parse(JSON.stringify(section));
-		return sectionJSON[identifier];
+	public getValue(str: string, identifier: string, type: string): string {
+		let indexStartOfValue = str.indexOf(identifier) + identifier.length + 2;
+		let indexEndOfValue: number;
+		if (type === "string") {
+			indexStartOfValue += 1;
+			indexEndOfValue = str.indexOf('"', indexStartOfValue);
+			return str.substring(indexStartOfValue, indexEndOfValue);
+		} else {
+			indexEndOfValue = str.indexOf(",", indexStartOfValue);
+			return str.substring(indexStartOfValue, indexEndOfValue);
+		}
 	}
 
 	// transform field from naming convention in query to naming convention in dataset
@@ -252,4 +288,12 @@ export class QueryContainer {
 		return field;
 	}
 
+	// returns the expects type for the field (number or string)
+	public returnValueType(field: string) {
+		if (field === "id" || field === "Avg" || field === "Pass" || field === "Fail" || field === "Audit") {
+			return "number";
+		} else {
+			return "string";
+		}
+	}
 }
