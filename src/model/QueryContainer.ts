@@ -125,27 +125,32 @@ export class QueryContainer {
 				return result * sortOrder;
 			};
 		}
-		array.sort(dynamicSort(this.order));
-		return array;
+		return array.sort(dynamicSort(this.order));
 	}
 
-	public doesThisSectionMatch(
-		courseSectionString: string,
-		field: string,
-		value: string,
-		valueType: string,
-		comparator: string
+	public doesThisSectionMatch(section: string, field: string, value: string, valueType: string, comparator: string
 	): boolean {
 		let indexStartOfValue: number;
 		let indexEndOfValue: number;
 		if (valueType === "string") {
-			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
-			indexEndOfValue = courseSectionString.indexOf('"', indexStartOfValue + 1) + 1;
+			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexEndOfValue = section.indexOf('"', indexStartOfValue + 1) + 1;
 		} else {
-			indexStartOfValue = courseSectionString.indexOf(field) + field.length + 2;
-			indexEndOfValue = courseSectionString.indexOf(",", indexStartOfValue);
+			indexStartOfValue = section.indexOf(field) + field.length + 2;
+			indexEndOfValue = section.indexOf(",", indexStartOfValue);
 		}
-		let val = courseSectionString.substring(indexStartOfValue, indexEndOfValue);
+		let val: string = "";
+		if (field === "Year") {
+			// need to check if sections = overall, if yes, year = 1900
+			let sec = this.getValue(section, "Section", "string");
+			if (sec === "overall") {
+				val = "1900";
+			} else {
+				val = section.substring(indexStartOfValue + 1, indexEndOfValue - 1);
+			}
+		} else {
+			val = section.substring(indexStartOfValue, indexEndOfValue);
+		}
 		if (comparator === "EQ" || comparator === "IS") {
 			if (field === "id") {
 				val = "\"" + val + "\"";
@@ -285,13 +290,7 @@ export class QueryContainer {
 
 	// returns the expects type for the field (number or string)
 	public returnValueType(field: string) {
-		if (
-			field === "id" ||
-			field === "Avg" ||
-			field === "Pass" ||
-			field === "Fail" ||
-			field === "Audit"
-		) {
+		if (field === "id" || field === "Avg" || field === "Pass" || field === "Fail" || field === "Audit") {
 			return "number";
 		} else {
 			return "string";
