@@ -5,7 +5,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError,
+	NotFoundError, ResultTooLargeError,
 } from "./IInsightFacade";
 
 import {QueryContainer} from "../model/QueryContainer";
@@ -16,8 +16,6 @@ import {
 	deleteDatasetFromPersistence,
 	readContent, readDirectory,
 } from "./helperFunctionsAddDataset";
-import {clearDisk, getContentFromArchives} from "../../test/TestUtil";
-import {expect} from "chai";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -139,6 +137,9 @@ export default class InsightFacade implements IInsightFacade {
 								reject(error);
 							}
 
+							if (results.length > 5000) {
+								reject(new ResultTooLargeError("Exceeded 5000 entries"));
+							}
 							// handleSort
 							results = queryObject.handleSort(results);
 							resolve(results);

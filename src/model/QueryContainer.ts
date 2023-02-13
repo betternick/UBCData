@@ -28,24 +28,32 @@ export class QueryContainer {
 						resultArray = resultArray.concat(arr);
 					}
 				} else if (queryKey === "AND") {
-					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
-						let section = JSON.stringify(dataset.datasetArray[courseSection]);
-						// console.log("got to AND"); TODO: recurse, but keeping in mind the and structure
-						// pretty sure I do something like this:
-						// create # of arrays that match the total number of items in and
-						// for (item in AND)
-						// 		arr# = handlewhere(item)
-						// traverse arr1
-						// 		- for every item in arr 1, see if it's included in arr2/3/4...
-						//		- if yes, keep it. If not, remove it
-						//		- concat(arr1 with resultArray)
+					let temp: InsightResult[] = [];
+					let firstItem = queryJSON[queryKey][0];
+					let arr = this.handleWhere(firstItem, datasetID, dataset);
+
+					for (let item = 1; item < queryJSON[queryKey].length; item++) {
+						let nextItem = queryJSON[queryKey][item];
+						temp = this.handleWhere(nextItem, datasetID, dataset);
+						let filtered: InsightResult[] = [];
+						for (let i in arr) {
+							let itemi = arr[i];
+							let cont = true;
+							for (let j in temp) {
+								let itemj = temp[j];
+								if (JSON.stringify(itemi) === JSON.stringify(itemj) && cont === true) {
+									filtered.push(itemi);
+									cont = false;
+								}
+							}
+						}
+						arr = filtered;
 					}
+					resultArray = resultArray.concat(arr);
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
 					for (let courseSection in dataset.datasetArray) {
 						// iterate through every course section in the dataset
-						let section = JSON.stringify(dataset.datasetArray[courseSection]);
 					}
 				} else {
 					for (let courseSection in dataset.datasetArray) {
@@ -56,14 +64,7 @@ export class QueryContainer {
 				}
 			}
 		} else {
-			// WHERE body is empty -> return all entries -> create test case that doesn't return too many results
-			let courseResultArray = dataset.datasetArray[0];
-			for (let course in courseResultArray) {
-				// for each course in the dataset
-				for (let column in this.columns) {
-					// for each column option in the query
-				}
-			}
+			// get all entries
 		}
 		return resultArray;
 	}
@@ -105,9 +106,6 @@ export class QueryContainer {
 				myInsightResult[keyCol] = keyVal;
 			}
 			resultArray.push(myInsightResult);
-			if (resultArray.length > 5000) {
-				throw new ResultTooLargeError("Exceeded 5000 entries");
-			}
 		}
 	}
 
