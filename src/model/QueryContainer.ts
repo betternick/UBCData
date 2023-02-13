@@ -153,13 +153,11 @@ export class QueryContainer {
 			return valOfSection === value;
 		}
 	}
-
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: JSON, datasetID: string) {
 		let queryJSON = JSON.parse(JSON.stringify(query));
-
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
 			this.order = queryJSON.ORDER;
@@ -176,7 +174,6 @@ export class QueryContainer {
 			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
-
 	// checks whether only a single ID is referenced
 	public singleDatasetID(query: string, datasetID: string) {
 		for (let i = 0; i < query.length; i++) {
@@ -190,20 +187,17 @@ export class QueryContainer {
 		}
 		return;
 	}
-
 	// returns the identifier after an underscore
 	public returnIdentifier(query: string): string {
 		const indexUnderscore = query.indexOf("_");
 		return query.substring(indexUnderscore + 1);
 	}
-
 	// return value after identifier in a string
 	// Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
 	public getValue(section: JSON, identifier: string): string | number {
 		let sectionJSON = JSON.parse(JSON.stringify(section));
 		return sectionJSON[identifier];
 	}
-
 	// transform field from naming convention in query to naming convention in dataset
 	private transformQueryToDatasetConvention(field: string): string {
 		if (field === "uuid") {
@@ -229,7 +223,6 @@ export class QueryContainer {
 		}
 		return field;
 	}
-
 	// transform field from naming convention in dataset to naming convention in query
 	public transformDatasetToQueryConvention(field: string): string {
 		if (field === "id") {
@@ -255,5 +248,4 @@ export class QueryContainer {
 		}
 		return field;
 	}
-
 }

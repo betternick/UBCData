@@ -10,24 +10,24 @@ const persistFile = "./data/persistFile.json";
 function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): Promise<any> {
 	return new Promise(function (resolve, reject) {
 		if (map.has(id)) {
-			reject(new InsightError("ID already exists"));
+			return reject(new InsightError("ID already exists"));
 			// return false;
 		}
 
 		if (id.includes("_")) {
-			reject(new InsightError("_ is not allowed"));
+			return reject(new InsightError("_ is not allowed"));
 			// return false;
 		}
 		// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
 		if (id.replace(/\s+/g, "").length === 0) {
-			reject(new InsightError("ID only has whitespace"));
+			return reject(new InsightError("ID only has whitespace"));
 			// return false;
 		}
 		if (kind !== InsightDatasetKind.Sections) {
-			reject(new InsightError("kind must only be of type sections"));
+			return reject(new InsightError("kind must only be of type sections"));
 			// return false;
 		}
-		resolve(true);
+		return resolve(true);
 	});
 }
 
@@ -43,38 +43,40 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 				try {
 					foldRead = unzip.folder(/courses/);
 				} catch (e) {
-					reject(new InsightError("No courses folder?"));
+					return reject(new InsightError("No courses folder?"));
 				}
 
 				if (foldRead.length === 0 || foldRead[0].name !== "courses/") {
-					reject(new InsightError("No courses folder?"));
+					return reject(new InsightError("No courses folder?"));
 				}
 				unzip.folder("courses")?.forEach(function (relativePath, file) {
 					promisesArray.push(file.async("string"));
 				});
 			})
 			.then(() => {
-				Promise.all(promisesArray).then((dataArray) => {
-					for (const element of dataArray) {
-						let courseFileJSON = JSON.parse(element);
-						if (courseFileJSON.result.length > 0) {
-							for (const sectionElement of courseFileJSON.result) {
-								if (checkValidSection(sectionElement)) {
-									dataset.push(sectionElement);
-								}
+				return Promise.all(promisesArray);
+			})
+			.then((dataArray) => {
+				for (const element of dataArray) {
+					let courseFileJSON = JSON.parse(element);
+					if (courseFileJSON.result.length > 0) {
+						for (const sectionElement of courseFileJSON.result) {
+							if (checkValidSection(sectionElement)) {
+								dataset.push(sectionElement);
 							}
 						}
 					}
-					if (dataset.length === 0) {
-						throw new InsightError("No valid sections to add?");
-					} else {
-						resolve(dataset.length);
-					}
-				});
-			})
+				}
 
+				if (dataset.length === 0) {
+						// SYED: check
+					return reject(new InsightError("No valid sections to add?"));
+				} else {
+					return resolve(dataset.length);
+				}
+			})
 			.catch(function (err: any) {
-				reject(new InsightError("there is an error in readContent function???"));
+				return reject(new InsightError("there is an error in readContent function???"));
 			});
 	});
 }
@@ -165,10 +167,10 @@ function addToPersistFolder(data: Dataset, keys: string[]): Promise<any> {
 				return fs.writeJson(`${persistDir}/${data.id}.json`, jsonObj);
 			})
 			.then(() => {
-				resolve(keys);
+				return resolve(keys);
 			})
 			.catch((err) => {
-				reject(new InsightError(err + "could not read json file from disk"));
+				return reject(new InsightError(err + "could not read json file from disk"));
 			});
 	});
 }
@@ -252,11 +254,11 @@ function deleteDatasetFromPersistence(path: any, id: string): Promise<any> {
 						break;
 					}
 				}
-				resolve("file deleted");
+				return resolve("file deleted");
 			})
 			.catch((err) => {
 				console.log(err);
-				reject(new InsightError("file removal no worky" + err));
+				return reject(new InsightError("file removal no worky" + err));
 			});
 	});
 }
