@@ -1,0 +1,31 @@
+{
+	"title": "whiteSpaceID",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"IS": {
+							" _dept": "math"
+						}
+					}
+				},
+				{
+					"GT": {
+						" _avg": 98.7
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				" _dept",
+				" _id",
+				"s _avg"
+			],
+			"ORDER": " _id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

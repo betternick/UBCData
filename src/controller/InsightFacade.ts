@@ -16,7 +16,13 @@ import {
 	deleteDatasetFromPersistence,
 	readContent, readDirectory,
 } from "./helperFunctionsAddDataset";
-import {queryCheckerForLTGTEQ} from "./helperFunctionsPQsyed";
+
+import {
+	getDatasetID,
+	queryCheckerForColumns,
+	queryCheckerForLTGTEQ,
+	queryValidator
+} from "./helperFunctionsQueryChecking";
 import {getContentFromArchives} from "../../test/TestUtil";
 
 /**
@@ -102,7 +108,6 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		return new Promise((resolve, reject) => {
 			// Step 1) check if the query is a JSON object
-			queryCheckerForLTGTEQ(query);
 			// console.log("Does this query NOT violate LT/EQ/GT rules?: Answer: " + g);
 			if (typeof query !== "object") {
 				reject(new InsightError("Not a valid JSON object"));
@@ -110,6 +115,8 @@ export default class InsightFacade implements IInsightFacade {
 				reject(new InsightError("query is null?"));
 			} else {
 				let datasetID = this.getDatasetID(query);
+			//	SYED: checking for invalid queries
+				queryValidator(query);
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					reject(new InsightError("the dataset you are looking for has not been added"));
@@ -249,10 +256,11 @@ export default class InsightFacade implements IInsightFacade {
 // result.then((t) => {
 // 	console.log(t);
 // });
+
 // let query = {
 // 	WHERE: {
 // 		LT: {
-// 			sections_avg: 100000
+// 			sections_avg: 1
 // 		}
 // 	},
 // 	OPTIONS: {
@@ -268,7 +276,7 @@ export default class InsightFacade implements IInsightFacade {
 // 			"sections_title",
 // 			"sections_instructor"
 // 		],
-// 		ORDER: "sections_id"
+// 		ORDER: "sections_dept"
 // 	}
 // };
 
@@ -279,4 +287,6 @@ export default class InsightFacade implements IInsightFacade {
 //
 // let g = queryCheckerLTGTEQ(query2);
 // console.log(g);
+// //
+// let h = queryValidator(query);
 

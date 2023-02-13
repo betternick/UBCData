@@ -1,0 +1,19 @@
+{
+	"title": "negativeYear",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"sections_year": -10
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": []
+}
