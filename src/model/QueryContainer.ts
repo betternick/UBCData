@@ -1,4 +1,6 @@
 import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
+	singleDatasetID} from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
 	public columns: string[];
@@ -76,23 +78,23 @@ export class QueryContainer {
 		resultArray: InsightResult[],
 		comparator: string
 	) {
-		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
+		singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
 		// query = { sections_avg: 40}
 		let key = Object.keys(query)[0];   				    // something like: sections_avg
 		let value = Object.values(query)[0];   				// something like: 40
-		let identifier = this.transformQueryToDatasetConvention(this.returnIdentifier(key));	// something like: Avg
+		let identifier = transformQueryToDatasetConvention(returnIdentifier(key));	// something like: Avg
 
 		let match = this.doesThisSectionMatch(section, identifier, value, comparator);
 		if (match) {
 			let myInsightResult: InsightResult = {};
 			for (let col in this.columns) {
-				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
-				let valOfSection = this.getValue(section, this.columns[col]);
+				let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
+				let valOfSection = getValue(section, this.columns[col]);
 
 				let keyVal: string | number = "";
 				if (keyCol === datasetID + "_year") {
 					// need to check if sections = overall, if yes, year = 1900
-					let sec = this.getValue(section, "Section");
+					let sec = getValue(section, "Section");
 					if (sec === "overall") {
 						keyVal = 1900;
 					} else {
@@ -108,8 +110,8 @@ export class QueryContainer {
 
 			// adding uuid to each InsightResult:
 			if (!this.columns.includes("id")){
-				myInsightResult[datasetID.concat("_", this.transformDatasetToQueryConvention("id"))] =
-					this.getValue(section, "id");
+				myInsightResult[datasetID.concat("_", transformDatasetToQueryConvention("id"))] =
+					getValue(section, "id");
 			}
 
 			resultArray.push(myInsightResult);
@@ -154,6 +156,7 @@ export class QueryContainer {
 			return valOfSection === value;
 		}
 	}
+
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
@@ -168,85 +171,11 @@ export class QueryContainer {
 
 		// extracts all the column identifiers and puts them into the columns array
 		for (let col in columnsJSON) {
-			this.columns.push(this.returnIdentifier(columnsJSON[col]));
+			this.columns.push(returnIdentifier(columnsJSON[col]));
 		}
 		this.columns.sort(); // sort columns alphabetically
 		for (let col in this.columns) {
-			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
+			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
 		}
-	}
-	// checks whether only a single ID is referenced
-	public singleDatasetID(query: string, datasetID: string) {
-		for (let i = 0; i < query.length; i++) {
-			if (query[i] === "_") {
-				let indexStartOfID = query.lastIndexOf('"', i) + 1;
-				let result = query.substring(indexStartOfID, i);
-				if (result !== datasetID) {
-					throw new InsightError("multiple datasets referenced");
-				}
-			}
-		}
-		return;
-	}
-	// returns the identifier after an underscore
-	public returnIdentifier(query: string): string {
-		const indexUnderscore = query.indexOf("_");
-		return query.substring(indexUnderscore + 1);
-	}
-	// return value after identifier in a string
-	// Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
-	public getValue(section: JSON, identifier: string): string | number {
-		let sectionJSON = JSON.parse(JSON.stringify(section));
-		return sectionJSON[identifier];
-	}
-	// transform field from naming convention in query to naming convention in dataset
-	private transformQueryToDatasetConvention(field: string): string {
-		if (field === "uuid") {
-			field = "id";
-		} else if (field === "id") {
-			field = "Course";
-		} else if (field === "title") {
-			field = "Title";
-		} else if (field === "instructor") {
-			field = "Professor";
-		} else if (field === "dept") {
-			field = "Subject";
-		} else if (field === "year") {
-			field = "Year";
-		} else if (field === "avg") {
-			field = "Avg";
-		} else if (field === "pass") {
-			field = "Pass";
-		} else if (field === "fail") {
-			field = "Fail";
-		} else {
-			field = "Audit";
-		}
-		return field;
-	}
-	// transform field from naming convention in dataset to naming convention in query
-	public transformDatasetToQueryConvention(field: string): string {
-		if (field === "id") {
-			field = "uuid";
-		} else if (field === "Course") {
-			field = "id";
-		} else if (field === "Title") {
-			field = "title";
-		} else if (field === "Professor") {
-			field = "instructor";
-		} else if (field === "Subject") {
-			field = "dept";
-		} else if (field === "Year") {
-			field = "year";
-		} else if (field === "Avg") {
-			field = "avg";
-		} else if (field === "Pass") {
-			field = "pass";
-		} else if (field === "Fail") {
-			field = "fail";
-		} else {
-			field = "audit";
-		}
-		return field;
 	}
 }
