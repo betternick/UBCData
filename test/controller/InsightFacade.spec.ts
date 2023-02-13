@@ -247,35 +247,36 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		clearDisk();
 	});
 	// SYED: Folder test for ORDERED queries
-	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-	// 	"Dynamic InsightFacade PerformQuery tests",
-	// 	(input) => facade.performQuery(input),
-	// 	"./test/resources/queries",
-	// 	{
-	// 		assertOnResult: (actual, expected) => {
-	// 			expect(actual).to.deep.equal(expected);
-	// 		},
-	// 		errorValidator: (error): error is PQErrorKind =>
-	// 			error === "ResultTooLargeError" || error === "InsightError",
-	// 		assertOnError: (actual, expected) => {
-	// 			// SYED: Assertion to check if actual error is of the expected type
-	// 			if (expected === "InsightError") {
-	// 				expect(actual).to.be.an.instanceOf(InsightError);
-	// 			} else {
-	// 				expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-	// 			}
-	// 		},
-	// 	}
-	// );
+	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+		"Dynamic InsightFacade PerformQuery tests",
+		(input) => facade.performQuery(input),
+		"./test/resources/queries",
+		{
+			assertOnResult: (actual, expected) => {
+				expect(actual).to.deep.equal(expected);
+			},
+			errorValidator: (error): error is PQErrorKind =>
+				error === "ResultTooLargeError" || error === "InsightError",
+			assertOnError: (actual, expected) => {
+				// SYED: Assertion to check if actual error is of the expected type
+				if (expected === "InsightError") {
+					expect(actual).to.be.an.instanceOf(InsightError);
+				} else {
+					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+				}
+			},
+		}
+	);
 	// SYED: Folder test for UNORDERED queries
 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 		"Dynamic InsightFacade PerformQuery tests",
 		(input) => facade.performQuery(input),
-		"./test/resources/unorderedQueries",
+		"./test/resources/giantQueries",
 		{
-			assertOnResult: (actual, expected: any) => {
+			assertOnResult: (actual: any, expected: any) => {
 				// SYED: Assertion to check equality
 				expect(actual).to.have.deep.members(expected);
+				expect(actual.length).to.equals(expected.length);
 			},
 			errorValidator: (error): error is PQErrorKind =>
 				error === "ResultTooLargeError" || error === "InsightError",
@@ -290,6 +291,7 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		}
 	);
 });
+
 
 describe("Data Persistence test", function () {
 	let singleCourse: string;

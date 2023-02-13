@@ -16,6 +16,8 @@ import {
 	deleteDatasetFromPersistence,
 	readContent, readDirectory,
 } from "./helperFunctionsAddDataset";
+import {queryCheckerForLTGTEQ} from "./helperFunctionsPQsyed";
+import {getContentFromArchives} from "../../test/TestUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -100,6 +102,8 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		return new Promise((resolve, reject) => {
 			// Step 1) check if the query is a JSON object
+			queryCheckerForLTGTEQ(query);
+			// console.log("Does this query NOT violate LT/EQ/GT rules?: Answer: " + g);
 			if (typeof query !== "object") {
 				reject(new InsightError("Not a valid JSON object"));
 			} else if (query == null) {
@@ -110,7 +114,6 @@ export default class InsightFacade implements IInsightFacade {
 				if (datasetToQuery === undefined) {
 					reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
-
 					let queryJSON = JSON.parse(JSON.stringify(query));
 					// catch first level of query (OPTIONS or WHERE)
 					if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
@@ -199,3 +202,81 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
+
+
+// let facade = new InsightFacade();
+// // let obj = facade.
+// // let sections: string;
+// let sections = getContentFromArchives("pair.zip");
+
+// facade.addDataset("sections",sections,InsightDatasetKind.Sections).then((f) => {
+//
+// 	console.log(f);
+// });
+
+// facade.removeDataset("sections1").then((a) => {
+// 	console.log(a + "this is");
+// });
+//
+// facade.listDatasets().then((p) => {
+// 	console.log(p);
+// });
+//
+// console.log(InsightFacade.map);
+
+// let result = facade.performQuery({
+// 	WHERE: {
+// 		LT: {
+// 			sections_avg: 100000
+// 		}
+// 	},
+// 	OPTIONS: {
+// 		COLUMNS: [
+// 			"sections_dept",
+// 			"sections_avg",
+// 			"sections_id",
+// 			"sections_audit",
+// 			"sections_pass",
+// 			"sections_year",
+// 			"sections_fail",
+// 			"sections_uuid",
+// 			"sections_title",
+// 			"sections_instructor"
+// 		],
+// 		ORDER: "sections_id"
+// 	}
+// });
+// result.then((t) => {
+// 	console.log(t);
+// });
+// let query = {
+// 	WHERE: {
+// 		LT: {
+// 			sections_avg: 100000
+// 		}
+// 	},
+// 	OPTIONS: {
+// 		COLUMNS: [
+// 			"sections_dept",
+// 			"sections_avg",
+// 			"sections_id",
+// 			"sections_audit",
+// 			"sections_pass",
+// 			"sections_year",
+// 			"sections_fail",
+// 			"sections_uuid",
+// 			"sections_title",
+// 			"sections_instructor"
+// 		],
+// 		ORDER: "sections_id"
+// 	}
+// };
+
+// let query2 = {
+// 	any: 78
+// };
+//
+//
+// let g = queryCheckerLTGTEQ(query2);
+// console.log(g);
+
