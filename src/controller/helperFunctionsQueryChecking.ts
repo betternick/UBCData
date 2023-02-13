@@ -16,35 +16,60 @@ function JSONchecker(query: unknown): any{
 	return queryReturn;
 }
 
+function whereChecker (queryWhole: any): any {
+	let whereString: string = "WHERE";
+	let returnArray: any[] = [];
+	// const whereBlockKey;
+	const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
+	returnArray.push(queryWhereBlock);
+	if (queryWhereBlock === undefined || null) {
+		throw new InsightError("Missing WHERE");
+	}
+	if (Object.keys(queryWhereBlock).length > 1) {
+		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
+	}
+
+	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
+	// 	whereBlockKey; = "LT";
+	// };
+	// if	(Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
+	// 	whereBlockKey; = "GT";
+	// };
+	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
+	// 	whereBlockKey; = "EQ";
+	// };
+	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
+	// 	whereBlockKey; = "IS";
+	// };
+	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
+	// 	whereBlockKey; = "OR";
+	// };
+	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
+	// 	whereBlockKey; = "AND";
+	// };
+	return returnArray;
+}
+
 
 // returns true if the query does not violate IS/LT/GT rules
 function queryCheckerForLTGTEQ(queryWhole: any, datasetID: string): boolean {
 
-	// console.log(queryWhole);
-	let some: string = "WHERE";
-	const queryWhereBlock  = queryWhole[some as keyof typeof queryWhole];
+	const queryWhereBlock  = whereChecker(queryWhole);
 
-	if (queryWhereBlock === undefined || null) {
-		throw new InsightError("Missing WHERE");
-	}
-
-	if (Object.keys(queryWhereBlock).length > 1) {
-		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
-	}
-	let keyWhereBlock: string = "FLAG";
+	let whereBlockKey: string = "FLAG";
 	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
-		keyWhereBlock = "LT";
+		whereBlockKey = "LT";
 	};
 	if	(Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
-		keyWhereBlock = "GT";
+		whereBlockKey = "GT";
 	};
 	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-		keyWhereBlock = "EQ";
+		whereBlockKey = "EQ";
 	};
-	if (keyWhereBlock === "FLAG") {
+	if (whereBlockKey === "FLAG") {
 		return true;
 	}
-	let objectDeepest = queryWhereBlock[keyWhereBlock];
+	let objectDeepest = queryWhereBlock[whereBlockKey];
 	let objectKeys = Object.keys(objectDeepest);
 	if (objectKeys.length > 1) {
 		throw new InsightError("this field can only have 1 key");
@@ -55,10 +80,10 @@ function queryCheckerForLTGTEQ(queryWhole: any, datasetID: string): boolean {
 	let allowableFields: string[] = [datasetID + "_audit", datasetID + "_year", datasetID + "_pass",
 		datasetID + "_fail", datasetID + "_avg"];
 	if (!allowableFields.includes(objectKey)) {
-		throw new InsightError("Invalid key type for " + keyWhereBlock);
+		throw new InsightError("Invalid key type for " + whereBlockKey);
 	}
 	if (typeof (objectDeepest[objectKey]) !== "number"){
-		throw new InsightError("invalid Value type for " + keyWhereBlock + ", should be number");
+		throw new InsightError("invalid Value type for " + whereBlockKey + ", should be number");
 	}
 	return true;
 }
