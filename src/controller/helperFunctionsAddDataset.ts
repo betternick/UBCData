@@ -41,7 +41,7 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 			.then((unzip: JSZip) => {
 				let foldRead: any;
 				try {
-					foldRead = unzip.folder(/course/);
+					foldRead = unzip.folder(/courses/);
 				} catch (e) {
 					reject(new InsightError("No courses folder?"));
 				}

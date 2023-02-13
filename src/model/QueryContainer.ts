@@ -22,6 +22,12 @@ export class QueryContainer {
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
+					// LINDA -> FOR THE MORNING------------------------------------------------------------------------
+					// change apply comparator to always add uuid to Insight Result
+					// Then, after handleWhere has returned, but before handleSort:
+					//     1) remove duplicates (can I use a set???)
+					//	   2) if uuid is not part of columns, remove it from each InsightResult
+					// ------------------------------------------------------------------------------------------------
 					for (let item in Object.values(query)[0]) {
 						let nextItem = Object.values(query)[0][item];
 						let arr = this.handleWhere(nextItem, datasetID, dataset);
@@ -64,7 +70,7 @@ export class QueryContainer {
 				}
 			}
 		} else {
-			// get all entries
+			// empty where block -> return all sections
 		}
 		return resultArray;
 	}
