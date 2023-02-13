@@ -17,6 +17,14 @@ import {
 	readContent, readDirectory,
 } from "./helperFunctionsAddDataset";
 
+import {
+	getDatasetID,
+	queryCheckerForColumns,
+	queryCheckerForLTGTEQ,
+	queryValidator
+} from "./helperFunctionsQueryChecking";
+import {getContentFromArchives} from "../../test/TestUtil";
+
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -62,10 +70,10 @@ export default class InsightFacade implements IInsightFacade {
 					return addToPersistFolder(myDataset, keys);
 				})
 				.then((keysParam) => {
-					resolve(keysParam);
+					return resolve(keysParam);
 				})
 				.catch((err) => {
-					reject(new InsightError(err));
+					return reject(new InsightError(err));
 				});
 		});
 	}
@@ -73,26 +81,26 @@ export default class InsightFacade implements IInsightFacade {
 	public removeDataset(id: string): Promise<string> {
 		return new Promise(function (resolve, reject) {
 			if (id.includes("_")) {
-				reject(new InsightError("_ character is not allowed"));
+				return reject(new InsightError("_ character is not allowed"));
 			}
 			// Removing whitespace reference: https://stackoverflow.com/questions/10800355/remove-whitespaces-inside-a-string-in-javascript
 			if (id.replace(/\s+/g, "").length === 0) {
-				reject(new InsightError("ID cannot have only whitespaces"));
+				return reject(new InsightError("ID cannot have only whitespaces"));
 			}
 
 			if (!InsightFacade.map.has(id)) {
 				console.log(InsightFacade.map.has(id));
-				reject(new NotFoundError("Dataset doesn't exist"));
+				return reject(new NotFoundError("Dataset doesn't exist"));
 			}
 
 			InsightFacade.map.delete(id);
 
 			deleteDatasetFromPersistence(InsightFacade.persistDir, id)
 				.then(() => {
-					resolve(id);
+					return resolve(id);
 				})
 				.catch(() => {
-					reject(new InsightError("could not delete dataset"));
+					return reject(new InsightError("could not delete dataset"));
 				});
 		});
 	}
@@ -100,17 +108,19 @@ export default class InsightFacade implements IInsightFacade {
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		return new Promise((resolve, reject) => {
 			// Step 1) check if the query is a JSON object
+			// console.log("Does this query NOT violate LT/EQ/GT rules?: Answer: " + g);
 			if (typeof query !== "object") {
-				reject(new InsightError("Not a valid JSON object"));
+				return reject(new InsightError("Not a valid JSON object"));
 			} else if (query == null) {
-				reject(new InsightError("query is null?"));
+				return reject(new InsightError("query is null?"));
 			} else {
 				let datasetID = this.getDatasetID(query);
+			//	SYED: checking for invalid queries
+				queryValidator(query);
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 				if (datasetToQuery === undefined) {
-					reject(new InsightError("the dataset you are looking for has not been added"));
+					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
-
 					let queryJSON = JSON.parse(JSON.stringify(query));
 					// catch first level of query (OPTIONS or WHERE)
 					if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
@@ -126,7 +136,7 @@ export default class InsightFacade implements IInsightFacade {
 							try {
 								queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
 							} catch (error) {
-								reject(error);
+								return reject(error);
 							}
 
 							// handleWhere
@@ -134,22 +144,22 @@ export default class InsightFacade implements IInsightFacade {
 							try {
 								results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
 							} catch (error) {
-								reject(error);
+								return reject(error);
 							}
 
 							if (results.length > 5000) {
-								reject(new ResultTooLargeError("Exceeded 5000 entries"));
+								return reject(new ResultTooLargeError("Exceeded 5000 entries"));
 							}
 							// handleSort
 							results = queryObject.handleSort(results);
-							resolve(results);
+							return resolve(results);
 						}
-						reject(new InsightError("query missing WHERE or OPTIONS block"));
+						return reject(new InsightError("query missing WHERE or OPTIONS block"));
 					}
-					reject(new InsightError("query missing WHERE and OPTIONS blocks"));
+					return reject(new InsightError("query missing WHERE and OPTIONS blocks"));
 				}
 			}
-			reject (new InsightError("reject"));
+			return reject (new InsightError("reject"));
 		});
 	}
 
@@ -168,7 +178,7 @@ export default class InsightFacade implements IInsightFacade {
 				thing.numRows = value.numRows;
 				array.push(thing);
 			});
-			resolve(array);
+			return resolve(array);
 		});
 	}
 
@@ -199,3 +209,84 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
+
+
+// let facade = new InsightFacade();
+// // let obj = facade.
+// // let sections: string;
+// let sections = getContentFromArchives("pair.zip");
+
+// facade.addDataset("sections",sections,InsightDatasetKind.Sections).then((f) => {
+//
+// 	console.log(f);
+// });
+
+// facade.removeDataset("sections1").then((a) => {
+// 	console.log(a + "this is");
+// });
+//
+// facade.listDatasets().then((p) => {
+// 	console.log(p);
+// });
+//
+// console.log(InsightFacade.map);
+
+// let result = facade.performQuery({
+// 	WHERE: {
+// 		LT: {
+// 			sections_avg: 100000
+// 		}
+// 	},
+// 	OPTIONS: {
+// 		COLUMNS: [
+// 			"sections_dept",
+// 			"sections_avg",
+// 			"sections_id",
+// 			"sections_audit",
+// 			"sections_pass",
+// 			"sections_year",
+// 			"sections_fail",
+// 			"sections_uuid",
+// 			"sections_title",
+// 			"sections_instructor"
+// 		],
+// 		ORDER: "sections_id"
+// 	}
+// });
+// result.then((t) => {
+// 	console.log(t);
+// });
+
+// let query = {
+// 	WHERE: {
+// 		LT: {
+// 			sections_avg: 1
+// 		}
+// 	},
+// 	OPTIONS: {
+// 		COLUMNS: [
+// 			"sections_dept",
+// 			"sections_avg",
+// 			"sections_id",
+// 			"sections_audit",
+// 			"sections_pass",
+// 			"sections_year",
+// 			"sections_fail",
+// 			"sections_uuid",
+// 			"sections_title",
+// 			"sections_instructor"
+// 		],
+// 		ORDER: "sections_dept"
+// 	}
+// };
+
+// let query2 = {
+// 	any: 78
+// };
+//
+//
+// let g = queryCheckerLTGTEQ(query2);
+// console.log(g);
+// //
+// let h = queryValidator(query);
+
