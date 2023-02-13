@@ -14,30 +14,28 @@ export class QueryContainer {
 	// otherwise, returns the InsightResult[] that corresponds to the query
 	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
-		if (JSON.stringify(query) !== "{}") {
+		if (JSON.stringify(query) !== "{}") {  // WHERE block is not empty
 			let queryJSON = JSON.parse(JSON.stringify(query));
-			// WHERE block is not empty
-
 			// recursively traverse JSON query object:
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
-					// LINDA -> FOR THE MORNING------------------------------------------------------------------------
-					// change apply comparator to always add uuid to Insight Result
-					// Then, after handleWhere has returned, but before handleSort:
-					//     1) remove duplicates (can I use a set???)
-					//	   2) if uuid is not part of columns, remove it from each InsightResult
-					// ------------------------------------------------------------------------------------------------
 					for (let item in Object.values(query)[0]) {
 						let nextItem = Object.values(query)[0][item];
-						let arr = this.handleWhere(nextItem, datasetID, dataset);
-						resultArray = resultArray.concat(arr);
+						resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
 					}
+					// filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
+					// how-to-remove-all-duplicates-from-an-array-of-objects
+					resultArray = resultArray.filter((value, index) => {
+						const myValue = JSON.stringify(value);
+						return index === resultArray.findIndex((obj) => {
+							return JSON.stringify(obj) === myValue;
+						});
+					});
 				} else if (queryKey === "AND") {
 					let temp: InsightResult[] = [];
 					let firstItem = queryJSON[queryKey][0];
 					let arr = this.handleWhere(firstItem, datasetID, dataset);
-
 					for (let item = 1; item < queryJSON[queryKey].length; item++) {
 						let nextItem = queryJSON[queryKey][item];
 						temp = this.handleWhere(nextItem, datasetID, dataset);
@@ -58,12 +56,8 @@ export class QueryContainer {
 					resultArray = resultArray.concat(arr);
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
-					}
 				} else {
 					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
 						let section = dataset.datasetArray[courseSection];
 						this.applyComparator(datasetID, queryJSON[queryKey], section, resultArray, queryKey);
 					}
@@ -111,6 +105,13 @@ export class QueryContainer {
 				}
 				myInsightResult[keyCol] = keyVal;
 			}
+
+			// adding uuid to each InsightResult:
+			if (!this.columns.includes("id")){
+				myInsightResult[datasetID.concat("_", this.transformDatasetToQueryConvention("id"))] =
+					this.getValue(section, "id");
+			}
+
 			resultArray.push(myInsightResult);
 		}
 	}
