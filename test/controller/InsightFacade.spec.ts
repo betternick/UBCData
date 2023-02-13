@@ -271,7 +271,7 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 		"Dynamic InsightFacade PerformQuery tests",
 		(input) => facade.performQuery(input),
-		"./test/resources/giantQueries",
+		"./test/resources/unorderedQueries",
 		{
 			assertOnResult: (actual: any, expected: any) => {
 				// SYED: Assertion to check equality
