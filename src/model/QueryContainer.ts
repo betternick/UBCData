@@ -178,4 +178,14 @@ export class QueryContainer {
 			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
+
+	public filterUUID(results: InsightResult[], datasetID: string): InsightResult[] {
+		for (let res in results) {
+			delete results[res][datasetID.concat("_", transformDatasetToQueryConvention("id"))];
+		}
+		console.log(results[0]);
+		return results;
+	}
 }
+
+

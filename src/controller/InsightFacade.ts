@@ -131,14 +131,12 @@ export default class InsightFacade implements IInsightFacade {
 							Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 						) {
 							let queryObject = new QueryContainer();
-
 							// handleOptions
 							try {
 								queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
 							} catch (error) {
 								return reject(error);
 							}
-
 							// handleWhere
 							let results: InsightResult[] = [];
 							try {
@@ -146,9 +144,12 @@ export default class InsightFacade implements IInsightFacade {
 							} catch (error) {
 								return reject(error);
 							}
-
 							if (results.length > 5000) {
 								return reject(new ResultTooLargeError("Exceeded 5000 entries"));
+							}
+							// remove uuid from InsightResults if UUID is not a column
+							if (!queryObject.columns.includes("id")) {
+								results = queryObject.filterUUID(results, datasetID);
 							}
 							// handleSort
 							results = queryObject.handleSort(results);
