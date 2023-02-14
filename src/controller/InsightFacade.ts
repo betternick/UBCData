@@ -122,41 +122,36 @@ export default class InsightFacade implements IInsightFacade {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
 					let queryJSON = JSON.parse(JSON.stringify(query));
-					// catch first level of query (OPTIONS or WHERE)
-					if (Object.prototype.hasOwnProperty.call(query, "WHERE") ||
+					// check that query object has BOTH OPTIONS and WHERE
+					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 					) {
-						// check that query object has BOTH OPTIONS and WHERE
-						if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
-							Object.prototype.hasOwnProperty.call(query, "OPTIONS")
-						) {
-							let queryObject = new QueryContainer();
-
-							// handleOptions
-							try {
-								queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
-							} catch (error) {
-								return reject(error);
-							}
-
-							// handleWhere
-							let results: InsightResult[] = [];
-							try {
-								results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
-							} catch (error) {
-								return reject(error);
-							}
-
-							if (results.length > 5000) {
-								return reject(new ResultTooLargeError("Exceeded 5000 entries"));
-							}
-							// handleSort
-							results = queryObject.handleSort(results);
-							return resolve(results);
+						let queryObject = new QueryContainer();
+						// handleOptions
+						try {
+							queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
+						} catch (error) {
+							return reject(error);
 						}
-						return reject(new InsightError("query missing WHERE or OPTIONS block"));
+						// handleWhere
+						let results: InsightResult[] = [];
+						try {
+							results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
+						} catch (error) {
+							return reject(error);
+						}
+						if (results.length > 5000) {
+							return reject(new ResultTooLargeError("Exceeded 5000 entries"));
+						}
+						// remove uuid from InsightResults if UUID is not a column
+						if (!queryObject.columns.includes("id")) {
+							results = queryObject.filterUUID(results, datasetID);
+						}
+						// handleSort
+						results = queryObject.handleSort(results);
+						return resolve(results);
 					}
-					return reject(new InsightError("query missing WHERE and OPTIONS blocks"));
+					return reject(new InsightError("query missing WHERE/OPTIONS blocks"));
 				}
 			}
 			return reject (new InsightError("reject"));
