@@ -38,22 +38,18 @@ export class QueryContainer {
 					let temp: InsightResult[] = [];
 					let firstItem = queryJSON[queryKey][0];
 					let arr = this.handleWhere(firstItem, datasetID, dataset);
+					let uuid = datasetID + "_" + "uuid";
 					for (let item = 1; item < queryJSON[queryKey].length; item++) {
 						let nextItem = queryJSON[queryKey][item];
 						temp = this.handleWhere(nextItem, datasetID, dataset);
-						let filtered: InsightResult[] = [];
-						for (let i in arr) {
-							let itemi = arr[i];
-							let cont = true;
-							for (let j in temp) {
-								let itemj = temp[j];
-								if (JSON.stringify(itemi) === JSON.stringify(itemj) && cont === true) {
-									filtered.push(itemi);
-									cont = false;
-								}
-							}
-						}
-						arr = filtered;
+						// filtering one array by another array of objects by property: ref: https://urlis.net/fg8h2mqb
+						console.time();
+						arr = arr.filter((elem) => {
+							return temp.some((ele) => {
+								return ele[uuid] === elem[uuid];
+							});
+						});
+						console.timeEnd();
 					}
 					resultArray = resultArray.concat(arr);
 				} else if (queryKey === "NOT") {
@@ -113,7 +109,6 @@ export class QueryContainer {
 				myInsightResult[datasetID.concat("_", transformDatasetToQueryConvention("id"))] =
 					getValue(section, "id");
 			}
-
 			resultArray.push(myInsightResult);
 		}
 	}
@@ -166,7 +161,7 @@ export class QueryContainer {
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
 			this.order = queryJSON.ORDER;
 		}
-		// creates a substring that contains only the columns
+		// creates a object that contains only the columns
 		let columnsJSON = queryJSON.COLUMNS;
 
 		// extracts all the column identifiers and puts them into the columns array
@@ -183,7 +178,6 @@ export class QueryContainer {
 		for (let res in results) {
 			delete results[res][datasetID.concat("_", transformDatasetToQueryConvention("id"))];
 		}
-		console.log(results[0]);
 		return results;
 	}
 }
