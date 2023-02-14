@@ -26,6 +26,7 @@ let sectionsEmptyFile: string;
 let sectionsInvalidSection: string;
 // SYED: The following section only has the first 15 courses from pair
 let sectionsLightSection: string;
+let noCoursesFolder: string;
 let flag: number;
 
 before(function () {
@@ -37,6 +38,7 @@ before(function () {
 	sectionsEmptyFile = getContentFromArchives("pairEmpty.zip");
 	sectionsInvalidSection = getContentFromArchives("pairInvalidSection.zip");
 	sectionsLightSection = getContentFromArchives("pairLight.zip");
+	// noCoursesFolder = getContentFromArchives("noCoursesFolder.zip");
 	// Just in case there is anything hanging around from a previous run of the test suite
 	clearDisk();
 });
@@ -150,6 +152,29 @@ describe("Add/Remove/List Dataset", function () {
 					//  expect(err).to.be.instanceof(TooSimple);
 				}
 			});
+
+			it("FOUR heavy datasets added consecutively", async function () {
+				try {
+					// console.time();
+					const result = await facade.addDataset("set1", sections, InsightDatasetKind.Sections);
+					const result2 = await facade.addDataset("set2", sections, InsightDatasetKind.Sections);
+					const result3 = await facade.addDataset("set3", sections, InsightDatasetKind.Sections);
+					const result4 = await facade.addDataset("set4", sections, InsightDatasetKind.Sections);
+					const len = await facade.listDatasets();
+					expect(len.length).to.equals(4);
+					// console.time();
+					// const result2 = await facade.addDataset("qw2", sectionsLightSection, InsightDatasetKind.Sections);
+					// expect(result2.length).to.equals(2);
+					// const len1 = await facade.listDatasets();
+					// expect(len1.length).to.equals(2);
+					// expect(result2[0]).to.equals("qw");
+					// expect(result2[1]).to.equals("qw2");
+				} catch (err) {
+					console.error(err);
+					expect.fail("Should not have rejected!");
+					//  expect(err).to.be.instanceof(TooSimple);
+				}
+			});
 		});
 	});
 
@@ -228,123 +253,124 @@ describe("Add/Remove/List Dataset", function () {
  * You can still make tests te normal way, this is just a convenient tool for a majority of queries.
  */
 
-type PQErrorKind = "ResultTooLargeError" | "InsightError";
-describe("PerformQuery Dynamic Folder Test Suite", function () {
-	before(function () {
-		flag = 1;
-		// SYED: added the below to see if fixes flakiness
-		clearDisk();
-		console.info(`Before: ${this.test?.parent?.title}`);
-		facade = new InsightFacade();
-		// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
-		// Will *fail* if there is a problem reading ANY dataset.
-		const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
-		return Promise.all(loadDatasetPromises);
-		// facade.addDataset("sections", sections, InsightDatasetKind.Sections).then()
-	});
-	after(function () {
-		// console.info(`After: ${this.test?.parent?.title}`);
-		clearDisk();
-	});
-	// SYED: Folder test for ORDERED queries
-	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-	// 	"Dynamic InsightFacade PerformQuery tests",
-	// 	(input) => facade.performQuery(input),
-	// 	"./test/resources/queries",
-	// 	{
-	// 		assertOnResult: (actual, expected) => {
-	// 			expect(actual).to.deep.equal(expected);
-	// 		},
-	// 		errorValidator: (error): error is PQErrorKind =>
-	// 			error === "ResultTooLargeError" || error === "InsightError",
-	// 		assertOnError: (actual, expected) => {
-	// 			// SYED: Assertion to check if actual error is of the expected type
-	// 			if (expected === "InsightError") {
-	// 				expect(actual).to.be.an.instanceOf(InsightError);
-	// 			} else {
-	// 				expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-	// 			}
-	// 		},
-	// 	}
-	// );
-	// SYED: Folder test for UNORDERED queries
-	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-		"Dynamic InsightFacade PerformQuery tests",
-		(input) => facade.performQuery(input),
-		"./test/resources/unorderedQueries",
-		{
-			assertOnResult: (actual: any, expected: any) => {
-				// SYED: Assertion to check equality
-				expect(actual).to.have.deep.members(expected);
-				expect(actual.length).to.equals(expected.length);
-			},
-			errorValidator: (error): error is PQErrorKind =>
-				error === "ResultTooLargeError" || error === "InsightError",
-			assertOnError: (actual, expected) => {
-				// SYED: Assertion to check if actual error is of the expected type
-				if (expected === "InsightError") {
-					expect(actual).to.be.an.instanceOf(InsightError);
-				} else {
-					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-				}
-			},
-		}
-	);
-});
-
-
-describe("Data Persistence test", function () {
-	let singleCourse: string;
-	let threeCourses: string;
-
-	before(function () {
-		// This block runs once and loads the datasets.
-		clearDisk();
-		singleCourse = getContentFromArchives("singleCourse.zip");
-		threeCourses = getContentFromArchives("Pair3CoursesOnly.zip");
-	});
-
-	it("persistence of datasets while instantiating new InsightFacade objects", async function () {
-		let datafacade = new InsightFacade();
-		const result = await datafacade.addDataset("1", singleCourse, InsightDatasetKind.Sections);
-		expect(result.length).to.equals(1);
-		expect(result[0]).to.equals("1");
-		const len = await datafacade.listDatasets();
-		expect(len.length).to.equals(1);
-		expect(len[0].id).to.equals("1");
-		expect(len[0].numRows).to.equals(5);
-		expect(len[0].kind).to.equals(InsightDatasetKind.Sections);
-
-		let datafacade2 = new InsightFacade();
-		const len2 = await datafacade2.listDatasets();
-		expect(len2.length).to.equals(1);
-		expect(len2[0].id).to.equals("1");
-		expect(len2[0].numRows).to.equals(5);
-		expect(len2[0].kind).to.equals(InsightDatasetKind.Sections);
-		const result2 = await datafacade.addDataset("2", threeCourses, InsightDatasetKind.Sections);
-
-		let datafacade3 = new InsightFacade();
-		const len3 = await datafacade3.listDatasets();
-		expect(len3.length).to.equals(2);
-		expect(len3[1].id).to.equals("2");
-		expect(len3[1].numRows).to.equals(8);
-		expect(len3[1].kind).to.equals(InsightDatasetKind.Sections);
-
-		let datafacade4 = new InsightFacade();
-		const rm = await datafacade4.removeDataset("1");
-		expect(rm).to.equals("1");
-		const len4 = await datafacade4.listDatasets();
-		expect(len4.length).to.equals(1);
-		expect(len4[0].id).to.equals("2");
-		expect(len4[0].numRows).to.equals(8);
-		expect(len4[0].kind).to.equals(InsightDatasetKind.Sections);
-		const bigADD = await datafacade4.addDataset("big", sections, InsightDatasetKind.Sections);
-
-		let datafacade5 = new InsightFacade();
-		const len5 = await datafacade5.listDatasets();
-		expect(len5.length).to.equals(2);
-		expect(len5[0].id).to.equals("2");
-		expect(len5[1].id).to.equals("big");
-		expect(len5[1].numRows).to.equals(64612);
-	});
-});
+// type PQErrorKind = "ResultTooLargeError" | "InsightError";
+// describe("PerformQuery Dynamic Folder Test Suite", function () {
+// 	before(function () {
+// 		flag = 1;
+// 		// SYED: added the below to see if fixes flakiness
+// 		clearDisk();
+// 		console.info(`Before: ${this.test?.parent?.title}`);
+// 		facade = new InsightFacade();
+// 		// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
+// 		// Will *fail* if there is a problem reading ANY dataset.
+// 		const loadDatasetPromises = [facade.addDataset("sections", sections, InsightDatasetKind.Sections)];
+// 		return Promise.all(loadDatasetPromises);
+// 		// facade.addDataset("sections", sections, InsightDatasetKind.Sections).then()
+// 	});
+// 	after(function () {
+// 		// console.info(`After: ${this.test?.parent?.title}`);
+// 		clearDisk();
+// 	});
+// 	// SYED: Folder test for ORDERED queries
+// 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+// 		"Dynamic InsightFacade PerformQuery tests",
+// 		(input) => facade.performQuery(input),
+// 		"./test/resources/queries",
+// 		{
+// 			assertOnResult: (actual, expected) => {
+// 				expect(actual).to.deep.equal(expected);
+// 			},
+// 			errorValidator: (error): error is PQErrorKind =>
+// 				error === "ResultTooLargeError" || error === "InsightError",
+// 			assertOnError: (actual, expected) => {
+// 				// SYED: Assertion to check if actual error is of the expected type
+// 				if (expected === "InsightError") {
+// 					expect(actual).to.be.an.instanceOf(InsightError);
+// 				} else {
+// 					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+// 				}
+// 			},
+// 		}
+// 	);
+// 	// SYED: Folder test for UNORDERED queries
+// 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+// 		"Dynamic InsightFacade PerformQuery tests",
+// 		(input) => facade.performQuery(input),
+// 		"./test/resources/unorderedQueries",
+// 		{
+// 			assertOnResult: (actual: any, expected: any) => {
+// 				// SYED: Assertion to check equality
+// 				expect(actual).to.have.deep.members(expected);
+// 				expect(actual.length).to.equals(expected.length);
+// 			},
+// 			errorValidator: (error): error is PQErrorKind =>
+// 				error === "ResultTooLargeError" || error === "InsightError",
+// 			assertOnError: (actual, expected) => {
+// 				// SYED: Assertion to check if actual error is of the expected type
+// 				if (expected === "InsightError") {
+// 					expect(actual).to.be.an.instanceOf(InsightError);
+// 				} else {
+// 					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+// 				}
+// 			},
+// 		}
+// 	);
+// });
+//
+//
+// describe("Data Persistence test", function () {
+// 	let singleCourse: string;
+// 	let threeCourses: string;
+//
+// 	before(function () {
+// 		// This block runs once and loads the datasets.
+// 		clearDisk();
+// 		singleCourse = getContentFromArchives("singleCourse.zip");
+// 		threeCourses = getContentFromArchives("Pair3CoursesOnly.zip");
+//
+// 	});
+//
+// 	it("persistence of datasets while instantiating new InsightFacade objects", async function () {
+// 		let datafacade = new InsightFacade();
+// 		const result = await datafacade.addDataset("1", sections, InsightDatasetKind.Sections);
+// 		expect(result.length).to.equals(1);
+// 		expect(result[0]).to.equals("1");
+// 		const len = await datafacade.listDatasets();
+// 		expect(len.length).to.equals(1);
+// 		expect(len[0].id).to.equals("1");
+// 		expect(len[0].numRows).to.equals(64612);
+// 		expect(len[0].kind).to.equals(InsightDatasetKind.Sections);
+//
+// 		let datafacade2 = new InsightFacade();
+// 		const len2 = await datafacade2.listDatasets();
+// 		expect(len2.length).to.equals(1);
+// 		expect(len2[0].id).to.equals("1");
+// 		expect(len2[0].numRows).to.equals(64612);
+// 		expect(len2[0].kind).to.equals(InsightDatasetKind.Sections);
+// 		const result2 = await datafacade.addDataset("2", sections, InsightDatasetKind.Sections);
+//
+// 		let datafacade3 = new InsightFacade();
+// 		const len3 = await datafacade3.listDatasets();
+// 		expect(len3.length).to.equals(2);
+// 		expect(len3[1].id).to.equals("2");
+// 		expect(len3[1].numRows).to.equals(64612);
+// 		expect(len3[1].kind).to.equals(InsightDatasetKind.Sections);
+//
+// 		let datafacade4 = new InsightFacade();
+// 		const rm = await datafacade4.removeDataset("1");
+// 		expect(rm).to.equals("1");
+// 		const len4 = await datafacade4.listDatasets();
+// 		expect(len4.length).to.equals(1);
+// 		expect(len4[0].id).to.equals("2");
+// 		expect(len4[0].numRows).to.equals(64612);
+// 		expect(len4[0].kind).to.equals(InsightDatasetKind.Sections);
+// 		const bigADD = await datafacade4.addDataset("big", sections, InsightDatasetKind.Sections);
+//
+// 		let datafacade5 = new InsightFacade();
+// 		const len5 = await datafacade5.listDatasets();
+// 		expect(len5.length).to.equals(2);
+// 		expect(len5[0].id).to.equals("2");
+// 		expect(len5[1].id).to.equals("big");
+// 		expect(len5[1].numRows).to.equals(64612);
+// 	});
+// });

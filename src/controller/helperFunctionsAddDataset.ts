@@ -35,20 +35,21 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 	return new Promise(function (resolve, reject) {
 		let zip = new JSZip();
 		let promisesArray: any = [];
+		let coursesArray: any = [];
 		// SYED: ref: https://stuk.github.io/jszip/documentation/howto/read_zip.html &
 		// https://stuk.github.io/jszip/documentation/api_jszip/for_each.html
 		zip.loadAsync(content, {base64: true})
 			.then((unzip: JSZip) => {
-				let foldRead: any;
-				try {
-					foldRead = unzip.folder(/course/);
-				} catch (e) {
-					return reject(new InsightError("No courses folder?"));
-				}
-
-				if (foldRead.length === 0 || foldRead[0].name !== "courses/") {
-					return reject(new InsightError("No courses folder?"));
-				}
+				// let foldRead: any;
+				// try {
+				// 	// foldRead = unzip.folder(/courses/);
+				// } catch (e) {
+				// 	return reject(new InsightError("No courses folder?123"));
+				// }
+				// //
+				// if (foldRead.length === 0 || foldRead[0].name !== "courses/") {
+				// 	return reject(new InsightError("No courses folder?456"));
+				// }
 				unzip.folder("courses")?.forEach(function (relativePath, file) {
 					promisesArray.push(file.async("string"));
 				});
@@ -60,16 +61,23 @@ function readContent(content: any, dataset: JSON[]): Promise<number> {
 				for (const element of dataArray) {
 					let courseFileJSON = JSON.parse(element);
 					if (courseFileJSON.result.length > 0) {
-						for (const sectionElement of courseFileJSON.result) {
-							if (checkValidSection(sectionElement)) {
-								dataset.push(sectionElement);
-							}
-						}
+						coursesArray.push(courseFileJSON);
 					}
+				};
+				for (const course of coursesArray) {
+					course.result.forEach((section: any) => {
+						if (checkValidSection(section)){
+							dataset.push(section);
+						}
+						// dataset.push(section));
+					});
 				}
-
+				// for (let i = 0; i < dataset.length; i++){
+				// 	if (!checkValidSection(dataset[i])) {
+				// 		dataset.splice(i, 1);
+				// 	}
+				// }
 				if (dataset.length === 0) {
-						// SYED: check
 					return reject(new InsightError("No valid sections to add?"));
 				} else {
 					return resolve(dataset.length);

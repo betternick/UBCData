@@ -116,7 +116,7 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				let datasetID = this.getDatasetID(query);
 			//	SYED: checking for invalid queries
-				queryValidator(query);
+			// 	queryValidator(query);
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));

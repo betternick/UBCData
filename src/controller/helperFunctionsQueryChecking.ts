@@ -11,7 +11,7 @@ function JSONchecker(query: unknown): any{
 	try {
 		queryReturn = JSON.parse(JSON.stringify(query));
 	} catch (err) {
-		throw new InsightError("Not a valid JSON query");
+		throw new InsightError("Not a valid JSON object");
 	}
 	return queryReturn;
 }
