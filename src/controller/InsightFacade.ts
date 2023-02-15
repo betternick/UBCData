@@ -205,3 +205,31 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
+
+
+let query = {
+	WHERE: {
+		IS: {
+			sections_dept: "RT1*"
+		}
+	},
+	OPTIONS: {
+		COLUMNS: [
+			"sections_dept",
+			"sections_avg",
+			"sections_id",
+			"sections_audit",
+			"sections_pass",
+			"sections_year",
+			"sections_fail",
+			"sections_uuid",
+			"sections_title",
+			"sections_instructor"
+		],
+		ORDER: "sections_dept"
+	}
+};
+
+let g = queryValidator(query);
+console.log(g);
+
