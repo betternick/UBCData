@@ -22,18 +22,18 @@ export class QueryContainer {
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
-					// for (let item in Object.values(query)[0]) {
-					// 	let nextItem = Object.values(query)[0][item];
-					// 	resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
-					// }
-					// // filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
-					// // how-to-remove-all-duplicates-from-an-array-of-objects
-					// resultArray = resultArray.filter((value, index) => {
-					// 	const myValue = JSON.stringify(value);
-					// 	return index === resultArray.findIndex((obj) => {
-					// 		return JSON.stringify(obj) === myValue;
-					// 	});
-					// });
+					for (let item in Object.values(query)[0]) {
+						let nextItem = Object.values(query)[0][item];
+						resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
+					}
+					// filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
+					// how-to-remove-all-duplicates-from-an-array-of-objects
+					resultArray = resultArray.filter((value, index) => {
+						const myValue = JSON.stringify(value);
+						return index === resultArray.findIndex((obj) => {
+							return JSON.stringify(obj) === myValue;
+						});
+					});
 				} else if (queryKey === "AND") {
 					// let temp: InsightResult[] = [];
 					// let firstItem = queryJSON[queryKey][0];
