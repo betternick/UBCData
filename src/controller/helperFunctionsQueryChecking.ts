@@ -148,7 +148,7 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string): boolean {
 	if (count === 2) {
 		let firstPositionOfAsterisk = stringVal.indexOf("*");
 		let lastPositionOfAsterisk = stringVal.lastIndexOf("*");
-		if (firstPositionOfAsterisk !== 0 && lastPositionOfAsterisk !== lengthOfStringVal - 1){
+		if (firstPositionOfAsterisk !== 0 || lastPositionOfAsterisk !== lengthOfStringVal - 1){
 			throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
 		}
 	}

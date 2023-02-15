@@ -210,7 +210,7 @@ export default class InsightFacade implements IInsightFacade {
 let query = {
 	WHERE: {
 		IS: {
-			sections_dept: "RT1*"
+			sections_dept: "g*h*"
 		}
 	},
 	OPTIONS: {
