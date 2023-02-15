@@ -16,47 +16,135 @@ function JSONchecker(query: unknown): any{
 	return queryReturn;
 }
 
-function whereChecker (queryWhole: any): any {
+function whereChecker (queryWhole: any, datasetID: string): any {
 	let whereString: string = "WHERE";
-	let returnArray: any[] = [];
-	// const whereBlockKey;
 	const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
-	returnArray.push(queryWhereBlock);
 	if (queryWhereBlock === undefined || null) {
 		throw new InsightError("Missing WHERE");
 	}
 	if (Object.keys(queryWhereBlock).length > 1) {
 		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
 	}
+	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
+	};
+	if	(Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
+	};
+	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
+	};
+	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "IS")) {
+		queryCheckerForIs(queryWhereBlock,datasetID);
+	};
+	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "OR")) {
+		queryCheckerForOr(queryWhereBlock,datasetID);
+	};
+	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "AND")) {
+		queryCheckerForAnd(queryWhereBlock,datasetID);
+	};
+}
 
-	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
-	// 	whereBlockKey; = "LT";
-	// };
-	// if	(Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
-	// 	whereBlockKey; = "GT";
-	// };
-	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-	// 	whereBlockKey; = "EQ";
-	// };
-	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-	// 	whereBlockKey; = "IS";
-	// };
-	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-	// 	whereBlockKey; = "OR";
-	// };
-	// if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-	// 	whereBlockKey; = "AND";
-	// };
-	return returnArray;
+// checks query for OR
+function queryCheckerForOr(queryWhereBlock: any, datasetID: string): boolean {
+	let whereBlockKey: string = "OR";
+	let objectDeepest = queryWhereBlock[whereBlockKey];
+	// console.log(objectDeepest);
+	for (const element of objectDeepest) {
+		let key = Object.keys(element);
+		// console.log(Object.keys(element));
+		switch(key[0]) {
+			case "LT":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "GT":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "EQ":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "IS":
+				queryCheckerForIs(element,datasetID);
+				break;
+			case "OR":
+				queryCheckerForOr(element,datasetID);
+				break;
+			case "AND":
+				queryCheckerForAnd(element,datasetID);
+				break;
+			default:
+				throw new InsightError("Invalid filter key: " + key[0]);
+		}
+	}
+	return true;
+}
+
+// checks query for AND
+function queryCheckerForAnd(queryWhereBlock: any, datasetID: string): boolean {
+	let whereBlockKey: string = "AND";
+	let objectDeepest = queryWhereBlock[whereBlockKey];
+	// console.log(objectDeepest);
+	for (const element of objectDeepest) {
+		let key = Object.keys(element);
+		// console.log(Object.keys(element));
+		switch(key[0]) {
+			case "LT":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "GT":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "EQ":
+				queryCheckerForLtGtEq(element,datasetID);
+				break;
+			case "IS":
+				queryCheckerForIs(element,datasetID);
+				break;
+			case "OR":
+				queryCheckerForOr(element,datasetID);
+				break;
+			case "AND":
+				queryCheckerForAnd(element,datasetID);
+				break;
+			default:
+				throw new InsightError("Invalid filter key: " + key[0]);
+		}
+	}
+	return true;
+}
+
+
+// checks query for IS
+function queryCheckerForIs(queryWhereBlock: any, datasetID: string): boolean {
+	// let whereString: string = "WHERE";
+	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
+	let whereBlockKey: string = "IS";
+	let objectDeepest = queryWhereBlock[whereBlockKey];
+	let objectKeys = Object.keys(objectDeepest);
+	if (objectKeys.length > 1) {
+		throw new InsightError("this field can only have 1 key");
+		return false;
+	}
+	let objectKey = objectKeys[0];
+	// console.log(objectKey);
+	let allowableFields: string[] = [datasetID + "_dept", datasetID + "_instructor", datasetID + "_title",
+		datasetID + "_id", datasetID + "_uuid"];
+	if (!allowableFields.includes(objectKey)) {
+		throw new InsightError("Invalid key type for " + whereBlockKey + ": " +
+			objectKey.substring(datasetID.length + 1));
+	}
+	if (typeof (objectDeepest[objectKey]) !== "string"){
+		throw new InsightError("Invalid Value type for " + whereBlockKey + ", should be string");
+	}
+	return true;
 }
 
 
 // returns true if the query does not violate IS/LT/GT rules
-function queryCheckerForLTGTEQ(queryWhole: any, datasetID: string): boolean {
-
-	const queryWhereBlock  = whereChecker(queryWhole);
-
-	let whereBlockKey: string = "FLAG";
+function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string): boolean {
+	// let whereString: string = "WHERE";
+	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
+	let whereBlockKey: string = "INITIALIZED";
 	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
 		whereBlockKey = "LT";
 	};
@@ -66,9 +154,6 @@ function queryCheckerForLTGTEQ(queryWhole: any, datasetID: string): boolean {
 	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
 		whereBlockKey = "EQ";
 	};
-	if (whereBlockKey === "FLAG") {
-		return true;
-	}
 	let objectDeepest = queryWhereBlock[whereBlockKey];
 	let objectKeys = Object.keys(objectDeepest);
 	if (objectKeys.length > 1) {
@@ -150,16 +235,18 @@ function getDatasetID(query: unknown): string {
 	return result;
 }
 
-function queryValidator(queryMy: unknown) {
+function queryValidator(queryMy: unknown): boolean {
 	let queryWhole = JSONchecker(queryMy);
 	let datasetID: string = getDatasetID(queryMy);
-	queryCheckerForLTGTEQ(queryWhole,datasetID);
+	whereChecker(queryWhole,datasetID);
 	queryCheckerForColumns(queryWhole,datasetID);
+	return true;
 }
 
 export {
 	getDatasetID,
-	queryCheckerForLTGTEQ,
+	whereChecker,
+	queryCheckerForLtGtEq,
 	queryCheckerForColumns,
 	queryValidator,
 };
