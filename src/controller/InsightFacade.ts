@@ -18,9 +18,6 @@ import {
 } from "./helperFunctionsAddDataset";
 
 import {
-	getDatasetID,
-	queryCheckerForColumns,
-	queryCheckerForLTGTEQ,
 	queryValidator
 } from "./helperFunctionsQueryChecking";
 import {getContentFromArchives} from "../../test/TestUtil";
@@ -116,7 +113,11 @@ export default class InsightFacade implements IInsightFacade {
 			} else {
 				let datasetID = this.getDatasetID(query);
 			//	SYED: checking for invalid queries
-				queryValidator(query);
+				try {
+					queryValidator(query);
+				} catch (err: any) {
+					return reject(new InsightError(err));
+				}
 				let datasetToQuery = InsightFacade.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
@@ -204,84 +205,3 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
-
-
-// let facade = new InsightFacade();
-// // let obj = facade.
-// // let sections: string;
-// let sections = getContentFromArchives("pair.zip");
-
-// facade.addDataset("sections",sections,InsightDatasetKind.Sections).then((f) => {
-//
-// 	console.log(f);
-// });
-
-// facade.removeDataset("sections1").then((a) => {
-// 	console.log(a + "this is");
-// });
-//
-// facade.listDatasets().then((p) => {
-// 	console.log(p);
-// });
-//
-// console.log(InsightFacade.map);
-
-// let result = facade.performQuery({
-// 	WHERE: {
-// 		LT: {
-// 			sections_avg: 100000
-// 		}
-// 	},
-// 	OPTIONS: {
-// 		COLUMNS: [
-// 			"sections_dept",
-// 			"sections_avg",
-// 			"sections_id",
-// 			"sections_audit",
-// 			"sections_pass",
-// 			"sections_year",
-// 			"sections_fail",
-// 			"sections_uuid",
-// 			"sections_title",
-// 			"sections_instructor"
-// 		],
-// 		ORDER: "sections_id"
-// 	}
-// });
-// result.then((t) => {
-// 	console.log(t);
-// });
-
-// let query = {
-// 	WHERE: {
-// 		LT: {
-// 			sections_avg: 1
-// 		}
-// 	},
-// 	OPTIONS: {
-// 		COLUMNS: [
-// 			"sections_dept",
-// 			"sections_avg",
-// 			"sections_id",
-// 			"sections_audit",
-// 			"sections_pass",
-// 			"sections_year",
-// 			"sections_fail",
-// 			"sections_uuid",
-// 			"sections_title",
-// 			"sections_instructor"
-// 		],
-// 		ORDER: "sections_dept"
-// 	}
-// };
-
-// let query2 = {
-// 	any: 78
-// };
-//
-//
-// let g = queryCheckerLTGTEQ(query2);
-// console.log(g);
-// //
-// let h = queryValidator(query);
-
