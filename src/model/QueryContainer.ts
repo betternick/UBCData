@@ -22,36 +22,36 @@ export class QueryContainer {
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
-					for (let item in Object.values(query)[0]) {
-						let nextItem = Object.values(query)[0][item];
-						resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
-					}
-					// filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
-					// how-to-remove-all-duplicates-from-an-array-of-objects
-					resultArray = resultArray.filter((value, index) => {
-						const myValue = JSON.stringify(value);
-						return index === resultArray.findIndex((obj) => {
-							return JSON.stringify(obj) === myValue;
-						});
-					});
-				} else if (queryKey === "AND") {
-					// let temp: InsightResult[] = [];
-					// let firstItem = queryJSON[queryKey][0];
-					// let arr = this.handleWhere(firstItem, datasetID, dataset);
-					// let uuid = datasetID + "_" + "uuid";
-					// for (let item = 1; item < queryJSON[queryKey].length; item++) {
-					// 	let nextItem = queryJSON[queryKey][item];
-					// 	temp = this.handleWhere(nextItem, datasetID, dataset);
-					// 	// filtering one array by another array of objects by property: ref: https://urlis.net/fg8h2mqb
-					// 	console.time();
-					// 	arr = arr.filter((elem) => {
-					// 		return temp.some((ele) => {
-					// 			return ele[uuid] === elem[uuid];
-					// 		});
-					// 	});
-					// 	console.timeEnd();
+					// for (let item in Object.values(query)[0]) {
+					// 	let nextItem = Object.values(query)[0][item];
+					// 	resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
 					// }
-					// resultArray = resultArray.concat(arr);
+					// // filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
+					// // how-to-remove-all-duplicates-from-an-array-of-objects
+					// resultArray = resultArray.filter((value, index) => {
+					// 	const myValue = JSON.stringify(value);
+					// 	return index === resultArray.findIndex((obj) => {
+					// 		return JSON.stringify(obj) === myValue;
+					// 	});
+					// });
+				} else if (queryKey === "AND") {
+					let temp: InsightResult[] = [];
+					let firstItem = queryJSON[queryKey][0];
+					let arr = this.handleWhere(firstItem, datasetID, dataset);
+					let uuid = datasetID + "_" + "uuid";
+					for (let item = 1; item < queryJSON[queryKey].length; item++) {
+						let nextItem = queryJSON[queryKey][item];
+						temp = this.handleWhere(nextItem, datasetID, dataset);
+						// filtering one array by another array of objects by property: ref: https://urlis.net/fg8h2mqb
+						console.time();
+						arr = arr.filter((elem) => {
+							return temp.some((ele) => {
+								return ele[uuid] === elem[uuid];
+							});
+						});
+						console.timeEnd();
+					}
+					resultArray = resultArray.concat(arr);
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
 				} else {
