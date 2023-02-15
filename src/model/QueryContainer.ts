@@ -1,4 +1,6 @@
 import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
+	singleDatasetID} from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
 	public columns: string[];
@@ -14,57 +16,53 @@ export class QueryContainer {
 	// otherwise, returns the InsightResult[] that corresponds to the query
 	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
-		if (JSON.stringify(query) !== "{}") {
+		if (JSON.stringify(query) !== "{}") {  // WHERE block is not empty
 			let queryJSON = JSON.parse(JSON.stringify(query));
-			// WHERE block is not empty
-
 			// recursively traverse JSON query object:
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
 				if (queryKey === "OR") {
-					for (let item in Object.values(query)[0]) {
-						let nextItem = Object.values(query)[0][item];
-						let arr = this.handleWhere(nextItem, datasetID, dataset);
-						resultArray = resultArray.concat(arr);
-					}
+					// for (let item in Object.values(query)[0]) {
+					// 	let nextItem = Object.values(query)[0][item];
+					// 	resultArray = resultArray.concat(this.handleWhere(nextItem, datasetID, dataset));
+					// }
+					// // filtering duplicate objects out of array: ref: https://stackoverflow.com/questions/2218999/
+					// // how-to-remove-all-duplicates-from-an-array-of-objects
+					// resultArray = resultArray.filter((value, index) => {
+					// 	const myValue = JSON.stringify(value);
+					// 	return index === resultArray.findIndex((obj) => {
+					// 		return JSON.stringify(obj) === myValue;
+					// 	});
+					// });
 				} else if (queryKey === "AND") {
-					let temp: InsightResult[] = [];
-					let firstItem = queryJSON[queryKey][0];
-					let arr = this.handleWhere(firstItem, datasetID, dataset);
-
-					for (let item = 1; item < queryJSON[queryKey].length; item++) {
-						let nextItem = queryJSON[queryKey][item];
-						temp = this.handleWhere(nextItem, datasetID, dataset);
-						let filtered: InsightResult[] = [];
-						for (let i in arr) {
-							let itemi = arr[i];
-							let cont = true;
-							for (let j in temp) {
-								let itemj = temp[j];
-								if (JSON.stringify(itemi) === JSON.stringify(itemj) && cont === true) {
-									filtered.push(itemi);
-									cont = false;
-								}
-							}
-						}
-						arr = filtered;
-					}
-					resultArray = resultArray.concat(arr);
+					// let temp: InsightResult[] = [];
+					// let firstItem = queryJSON[queryKey][0];
+					// let arr = this.handleWhere(firstItem, datasetID, dataset);
+					// let uuid = datasetID + "_" + "uuid";
+					// for (let item = 1; item < queryJSON[queryKey].length; item++) {
+					// 	let nextItem = queryJSON[queryKey][item];
+					// 	temp = this.handleWhere(nextItem, datasetID, dataset);
+					// 	// filtering one array by another array of objects by property: ref: https://urlis.net/fg8h2mqb
+					// 	console.time();
+					// 	arr = arr.filter((elem) => {
+					// 		return temp.some((ele) => {
+					// 			return ele[uuid] === elem[uuid];
+					// 		});
+					// 	});
+					// 	console.timeEnd();
+					// }
+					// resultArray = resultArray.concat(arr);
 				} else if (queryKey === "NOT") {
 					// console.log("got to NOT"); TODO: recurse, but keeping in mind the not structure
-					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
-					}
 				} else {
 					for (let courseSection in dataset.datasetArray) {
-						// iterate through every course section in the dataset
 						let section = dataset.datasetArray[courseSection];
 						this.applyComparator(datasetID, queryJSON[queryKey], section, resultArray, queryKey);
 					}
 				}
 			}
 		} else {
-			// get all entries
+			// empty where block -> return all sections
 		}
 		return resultArray;
 	}
@@ -76,23 +74,23 @@ export class QueryContainer {
 		resultArray: InsightResult[],
 		comparator: string
 	) {
-		this.singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
+		singleDatasetID("", datasetID); // check that multiple datasets aren't referenced
 		// query = { sections_avg: 40}
 		let key = Object.keys(query)[0];   				    // something like: sections_avg
 		let value = Object.values(query)[0];   				// something like: 40
-		let identifier = this.transformQueryToDatasetConvention(this.returnIdentifier(key));	// something like: Avg
+		let identifier = transformQueryToDatasetConvention(returnIdentifier(key));	// something like: Avg
 
 		let match = this.doesThisSectionMatch(section, identifier, value, comparator);
 		if (match) {
 			let myInsightResult: InsightResult = {};
 			for (let col in this.columns) {
-				let keyCol = datasetID.concat("_", this.transformDatasetToQueryConvention(this.columns[col]));
-				let valOfSection = this.getValue(section, this.columns[col]);
+				let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
+				let valOfSection = getValue(section, this.columns[col]);
 
 				let keyVal: string | number = "";
 				if (keyCol === datasetID + "_year") {
 					// need to check if sections = overall, if yes, year = 1900
-					let sec = this.getValue(section, "Section");
+					let sec = getValue(section, "Section");
 					if (sec === "overall") {
 						keyVal = 1900;
 					} else {
@@ -104,6 +102,12 @@ export class QueryContainer {
 					keyVal = valOfSection;
 				}
 				myInsightResult[keyCol] = keyVal;
+			}
+
+			// adding uuid to each InsightResult:
+			if (!this.columns.includes("id")){
+				myInsightResult[datasetID.concat("_", transformDatasetToQueryConvention("id"))] =
+					getValue(section, "id");
 			}
 			resultArray.push(myInsightResult);
 		}
@@ -147,6 +151,7 @@ export class QueryContainer {
 			return valOfSection === value;
 		}
 	}
+
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
@@ -156,90 +161,25 @@ export class QueryContainer {
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
 			this.order = queryJSON.ORDER;
 		}
-		// creates a substring that contains only the columns
+		// creates a object that contains only the columns
 		let columnsJSON = queryJSON.COLUMNS;
 
 		// extracts all the column identifiers and puts them into the columns array
 		for (let col in columnsJSON) {
-			this.columns.push(this.returnIdentifier(columnsJSON[col]));
+			this.columns.push(returnIdentifier(columnsJSON[col]));
 		}
 		this.columns.sort(); // sort columns alphabetically
 		for (let col in this.columns) {
-			this.columns[col] = this.transformQueryToDatasetConvention(this.columns[col]);
+			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
 		}
 	}
-	// checks whether only a single ID is referenced
-	public singleDatasetID(query: string, datasetID: string) {
-		for (let i = 0; i < query.length; i++) {
-			if (query[i] === "_") {
-				let indexStartOfID = query.lastIndexOf('"', i) + 1;
-				let result = query.substring(indexStartOfID, i);
-				if (result !== datasetID) {
-					throw new InsightError("multiple datasets referenced");
-				}
-			}
+
+	public filterUUID(results: InsightResult[], datasetID: string): InsightResult[] {
+		for (let res in results) {
+			delete results[res][datasetID.concat("_", transformDatasetToQueryConvention("id"))];
 		}
-		return;
-	}
-	// returns the identifier after an underscore
-	public returnIdentifier(query: string): string {
-		const indexUnderscore = query.indexOf("_");
-		return query.substring(indexUnderscore + 1);
-	}
-	// return value after identifier in a string
-	// Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
-	public getValue(section: JSON, identifier: string): string | number {
-		let sectionJSON = JSON.parse(JSON.stringify(section));
-		return sectionJSON[identifier];
-	}
-	// transform field from naming convention in query to naming convention in dataset
-	private transformQueryToDatasetConvention(field: string): string {
-		if (field === "uuid") {
-			field = "id";
-		} else if (field === "id") {
-			field = "Course";
-		} else if (field === "title") {
-			field = "Title";
-		} else if (field === "instructor") {
-			field = "Professor";
-		} else if (field === "dept") {
-			field = "Subject";
-		} else if (field === "year") {
-			field = "Year";
-		} else if (field === "avg") {
-			field = "Avg";
-		} else if (field === "pass") {
-			field = "Pass";
-		} else if (field === "fail") {
-			field = "Fail";
-		} else {
-			field = "Audit";
-		}
-		return field;
-	}
-	// transform field from naming convention in dataset to naming convention in query
-	public transformDatasetToQueryConvention(field: string): string {
-		if (field === "id") {
-			field = "uuid";
-		} else if (field === "Course") {
-			field = "id";
-		} else if (field === "Title") {
-			field = "title";
-		} else if (field === "Professor") {
-			field = "instructor";
-		} else if (field === "Subject") {
-			field = "dept";
-		} else if (field === "Year") {
-			field = "year";
-		} else if (field === "Avg") {
-			field = "avg";
-		} else if (field === "Pass") {
-			field = "pass";
-		} else if (field === "Fail") {
-			field = "fail";
-		} else {
-			field = "audit";
-		}
-		return field;
+		return results;
 	}
 }
+
+
