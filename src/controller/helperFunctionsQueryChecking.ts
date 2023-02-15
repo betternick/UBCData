@@ -136,6 +136,25 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string): boolean {
 	if (typeof (objectDeepest[objectKey]) !== "string"){
 		throw new InsightError("Invalid Value type for " + whereBlockKey + ", should be string");
 	}
+	let stringVal: string = objectDeepest[objectKey];
+	let count = stringVal.split("*").length - 1;
+	let lengthOfStringVal = stringVal.length;
+	if (count === 1) {
+		let positionOfAsterisk = stringVal.indexOf("*");
+		if (positionOfAsterisk !== 0 && positionOfAsterisk !== lengthOfStringVal - 1){
+			throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
+		}
+	}
+	if (count === 2) {
+		let firstPositionOfAsterisk = stringVal.indexOf("*");
+		let lastPositionOfAsterisk = stringVal.lastIndexOf("*");
+		if (firstPositionOfAsterisk !== 0 || lastPositionOfAsterisk !== lengthOfStringVal - 1){
+			throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
+		}
+	}
+	if (count === 3) {
+		throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
+	}
 	return true;
 }
 
