@@ -15,7 +15,7 @@ function JSONchecker(query: unknown): any{
 	return queryReturn;
 }
 // comment to add a line without ESLint losing it
-function whereChecker (queryWhole: any, datasetID: string): any {
+function whereChecker (queryWhole: any, datasetID: string): boolean {
 	let whereString: string = "WHERE";
 	const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
 	if (queryWhereBlock === undefined || null) {
@@ -23,6 +23,9 @@ function whereChecker (queryWhole: any, datasetID: string): any {
 	}
 	if (Object.keys(queryWhereBlock).length > 1) {
 		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
+	}
+	if (Object.keys(queryWhereBlock).length === 0) {
+		return true;
 	}
 	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
 		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
@@ -42,6 +45,7 @@ function whereChecker (queryWhole: any, datasetID: string): any {
 		// console.log(Object.keys(queryWhereBlock));
 		throw new InsightError("Invalid filter key: " + Object.keys(queryWhereBlock) );
 	}
+	return true;
 }
 // checks query for NOT
 function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
@@ -291,10 +295,5 @@ function queryValidator(queryMy: unknown) {
 	queryCheckerForColumns(queryWhole,datasetID);
 }
 // comment to add a line without ESLint losing it
-export {
-	getDatasetID,
-	whereChecker,
-	queryCheckerForLtGtEq,
-	queryCheckerForColumns,
-	queryValidator,
+export {getDatasetID, whereChecker, queryCheckerForLtGtEq, queryCheckerForColumns, queryValidator,
 };
