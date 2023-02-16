@@ -1,6 +1,8 @@
 import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
-import {returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
-	singleDatasetID} from "./helperFunctionsQueryContainer";
+import {
+	returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
+	singleDatasetID, wildcardMatcher
+} from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
 	public columns: string[];
@@ -132,7 +134,11 @@ export class QueryContainer {
 		} else if (comparator === "LT") {
 			return valOfSection < value;
 		} else { // comparator === "IS"
-			return valOfSection === value;
+			if (value.includes("*")) {
+				return wildcardMatcher(valOfSection, value);
+			} else {
+				return valOfSection === value;
+			}
 		}
 	}
 
