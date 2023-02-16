@@ -1,0 +1,31 @@
+{
+	"title": "tooManyAsterisks",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"IS": {
+							"sections_dept": "**ath"
+						}
+					}
+				},
+				{
+					"GT": {
+						"sections_avg": 98.7
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_avg"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

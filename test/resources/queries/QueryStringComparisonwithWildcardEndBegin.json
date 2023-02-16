@@ -1,0 +1,29 @@
+{
+  "title": "testing a query dynamically - String comparison with wildcard begin and end",
+  "input": {
+    "WHERE": {
+      "IS": {
+        "sections_instructor": "*wels*"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_avg"
+      ],
+      "ORDER": "sections_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected": [
+    {
+      "sections_dept": "scie",
+      "sections_avg": 69.35
+    },
+    {
+      "sections_dept": "scie",
+      "sections_avg": 71.63
+    }
+  ]
+}
+

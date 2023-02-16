@@ -122,7 +122,7 @@ export default class InsightFacade implements IInsightFacade {
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
-					let queryJSON = JSON.parse(JSON.stringify(query));
+					let queryJSON = query;
 					// check that query object has BOTH OPTIONS and WHERE
 					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
@@ -130,14 +130,15 @@ export default class InsightFacade implements IInsightFacade {
 						let queryObject = new QueryContainer();
 						// handleOptions
 						try {
-							queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
+							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON], datasetID);
 						} catch (error) {
 							return reject(error);
 						}
 						// handleWhere
 						let results: InsightResult[] = [];
 						try {
-							results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
+							results = queryObject.handleWhere(queryJSON["WHERE" as keyof typeof queryJSON], datasetID,
+								datasetToQuery);
 						} catch (error) {
 							return reject(error);
 						}
@@ -206,30 +207,3 @@ export default class InsightFacade implements IInsightFacade {
 	}
 }
 
-//
-// let query = {
-// 	WHERE: {
-// 		IS: {
-// 			sections_dept: "g*h*"
-// 		}
-// 	},
-// 	OPTIONS: {
-// 		COLUMNS: [
-// 			"sections_dept",
-// 			"sections_avg",
-// 			"sections_id",
-// 			"sections_audit",
-// 			"sections_pass",
-// 			"sections_year",
-// 			"sections_fail",
-// 			"sections_uuid",
-// 			"sections_title",
-// 			"sections_instructor"
-// 		],
-// 		ORDER: "sections_dept"
-// 	}
-// };
-//
-// let g = queryValidator(query);
-// console.log(g);
-//

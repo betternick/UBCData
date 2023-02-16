@@ -1,0 +1,19 @@
+{
+  "title": "testing a query dynamically - Zero results - empty array",
+  "input": {
+    "WHERE":{
+      "GT":{
+        "sections_avg":99.9999
+      }
+    },
+    "OPTIONS":{
+      "COLUMNS":[
+        "sections_dept",
+        "sections_avg"
+      ],
+      "ORDER":"sections_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected": []
+}

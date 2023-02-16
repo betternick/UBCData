@@ -1,0 +1,22 @@
+{
+  "title": "Query formatting issue - Avg instead of avg",
+  "input": {
+    "WHERE": {
+      "AND":
+      [
+        {"LT": {"sections_Avg": 99}},
+        {"IS": {"sections_dept": "aanb"}}
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_Avg"
+      ],
+      "ORDER": "sections_Avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+

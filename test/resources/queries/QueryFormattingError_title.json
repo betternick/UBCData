@@ -1,0 +1,22 @@
+{
+  "title": "testing a query error - passing number to string field",
+  "input": {
+    "WHERE": {
+      "AND":
+      [
+        {"LT": {"sections_avg": 99}},
+        {"IS": {"sections_title": 123}}
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_avg"
+      ],
+      "ORDER": "sections_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+
