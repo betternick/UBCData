@@ -142,13 +142,7 @@ export default class InsightFacade implements IInsightFacade {
 						} catch (error) {
 							return reject(error);
 						}
-						if (results.length > 5000) {
-							return reject(new ResultTooLargeError("Exceeded 5000 entries"));
-						}
-						// remove uuid from InsightResults if UUID is not a column
-						if (!queryObject.columns.includes("id")) {
-							results = queryObject.filterUUID(results, datasetID);
-						}
+
 						// handleSort
 						results = queryObject.handleSort(results);
 						return resolve(results);

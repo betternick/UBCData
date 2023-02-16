@@ -75,3 +75,30 @@ export function singleDatasetID(query: string, datasetID: string) {
 	}
 	return;
 }
+
+export function wildcardMatcher (stringToCheck: string, queryString: string): boolean {
+	let countOfAsterisks = queryString.split("*").length - 1;
+	let lengthOfQueryString = queryString.length;
+	if (countOfAsterisks === 1) {								// CASE 1: When there is 1 asterisk
+		let positionOfAsterisk = queryString.indexOf("*");
+		if (positionOfAsterisk === 0) { 						// Asterisk is at start of string
+			let subStringToMatch = queryString.substring(1);
+			if (stringToCheck.endsWith(subStringToMatch)) {
+				return true;
+			}
+		}
+		if (positionOfAsterisk === lengthOfQueryString - 1) { 	// Asterisk is at end of string
+			let subStringToMatch = queryString.substring(0, lengthOfQueryString - 1);
+			if (stringToCheck.startsWith(subStringToMatch)) {
+				return true;
+			}
+		}
+	}
+	if (countOfAsterisks === 2) {
+		let subStringToMatch = queryString.substring(1, lengthOfQueryString - 1);
+		if (stringToCheck.includes(subStringToMatch)) {
+			return true;
+		}
+	}
+	return false;
+}
