@@ -11,6 +11,9 @@ export class QueryContainer {
 		this.order = "";
 	}
 
+	// handles the WHERE block in a query
+	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
+	// otherwise, returns the InsightResult[] that corresponds to the query
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
@@ -40,6 +43,7 @@ export class QueryContainer {
 					myInsightResult[keyCol] = keyVal;
 				}
 				resultArray.push(myInsightResult);
+
 				if (resultArray.length > 5000) {
 					throw new ResultTooLargeError("Exceeded over 5000 results");
 				}
@@ -48,9 +52,8 @@ export class QueryContainer {
 		return resultArray;
 	}
 
-	// handles the WHERE block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
-	// otherwise, returns the InsightResult[] that corresponds to the query
+	// Applies the filters in the query to the given section and returns
+	// true if the section matches all filters, false otherwise
 	public applyFilters(query: any, datasetID: string, section: any): boolean {
 		let result: boolean = false;
 		if (JSON.stringify(query) !== "{}") {  // WHERE block is not empty
@@ -62,7 +65,7 @@ export class QueryContainer {
 					let tempResult: boolean = this.applyFilters(firstItem, datasetID, section);
 					for (let item = 1; item < query[queryKey].length; item++) {
 						let nextItem = query[queryKey][item];
-						if (tempResult === false) {
+						if (!tempResult) {
 							tempResult = this.applyFilters(nextItem, datasetID, section);
 						}
 					}
@@ -72,18 +75,13 @@ export class QueryContainer {
 					let tempResult: boolean = this.applyFilters(firstItem, datasetID, section);
 					for (let item = 1; item < query[queryKey].length; item++) {
 						let nextItem = query[queryKey][item];
-						if (tempResult === true) {
+						if (tempResult) {
 							tempResult = this.applyFilters(nextItem, datasetID, section);
 						}
 					}
 					result = tempResult;
 				} else if (queryKey === "NOT") {
-					let tempResult = this.applyFilters(query[queryKey], datasetID, section);
-					if (tempResult === true) {
-						result = false;
-					} else {
-						result = true;
-					}
+					return !this.applyFilters(query[queryKey], datasetID, section);
 				} else {
 					let key = Object.keys(query[queryKey])[0]; 						// something like: sections_avg
 					let value = Object.values(query[queryKey])[0];   				// something like: 40
@@ -98,44 +96,6 @@ export class QueryContainer {
 		}
 	}
 
-	// private applyComparator(datasetID: string, query: JSON, section: JSON, comparator: string) {
-	//
-	// 	let key = Object.keys(query)[0];   				    // something like: sections_avg
-	// 	let value = Object.values(query)[0];   				// something like: 40
-	// 	let identifier = transformQueryToDatasetConvention(returnIdentifier(key));	// something like: Avg
-	//
-	// 	let match = this.doesThisSectionMatch(section, identifier, value, comparator);
-	// 	if (match) {
-	// 		let myInsightResult: InsightResult = {};
-	// 		for (let col in this.columns) {
-	// 			let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
-	// 			let valOfSection = getValue(section, this.columns[col]);
-	//
-	// 			let keyVal: string | number = "";
-	// 			if (keyCol === datasetID + "_year") {
-	// 				// need to check if sections = overall, if yes, year = 1900
-	// 				let sec = getValue(section, "Section");
-	// 				if (sec === "overall") {
-	// 					keyVal = 1900;
-	// 				} else {
-	// 					keyVal = Number(valOfSection); 	// need to year to number
-	// 				}
-	// 			} else if (keyCol === datasetID + "_uuid") {
-	// 				keyVal = valOfSection.toString();	// need to convert uuid to string
-	// 			} else {
-	// 				keyVal = valOfSection;
-	// 			}
-	// 			myInsightResult[keyCol] = keyVal;
-	// 		}
-	//
-	// 		// adding uuid to each InsightResult:
-	// 		if (!this.columns.includes("id")){
-	// 			myInsightResult[datasetID.concat("_", transformDatasetToQueryConvention("id"))] =
-	// 				getValue(section, "id");
-	// 		}
-	// 		resultArray.push(myInsightResult);
-	// 	}
-	// }
 
 	// sorts the array based on this.order
 	public handleSort (array: InsightResult[]): InsightResult[] {
@@ -151,6 +111,8 @@ export class QueryContainer {
 		return array.sort(dynamicSort(this.order));
 	}
 
+	// checks if the given section matches the values from the query for the
+	// given comparator. Returns true if it matches, false otherwise
 	public doesThisSectionMatch(section: any, identifier: string, value: any, comparator: string): boolean {
 		let valOfSection = section[identifier];
 		if (identifier === "id") {
