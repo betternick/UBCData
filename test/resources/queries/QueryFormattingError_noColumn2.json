@@ -1,0 +1,13 @@
+{
+  "title": "testing a query dynamically - Formatting error - no columns, no options",
+  "input": {
+    "WHERE": {
+      "IS": {
+        "sections_dept": "aanb"
+      }
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+

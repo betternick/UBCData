@@ -122,7 +122,7 @@ export default class InsightFacade implements IInsightFacade {
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
-					let queryJSON = JSON.parse(JSON.stringify(query));
+					let queryJSON = query;
 					// check that query object has BOTH OPTIONS and WHERE
 					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
@@ -130,14 +130,15 @@ export default class InsightFacade implements IInsightFacade {
 						let queryObject = new QueryContainer();
 						// handleOptions
 						try {
-							queryObject.handleOptions(queryJSON.OPTIONS, datasetID);
+							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON], datasetID);
 						} catch (error) {
 							return reject(error);
 						}
 						// handleWhere
 						let results: InsightResult[] = [];
 						try {
-							results = queryObject.handleWhere(queryJSON.WHERE, datasetID, datasetToQuery);
+							results = queryObject.handleWhere(queryJSON["WHERE" as keyof typeof queryJSON], datasetID,
+								datasetToQuery);
 						} catch (error) {
 							return reject(error);
 						}
@@ -209,8 +210,8 @@ export default class InsightFacade implements IInsightFacade {
 //
 // let query = {
 // 	WHERE: {
-// 		IS: {
-// 			sections_dept: "g*h*"
+// 		NOT: {
+// 			sections_avg: 95
 // 		}
 // 	},
 // 	OPTIONS: {
@@ -230,6 +231,35 @@ export default class InsightFacade implements IInsightFacade {
 // 	}
 // };
 //
+
+// let query3 = {
+// 	WHERE: {
+// 		NOT:{
+// 			LT: {
+// 				sections_avg: 99
+// 			}
+// 		}
+// 	},
+// 	OPTIONS: {
+// 		COLUMNS: [
+// 			"sections_dept",
+// 			"sections_avg"
+// 		],
+// 		ORDER: "sections_avg"
+// 	}
+// };
 // let g = queryValidator(query);
 // console.log(g);
 //
+//
+// let facade = new InsightFacade();
+// let sections = getContentFromArchives("pair.zip");
+//
+// facade.addDataset("sections",sections,InsightDatasetKind.Sections).then((f) => {
+//
+// 	console.log(f);
+// });
+//
+// facade.performQuery(query3).then((f) => {
+// 	console.log(f);
+// });

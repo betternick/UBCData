@@ -1,0 +1,16 @@
+{
+  "title": "testing a query dynamically - Formatting error - ordering by unavailable column",
+  "input": {
+    "WHERE": {
+      "IS": {
+        "sections_dept": "aanb"
+      }
+    },
+    "OPTIONS": {
+      "ORDER": "sections_pass"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+

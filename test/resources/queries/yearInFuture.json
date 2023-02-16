@@ -1,0 +1,19 @@
+{
+	"title": "yearInFuture",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"sections_year": 2025
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": []
+}

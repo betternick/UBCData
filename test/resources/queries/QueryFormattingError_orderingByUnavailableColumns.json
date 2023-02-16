@@ -1,0 +1,22 @@
+{
+  "title": "testing a query dynamically - AND",
+  "input": {
+    "WHERE": {
+      "AND":
+      [
+        {"LT": {"sections_avg": 99}},
+        {"IS": {"sections_dept": "aanb"}}
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "sections_dept",
+        "sections_avg"
+      ],
+      "ORDER": "sections_audit"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
+

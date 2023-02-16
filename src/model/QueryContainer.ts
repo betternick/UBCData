@@ -14,10 +14,10 @@ export class QueryContainer {
 	// handles the WHERE block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
 	// otherwise, returns the InsightResult[] that corresponds to the query
-	public handleWhere(query: JSON, datasetID: string, dataset: Dataset): InsightResult[] {
+	public handleWhere(query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		if (JSON.stringify(query) !== "{}") {  // WHERE block is not empty
-			let queryJSON = JSON.parse(JSON.stringify(query));
+			let queryJSON = query;
 			// recursively traverse JSON query object:
 			// ref: https://blog.boot.dev/javascript/how-to-recursively-traverse-objects/
 			for (let queryKey in query) {
@@ -127,9 +127,9 @@ export class QueryContainer {
 		return array.sort(dynamicSort(this.order));
 	}
 
-	public doesThisSectionMatch(section: JSON, identifier: string, value: string | number,
+	public doesThisSectionMatch(section: any, identifier: string, value: string | number,
 		comparator: string): boolean {
-		let sectionJSON = JSON.parse(JSON.stringify(section));
+		let sectionJSON = section;
 		let valOfSection = sectionJSON[identifier];
 		if (identifier === "id") {
 			valOfSection = valOfSection.toString();
@@ -155,8 +155,8 @@ export class QueryContainer {
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
-	public handleOptions(query: JSON, datasetID: string) {
-		let queryJSON = JSON.parse(JSON.stringify(query));
+	public handleOptions(query: any, datasetID: string) {
+		let queryJSON = query;
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
 			this.order = queryJSON.ORDER;

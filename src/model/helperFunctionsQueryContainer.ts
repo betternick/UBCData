@@ -8,8 +8,8 @@ export function returnIdentifier(query: string): string {
 }
 // return value after identifier in a string
 // Linda -> probably want to refactor returnValueToSearch and doesThisSectionMatch to just use this function instead
-export function getValue(section: JSON, identifier: string): string | number {
-	let sectionJSON = JSON.parse(JSON.stringify(section));
+export function getValue(section: any, identifier: string): string | number {
+	let sectionJSON = section;
 	return sectionJSON[identifier];
 }
 // transform field from naming convention in query to naming convention in dataset
