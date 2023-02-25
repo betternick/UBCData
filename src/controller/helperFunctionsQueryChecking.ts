@@ -4,7 +4,7 @@ import {JSONchecker, queryCheckerForIs} from "./additionalHelperFunctionsQueryCh
 function whereChecker (queryWhole: any, datasetID: string): boolean {
 	const queryWhereBlock = queryWhole["WHERE" as keyof typeof queryWhole];
 	let keys = Object.keys(queryWhereBlock);
-	if (queryWhereBlock === undefined || null) {
+	if (queryWhereBlock === undefined || queryWhereBlock === null) {
 		throw new InsightError("Missing WHERE");
 	} else if (keys.length > 1) {
 		throw new InsightError("WHERE should only have 1 key, has " + keys.length);
@@ -45,8 +45,7 @@ function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
 }
 // checks query for OR
 function queryCheckerForOrAnd(queryWhereBlock: any, datasetID: string, comparator: string) {
-	let whereBlockKey: string = comparator;
-	let objectDeepest = queryWhereBlock[whereBlockKey];
+	let objectDeepest = queryWhereBlock[comparator];
 	for (const element of objectDeepest) {
 		let key = Object.keys(element);
 		if (key[0] === "LT" || key[0] === "GT" || key[0] === "EQ") {
