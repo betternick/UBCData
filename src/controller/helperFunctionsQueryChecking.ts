@@ -2,28 +2,21 @@ import {InsightError} from "./IInsightFacade";
 import {JSONchecker, queryCheckerForIs} from "./additionalHelperFunctionsQueryChecking";
 
 function whereChecker (queryWhole: any, datasetID: string): boolean {
-	let whereString: string = "WHERE";
-	const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
+	const queryWhereBlock = queryWhole["WHERE" as keyof typeof queryWhole];
+	let keys = Object.keys(queryWhereBlock);
 	if (queryWhereBlock === undefined || null) {
 		throw new InsightError("Missing WHERE");
-	}
-	if (Object.keys(queryWhereBlock).length > 1) {
+	} else if (keys.length > 1) {
 		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
-	}
-	if (Object.keys(queryWhereBlock).length === 0) {
+	} else if (keys.length === 0) {
 		return true;
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT") ||
-			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT") ||
-			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-		let key: string = Object.keys(queryWhereBlock)[0];
-		queryCheckerForLtGtEq(queryWhereBlock,datasetID, key);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "IS")) {
+	} else if (keys[0] === "LT" || keys[0] === "GT" || keys[0] === "EQ") {
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID, keys[0]);
+	} else if (keys[0] === "IS") {
 		queryCheckerForIs(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "OR") ||
-			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "AND")) {
-		let key: string = Object.keys(queryWhereBlock)[0];
-		queryCheckerForOrAnd(queryWhereBlock,datasetID, key);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "NOT")) {
+	} else if (keys[0] === "OR" || keys[0] === "AND") {
+		queryCheckerForOrAnd(queryWhereBlock,datasetID, keys[0]);
+	} else if (keys[0] === "NOT") {
 		queryCheckerForNot(queryWhereBlock,datasetID);
 	} else {
 		throw new InsightError("Invalid filter key: " + Object.keys(queryWhereBlock) );
