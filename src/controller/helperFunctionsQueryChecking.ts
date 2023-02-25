@@ -1,60 +1,24 @@
-import {Dataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
+import {InsightError} from "./IInsightFacade";
 import {JSONchecker, queryCheckerForIs} from "./additionalHelperFunctionsQueryChecking";
-// comment to add a line without ESLint losing it
-// function JSONchecker(query: unknown): any{
-// 	let queryReturn;
-// 	if (typeof query !== "object") {
-// 		throw new InsightError("Invalid query string");
-// 	} else if (query === null) {
-// 		throw new InsightError("Invalid query string");
-// 	}
-// 	try {
-// 		queryReturn = JSON.parse(JSON.stringify(query));
-// 	} catch (err) {
-// 		throw new InsightError("Invalid query string");
-// 	}
-// 	let objectKeys = Object.keys(queryReturn);
-// 	let allowedKeys = ["WHERE", "ORDER", "OPTIONS"];
-// 	let disallowedKeyFlag = false;
-// 	for (const key of objectKeys) {
-// 		if (!allowedKeys.includes(key)){
-// 			disallowedKeyFlag = true;
-// 		}
-// 	}
-// 	if (objectKeys.length > 3 || disallowedKeyFlag) {
-// 		throw new InsightError("Excess keys in query");
-// 	}
-// 	return queryReturn;
-// }
-// comment to add a line without ESLint losing it
+
 function whereChecker (queryWhole: any, datasetID: string): boolean {
-	let whereString: string = "WHERE";
-	const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
+	const queryWhereBlock = queryWhole["WHERE" as keyof typeof queryWhole];
+	let keys = Object.keys(queryWhereBlock);
 	if (queryWhereBlock === undefined || null) {
 		throw new InsightError("Missing WHERE");
-	}
-	if (Object.keys(queryWhereBlock).length > 1) {
+	} else if (keys.length > 1) {
 		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
-	}
-	if (Object.keys(queryWhereBlock).length === 0) {
+	} else if (keys.length === 0) {
 		return true;
-	}
-	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
-		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
-		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "IS")) {
+	} else if (keys[0] === "LT" || keys[0] === "GT" || keys[0] === "EQ") {
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID, keys[0]);
+	} else if (keys[0] === "IS") {
 		queryCheckerForIs(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "OR")) {
-		queryCheckerForOr(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "AND")) {
-		queryCheckerForAnd(queryWhereBlock,datasetID);
-	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "NOT")) {
+	} else if (keys[0] === "OR" || keys[0] === "AND") {
+		queryCheckerForOrAnd(queryWhereBlock,datasetID, keys[0]);
+	} else if (keys[0] === "NOT") {
 		queryCheckerForNot(queryWhereBlock,datasetID);
 	} else {
-		// console.log(Object.keys(queryWhereBlock));
 		throw new InsightError("Invalid filter key: " + Object.keys(queryWhereBlock) );
 	}
 	return true;
@@ -63,111 +27,44 @@ function whereChecker (queryWhole: any, datasetID: string): boolean {
 function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
 	let whereBlockKey: string = "NOT";
 	let objectDeepest = queryWhereBlock[whereBlockKey];
-	// console.log(objectDeepest);
-	if (Array.isArray(objectDeepest)){
-		throw new InsightError("NOT must be an object, not an array");
+	if (typeof objectDeepest !== "object"){
+		throw new InsightError("NOT must be an object, currently not in object form");
 	}
 	let key = Object.keys(objectDeepest);
-	// console.log(key);
-	switch(key[0]) {
-		case "LT":
-			queryCheckerForLtGtEq(objectDeepest,datasetID);
-			break;
-		case "GT":
-			queryCheckerForLtGtEq(objectDeepest,datasetID);
-			break;
-		case "EQ":
-			queryCheckerForLtGtEq(objectDeepest,datasetID);
-			break;
-		case "IS":
-			queryCheckerForIs(objectDeepest,datasetID);
-			break;
-		case "OR":
-			queryCheckerForOr(objectDeepest,datasetID);
-			break;
-		case "AND":
-			queryCheckerForAnd(objectDeepest,datasetID);
-			break;
-		case "NOT":
-			queryCheckerForNot(objectDeepest,datasetID);
-			break;
-		default:
-			throw new InsightError("Invalid filter key: " + key[0]);
+	if (key[0] === "LT" || key[0] === "GT" || key[0] === "EQ") {
+		queryCheckerForLtGtEq(objectDeepest, datasetID, key[0]);
+	} else if (key[0] === "IS") {
+		queryCheckerForIs(objectDeepest, datasetID);
+	} else if (key[0] === "OR" || key[0] === "AND") {
+		queryCheckerForOrAnd(objectDeepest, datasetID, key[0]);
+	} else if (key[0] === "NOT") {
+		queryCheckerForNot(objectDeepest, datasetID);
+	} else {
+		throw new InsightError("Invalid filter key: " + key[0]);
 	}
 }
 // checks query for OR
-function queryCheckerForOr(queryWhereBlock: any, datasetID: string) {
-	let whereBlockKey: string = "OR";
+function queryCheckerForOrAnd(queryWhereBlock: any, datasetID: string, comparator: string) {
+	let whereBlockKey: string = comparator;
 	let objectDeepest = queryWhereBlock[whereBlockKey];
-	// console.log(objectDeepest);
 	for (const element of objectDeepest) {
 		let key = Object.keys(element);
-		// console.log(Object.keys(element));
-		switch (key[0]) {
-			case "LT":
-				queryCheckerForLtGtEq(element, datasetID);
-				break;
-			case "GT":
-				queryCheckerForLtGtEq(element, datasetID);
-				break;
-			case "EQ":
-				queryCheckerForLtGtEq(element, datasetID);
-				break;
-			case "IS":
-				queryCheckerForIs(element, datasetID);
-				break;
-			case "OR":
-				queryCheckerForOr(element, datasetID);
-				break;
-			case "AND":
-				queryCheckerForAnd(element, datasetID);
-				break;
-			case "NOT":
-				queryCheckerForNot(element, datasetID);
-				break;
-			default:
-				throw new InsightError("Invalid filter key: " + key[0]);
-		}
-	}
-}
-// checks query for AND
-function queryCheckerForAnd(queryWhereBlock: any, datasetID: string) {
-	let whereBlockKey: string = "AND";
-	let objectDeepest = queryWhereBlock[whereBlockKey];
-	// console.log(objectDeepest);
-	for (const element of objectDeepest) {
-		let key = Object.keys(element);
-		// console.log(Object.keys(element));
-		switch(key[0]) {
-			case "LT":
-				queryCheckerForLtGtEq(element,datasetID);
-				break;
-			case "GT":
-				queryCheckerForLtGtEq(element,datasetID);
-				break;
-			case "EQ":
-				queryCheckerForLtGtEq(element,datasetID);
-				break;
-			case "IS":
-				queryCheckerForIs(element,datasetID);
-				break;
-			case "OR":
-				queryCheckerForOr(element,datasetID);
-				break;
-			case "AND":
-				queryCheckerForAnd(element,datasetID);
-				break;
-			case "NOT":
-				queryCheckerForNot(element,datasetID);
-				break;
-			default:
-				throw new InsightError("Invalid filter key: " + key[0]);
+		if (key[0] === "LT" || key[0] === "GT" || key[0] === "EQ") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "IS") {
+			queryCheckerForIs(element, datasetID);
+		} else if (key[0] === "OR" || key[0] === "AND") {
+			queryCheckerForOrAnd(element, datasetID, key[0]);
+		} else if (key[0] === "NOT") {
+			queryCheckerForNot(element, datasetID);
+		} else {
+			throw new InsightError("Invalid filter key: " + key[0]);
 		}
 	}
 }
 
-// returns true if the query does not violate IS/LT/GT rules
-function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string) {
+// returns true if the query does not violate EQ/LT/GT rules
+function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string, comparator: string) {
 	// let whereString: string = "WHERE";
 	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
 	let whereBlockKey: string = "INITIALIZED";
