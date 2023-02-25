@@ -15,7 +15,9 @@ function whereChecker (queryWhole: any, datasetID: string): boolean {
 	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT") ||
 			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT") ||
 			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-		queryCheckerForLtGtEq(queryWhereBlock,datasetID);
+		let key: string = Object.keys(queryWhereBlock)[0];
+		console.log(key);
+		queryCheckerForLtGtEq(queryWhereBlock,datasetID, key);
 	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "IS")) {
 		queryCheckerForIs(queryWhereBlock,datasetID);
 	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "OR")) {
@@ -39,11 +41,11 @@ function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
 	}
 	let key = Object.keys(objectDeepest);
 	if (key[0] === "LT") {
-		queryCheckerForLtGtEq(objectDeepest, datasetID);
+		queryCheckerForLtGtEq(objectDeepest, datasetID, key[0]);
 	} else if (key[0] === "GT") {
-		queryCheckerForLtGtEq(objectDeepest, datasetID);
+		queryCheckerForLtGtEq(objectDeepest, datasetID, key[0]);
 	} else if (key[0] === "EQ") {
-		queryCheckerForLtGtEq(objectDeepest, datasetID);
+		queryCheckerForLtGtEq(objectDeepest, datasetID, key[0]);
 	} else if (key[0] === "IS") {
 		queryCheckerForIs(objectDeepest, datasetID);
 	} else if (key[0] === "OR") {
@@ -66,13 +68,13 @@ function queryCheckerForOr(queryWhereBlock: any, datasetID: string) {
 		// console.log(Object.keys(element));
 		switch (key[0]) {
 			case "LT":
-				queryCheckerForLtGtEq(element, datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "GT":
-				queryCheckerForLtGtEq(element, datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "EQ":
-				queryCheckerForLtGtEq(element, datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "IS":
 				queryCheckerForIs(element, datasetID);
@@ -101,13 +103,13 @@ function queryCheckerForAnd(queryWhereBlock: any, datasetID: string) {
 		// console.log(Object.keys(element));
 		switch(key[0]) {
 			case "LT":
-				queryCheckerForLtGtEq(element,datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "GT":
-				queryCheckerForLtGtEq(element,datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "EQ":
-				queryCheckerForLtGtEq(element,datasetID);
+				queryCheckerForLtGtEq(element, datasetID, key[0]);
 				break;
 			case "IS":
 				queryCheckerForIs(element,datasetID);
@@ -128,7 +130,7 @@ function queryCheckerForAnd(queryWhereBlock: any, datasetID: string) {
 }
 
 // returns true if the query does not violate IS/LT/GT rules
-function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string) {
+function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string, comparator: string) {
 	// let whereString: string = "WHERE";
 	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
 	let whereBlockKey: string = "INITIALIZED";
