@@ -16,7 +16,6 @@ function whereChecker (queryWhole: any, datasetID: string): boolean {
 			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT") ||
 			   Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
 		let key: string = Object.keys(queryWhereBlock)[0];
-		console.log(key);
 		queryCheckerForLtGtEq(queryWhereBlock,datasetID, key);
 	} else if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "IS")) {
 		queryCheckerForIs(queryWhereBlock,datasetID);
@@ -66,30 +65,22 @@ function queryCheckerForOr(queryWhereBlock: any, datasetID: string) {
 	for (const element of objectDeepest) {
 		let key = Object.keys(element);
 		// console.log(Object.keys(element));
-		switch (key[0]) {
-			case "LT":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "GT":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "EQ":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "IS":
-				queryCheckerForIs(element, datasetID);
-				break;
-			case "OR":
-				queryCheckerForOr(element, datasetID);
-				break;
-			case "AND":
-				queryCheckerForAnd(element, datasetID);
-				break;
-			case "NOT":
-				queryCheckerForNot(element, datasetID);
-				break;
-			default:
-				throw new InsightError("Invalid filter key: " + key[0]);
+		if (key[0] === "LT") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "GT") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "EQ") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "IS") {
+			queryCheckerForIs(element, datasetID);
+		} else if (key[0] === "OR") {
+			queryCheckerForOr(element, datasetID);
+		} else if (key[0] === "AND") {
+			queryCheckerForAnd(element, datasetID);
+		} else if (key[0] === "NOT") {
+			queryCheckerForNot(element, datasetID);
+		} else {
+			throw new InsightError("Invalid filter key: " + key[0]);
 		}
 	}
 }
@@ -101,30 +92,22 @@ function queryCheckerForAnd(queryWhereBlock: any, datasetID: string) {
 	for (const element of objectDeepest) {
 		let key = Object.keys(element);
 		// console.log(Object.keys(element));
-		switch(key[0]) {
-			case "LT":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "GT":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "EQ":
-				queryCheckerForLtGtEq(element, datasetID, key[0]);
-				break;
-			case "IS":
-				queryCheckerForIs(element,datasetID);
-				break;
-			case "OR":
-				queryCheckerForOr(element,datasetID);
-				break;
-			case "AND":
-				queryCheckerForAnd(element,datasetID);
-				break;
-			case "NOT":
-				queryCheckerForNot(element,datasetID);
-				break;
-			default:
-				throw new InsightError("Invalid filter key: " + key[0]);
+		if (key[0] === "LT") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "GT") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "EQ") {
+			queryCheckerForLtGtEq(element, datasetID, key[0]);
+		} else if (key[0] === "IS") {
+			queryCheckerForIs(element, datasetID);
+		} else if (key[0] === "OR") {
+			queryCheckerForOr(element, datasetID);
+		} else if (key[0] === "AND") {
+			queryCheckerForAnd(element, datasetID);
+		} else if (key[0] === "NOT") {
+			queryCheckerForNot(element, datasetID);
+		} else {
+			throw new InsightError("Invalid filter key: " + key[0]);
 		}
 	}
 }
