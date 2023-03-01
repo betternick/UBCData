@@ -112,10 +112,10 @@ describe("Add/Remove/List Dataset", function () {
 		});
 
 		describe("Other_addDataset_errors", function () {
-			it("should reject due to attempting to add a Rooms kind", function () {
-				const result = facade.addDataset("rain", sectionsLightSection, InsightDatasetKind.Rooms);
-				return expect(result).to.eventually.be.rejectedWith(InsightError);
-			});
+			// it("should reject due to attempting to add a Rooms kind", function () {
+			// 	const result = facade.addDataset("rain", sectionsLightSection, InsightDatasetKind.Rooms);
+			// 	return expect(result).to.eventually.be.rejectedWith(InsightError);
+			// });
 
 			it("should reject due to a duplicate add chai-as-promised V2", function () {
 				const result = facade

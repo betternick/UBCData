@@ -23,15 +23,23 @@ function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): Promise
 			return reject(new InsightError("ID only has whitespace"));
 			// return false;
 		}
-		if (kind !== InsightDatasetKind.Sections) {
-			return reject(new InsightError("kind must only be of type sections"));
+		if (kind !== InsightDatasetKind.Sections && kind !== InsightDatasetKind.Rooms) {
+			return reject(new InsightError("kind must only be of type sections or type rooms"));
 			// return false;
 		}
-		return resolve(true);
+		if (kind === InsightDatasetKind.Sections) {
+			return resolve("sections");
+			// return false;
+		}
+		if (kind === InsightDatasetKind.Rooms) {
+			return resolve("rooms");
+			// return false;
+		}
+		// return resolve(true);
 	});
 }
 
-function readContent(content: any, dataset: JSON[]): Promise<number> {
+function readSectionsContent(content: any, dataset: JSON[]): Promise<number> {
 	return new Promise(function (resolve, reject) {
 		let zip = new JSZip();
 		let promisesArray: any = [];
@@ -183,27 +191,6 @@ function addToPersistFolder(data: Dataset, keys: string[]): Promise<any> {
 	});
 }
 
-// 		checkFileExistsElseCreateFile()
-// 			.then(() => {
-// 				return fs.readJson(persistFile);
-// 			})
-// 			.then((jsonObj) => {
-// 				//	ref: https://stackoverflow.com/questions/36093042/how-do-i-add-to-an-existing-json-file-
-// 				//	in-node-js
-// 				jsonObj.fileArray.push(data);
-// 				console.log(jsonObj);
-// 				console.log("Testing addTopersistfolder func");
-// 				return fs.writeJson(persistFile, jsonObj);
-// 			})
-// 			.then(() => {
-// 				resolve(keys);
-// 			})
-// 			.catch((err) => {
-// 				reject(new InsightError(err + "could not read json file from disk"));
-// 			});
-// 	});
-// }
-
 // This is a synchronous function
 // function loadDatasetFromPersistence(map: Map<string, Dataset>): Promise<boolean> {
 // 	return new Promise(function (resolve, reject) {
@@ -272,7 +259,7 @@ function deleteDatasetFromPersistence(path: any, id: string): Promise<any> {
 }
 
 export {
-	readContent,
+	readSectionsContent,
 	checkIdAndKind,
 	checkValidSection,
 	// checkFileExistsElseCreateFile,

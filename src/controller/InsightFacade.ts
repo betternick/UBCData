@@ -5,7 +5,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError, ResultTooLargeError,
+	NotFoundError,
 } from "./IInsightFacade";
 
 import {QueryContainer} from "../model/QueryContainer";
@@ -14,13 +14,11 @@ import {
 	addToPersistFolder,
 	checkIdAndKind,
 	deleteDatasetFromPersistence,
-	readContent, readDirectory,
+	readDirectory,
+	readSectionsContent,
 } from "./helperFunctionsAddDataset";
 
-import {
-	queryValidator
-} from "./helperFunctionsQueryChecking";
-import {getContentFromArchives} from "../../test/TestUtil";
+import {queryValidator} from "./helperFunctionsQueryChecking";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -52,14 +50,18 @@ export default class InsightFacade implements IInsightFacade {
 			};
 
 			checkIdAndKind(id, kind, this.map)
-				.then(() => {
-					return readContent(content, myDataset.datasetArray);
+				.then((type) => {
+					if (type === "sections"){
+						return readSectionsContent(content, myDataset.datasetArray);
+					} else {
+						// standin for readContentRooms
+						myDataset.kind = InsightDatasetKind.Rooms;
+						return readSectionsContent(content, myDataset.datasetArray);
+					}
 				})
-
 				.then((length) => {
 					myDataset.numRows = length;
 					this.map.set(id, myDataset);
-
 					// ref: https://linuxhint.com/convert-map-keys-to-array-javascript/
 					keys = [...this.map.keys()];
 					// resolve(keys);
