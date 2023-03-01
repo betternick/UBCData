@@ -104,7 +104,7 @@ function checkValidSection(element: JSON): boolean {
 		textArray.includes("Audit");
 	return result;
 }
-
+// comment
 // Changed checkFile function to be synchronous
 // function checkFileExistsElseCreateFile(): Promise<boolean> {
 // 	return new Promise(function (resolve, reject) {
