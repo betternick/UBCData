@@ -28,6 +28,8 @@ let sectionsInvalidSection: string;
 let sectionsLightSection: string;
 let noCoursesFolder: string;
 let flag: number;
+let rooms: string;
+let rooms9buildings: string;
 
 before(function () {
 	// This block runs once and loads the datasets.
@@ -40,6 +42,8 @@ before(function () {
 	sectionsLightSection = getContentFromArchives("pairLight.zip");
 	// noCoursesFolder = getContentFromArchives("noCoursesFolder.zip");
 	// Just in case there is anything hanging around from a previous run of the test suite
+	rooms = getContentFromArchives("campus.zip");
+	rooms9buildings = getContentFromArchives("campus9buildings.zip");
 	clearDisk();
 });
 
@@ -89,6 +93,11 @@ describe("Add/Remove/List Dataset", function () {
 				const result = facade.addDataset("qwerty_123", sectionsLightSection, InsightDatasetKind.Sections);
 				return expect(result).to.eventually.be.rejectedWith(InsightError);
 			});
+
+			it("should reject because of an _ in the id - ROOMS", function () {
+				const result = facade.addDataset("qwerty_123", sectionsLightSection, InsightDatasetKind.Rooms);
+				return expect(result).to.eventually.be.rejectedWith(InsightError);
+			});
 		});
 
 		describe("addDataset_content_errors", function () {
@@ -109,6 +118,18 @@ describe("Add/Remove/List Dataset", function () {
 				// console.log(InsightError);
 				return expect(result).to.eventually.be.rejectedWith(InsightError);
 			});
+
+			it("should reject due to adding Rooms data for a Sections add", function () {
+				const result = facade.addDataset("qwerty", rooms, InsightDatasetKind.Sections);
+				// console.log(InsightError);
+				return expect(result).to.eventually.be.rejectedWith(InsightError);
+			});
+
+			it("should reject due to adding sections data for a Rooms add", function () {
+				const result = facade.addDataset("qwerty", sectionsLightSection, InsightDatasetKind.Rooms);
+				// console.log(InsightError);
+				return expect(result).to.eventually.be.rejectedWith(InsightError);
+			});
 		});
 
 		describe("Other_addDataset_errors", function () {
@@ -126,7 +147,7 @@ describe("Add/Remove/List Dataset", function () {
 			});
 		});
 
-		describe("addDataset_assertions", function () {
+		describe("addDataset_assertions - SECTIONS & ROOMS", function () {
 			it("dataset should be successfully added", async function () {
 				const result = await facade.addDataset("qwerty2", sectionsLightSection, InsightDatasetKind.Sections);
 				expect(result.length).to.equals(1);
@@ -152,6 +173,35 @@ describe("Add/Remove/List Dataset", function () {
 					//  expect(err).to.be.instanceof(TooSimple);
 				}
 			});
+
+			it("ROOMS dataset should be successfully added", async function () {
+				const result = await facade.addDataset("qwerty2", rooms, InsightDatasetKind.Rooms);
+				expect(result.length).to.equals(1);
+				expect(result[0]).to.equals("qwerty2");
+				const len2 = await facade.listDatasets();
+				expect(len2.length).to.equals(1);
+				expect(len2[0].id).to.equals("qwerty2");
+				expect(len2[0].kind).to.equals(InsightDatasetKind.Rooms);
+				expect(len2[0].numRows).to.equals(364);
+			});
+
+			// it("second dataset should be successfully added - ROOMS", async function () {
+			// 	try {
+			// 		const result = await facade.addDataset("qw", rooms, InsightDatasetKind.Rooms);
+			// 		const len0 = await facade.listDatasets();
+			// 		expect(len0.length).to.equals(1);
+			// 		const result2 = await facade.addDataset("qw2", rooms9buildings, InsightDatasetKind.Rooms);
+			// 		expect(result2.length).to.equals(2);
+			// 		const len1 = await facade.listDatasets();
+			// 		expect(len1.length).to.equals(2);
+			// 		expect(result2[0]).to.equals("qw");
+			// 		expect(result2[1]).to.equals("qw2");
+			// 	} catch (err) {
+			// 		console.error(err);
+			// 		expect.fail("Should not have rejected!");
+			// 		//  expect(err).to.be.instanceof(TooSimple);
+			// 	}
+			// });
 
 			// it("FOUR heavy datasets added consecutively", async function () {
 			// 	try {
@@ -211,6 +261,22 @@ describe("Add/Remove/List Dataset", function () {
 				const result3 = await facade.listDatasets();
 				expect(result3.length).to.equals(2);
 				await facade.addDataset("qwerty3", sectionsLightSection, InsightDatasetKind.Sections);
+				const result5 = await facade.listDatasets();
+				expect(result5.length).to.equals(3);
+				const result6 = await facade.removeDataset("qwerty2");
+				expect(result6).to.equals("qwerty2");
+				const result7 = await facade.listDatasets();
+				expect(result7.length).to.equals(2);
+				expect(result7[0].id).to.equals("qwerty");
+				expect(result7[1].id).to.equals("qwerty3");
+			});
+
+			it("ROOMS dataset removal", async function () {
+				await facade.addDataset("qwerty", rooms, InsightDatasetKind.Rooms);
+				await facade.addDataset("qwerty2", rooms, InsightDatasetKind.Rooms);
+				const result3 = await facade.listDatasets();
+				expect(result3.length).to.equals(2);
+				await facade.addDataset("qwerty3", rooms, InsightDatasetKind.Rooms);
 				const result5 = await facade.listDatasets();
 				expect(result5.length).to.equals(3);
 				const result6 = await facade.removeDataset("qwerty2");
@@ -330,7 +396,7 @@ describe("Data Persistence test", function () {
 
 	});
 
-	it("persistence of datasets while instantiating new InsightFacade objects", async function () {
+	it("persistence of Sections datasets", async function () {
 		let datafacade = new InsightFacade();
 		const result = await datafacade.addDataset("1", sections, InsightDatasetKind.Sections);
 		expect(result.length).to.equals(1);
@@ -373,4 +439,51 @@ describe("Data Persistence test", function () {
 		expect(len5[1].id).to.equals("big");
 		expect(len5[1].numRows).to.equals(64612);
 	});
+
+
+	it("persistence of Rooms datasets", async function () {
+		let datafacade = new InsightFacade();
+		const result = await datafacade.addDataset("1", rooms, InsightDatasetKind.Rooms);
+		expect(result.length).to.equals(1);
+		expect(result[0]).to.equals("1");
+		const len = await datafacade.listDatasets();
+		expect(len.length).to.equals(1);
+		expect(len[0].id).to.equals("1");
+		expect(len[0].numRows).to.equals(364);
+		expect(len[0].kind).to.equals(InsightDatasetKind.Rooms);
+
+		let datafacade2 = new InsightFacade();
+		const len2 = await datafacade2.listDatasets();
+		expect(len2.length).to.equals(1);
+		expect(len2[0].id).to.equals("1");
+		expect(len2[0].numRows).to.equals(364);
+		expect(len2[0].kind).to.equals(InsightDatasetKind.Rooms);
+		const result2 = await datafacade.addDataset("2", rooms, InsightDatasetKind.Rooms);
+
+		let datafacade3 = new InsightFacade();
+		const len3 = await datafacade3.listDatasets();
+		expect(len3.length).to.equals(2);
+		expect(len3[1].id).to.equals("2");
+		expect(len3[1].numRows).to.equals(364);
+		expect(len3[1].kind).to.equals(InsightDatasetKind.Rooms);
+
+		let datafacade4 = new InsightFacade();
+		const rm = await datafacade4.removeDataset("1");
+		expect(rm).to.equals("1");
+		const len4 = await datafacade4.listDatasets();
+		expect(len4.length).to.equals(1);
+		expect(len4[0].id).to.equals("2");
+		expect(len4[0].numRows).to.equals(364);
+		expect(len4[0].kind).to.equals(InsightDatasetKind.Rooms);
+		const bigADD = await datafacade4.addDataset("big", rooms, InsightDatasetKind.Rooms);
+
+		let datafacade5 = new InsightFacade();
+		const len5 = await datafacade5.listDatasets();
+		expect(len5.length).to.equals(2);
+		expect(len5[0].id).to.equals("2");
+		expect(len5[1].id).to.equals("big");
+		expect(len5[1].numRows).to.equals(364);
+	});
+
+
 });

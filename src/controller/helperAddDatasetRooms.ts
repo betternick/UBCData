@@ -1,6 +1,52 @@
-import * as http from "http";
-import {InsightError} from "./IInsightFacade";
-import JSZip from "jszip";
+import {Building, InsightError, Rooms} from "./IInsightFacade";
+import http from "http";
+
+
+export function initializeDefaultRoom(): Rooms {
+	let room: Rooms = {
+		fullname : "ImpossibleWord@$%#123",
+		shortname : "ImpossibleWord@$%#123",
+		number : "ImpossibleWord@$%#123",
+		name : "ImpossibleWord@$%#123",
+		address : "ImpossibleWord@$%#123",
+		lat : 1000000,
+		lon : 1000000,
+		seats : 1000000,
+		type : "ImpossibleWord@$%#123",
+		furniture : "ImpossibleWord@$%#123",
+		href : "ImpossibleWord@$%#123",
+	};
+	return room;
+}
+
+export function initializeDefaultBuilding(): Building {
+	let building: Building = {
+		fullname : "ImpossibleWord@$%#123",
+		shortname : "ImpossibleWord@$%#123",
+		address : "ImpossibleWord@$%#123",
+		lat : 1000000,
+		lon : 1000000,
+		rooms : []
+	};
+	return building;
+}
+
+export function checkValidRoom(room: Rooms): boolean {
+	let result: boolean =
+		room.fullname !== "ImpossibleWord@$%#123" &&
+		room.shortname !== "ImpossibleWord@$%#123" &&
+		room.number !== "ImpossibleWord@$%#123" &&
+		room.name !== "ImpossibleWord@$%#123" &&
+		room.address !== "ImpossibleWord@$%#123" &&
+		// room.lat !== 1000000 &&
+		// room.lon !== 1000000 &&
+		room.seats !== 1000000 &&
+		room.type !== "ImpossibleWord@$%#123" &&
+		room.furniture !== "ImpossibleWord@$%#123" &&
+		room.href !== "ImpossibleWord@$%#123";
+	return result;
+}
+
 
 // Encodes building address (string) for use in a URL request
 export function encodeAddress (address: string) {
@@ -8,8 +54,7 @@ export function encodeAddress (address: string) {
 }
 
 // Takes in building address and returns its lat and lon coordinates.
-export function getGeoData (address: string) {
-
+export function getGeoData (address: string): any {
 	return new Promise(function (resolve, reject) {
 		let encodedAddress: string = encodeAddress(address);
 		// The following function is copied from HTTP API
@@ -18,7 +63,6 @@ export function getGeoData (address: string) {
 		http.get(getURL, (res) => {
 			const {statusCode} = res;
 			const contentType = res.headers["content-type"];
-
 			let error;
 			// Any 2xx status code signals a successful response but
 			// here we're only checking for 200.
@@ -40,7 +84,6 @@ export function getGeoData (address: string) {
 				return reject(error);
 				// return;
 			}
-
 			res.setEncoding("utf8");
 			let rawData = "";
 			res.on("data", (chunk) => {
@@ -62,76 +105,3 @@ export function getGeoData (address: string) {
 		});
 	});
 }
-
-
-// function readRoomsContent(content: any, dataset: JSON[]): Promise<number> {
-// 	return new Promise(function (resolve, reject) {
-// 		let zip = new JSZip();
-// 		let promisesArray: any = [];
-// 		let coursesArray: any = [];
-// 		// SYED: ref: https://stuk.github.io/jszip/documentation/howto/read_zip.html &
-// 		// https://stuk.github.io/jszip/documentation/api_jszip/for_each.html
-// 		zip.loadAsync(content, {base64: true})
-// 			.then((unzip: JSZip) => {
-// 				// let foldRead: any;
-// 				// try {
-// 				// 	// foldRead = unzip.folder(/courses/);
-// 				// } catch (e) {
-// 				// 	return reject(new InsightError("No courses folder?123"));
-// 				// }
-// 				// //
-// 				// if (foldRead.length === 0 || foldRead[0].name !== "courses/") {
-// 				// 	return reject(new InsightError("No courses folder?456"));
-// 				// }
-// 				unzip.folder("courses")?.forEach(function (relativePath, file) {
-// 					promisesArray.push(file.async("string"));
-// 				});
-// 			})
-// 			.then(() => {
-// 				return Promise.all(promisesArray);
-// 			})
-// 			.then((dataArray) => {
-// 				for (const element of dataArray) {
-// 					let courseFileJSON = JSON.parse(element);
-// 					if (courseFileJSON.result.length > 0) {
-// 						coursesArray.push(courseFileJSON);
-// 					}
-// 				};
-// 				for (const course of coursesArray) {
-// 					course.result.forEach((section: any) => {
-// 						if (checkValidSection(section)){
-// 							dataset.push(section);
-// 						}
-// 						// dataset.push(section));
-// 					});
-// 				}
-// 				// for (let i = 0; i < dataset.length; i++){
-// 				// 	if (!checkValidSection(dataset[i])) {
-// 				// 		dataset.splice(i, 1);
-// 				// 	}
-// 				// }
-// 				if (dataset.length === 0) {
-// 					return reject(new InsightError("No valid sections to add?"));
-// 				} else {
-// 					return resolve(dataset.length);
-// 				}
-// 			})
-// 			.catch(function (err: any) {
-// 				return reject(new InsightError("there is an error in readContent function???"));
-// 			});
-// 	});
-// }
-
-
-let addy = "35 surrey St, Vancouver V6S";
-let addy2 = "6245 Agronomy Road V6T 1Z4x";
-// let res = getGeoData(addy2).then((u) => {
-// 	console.log(u);
-// });
-
-let res = getGeoData(addy2).then((u) => {
-	console.log(u);
-}).catch((y) => {
-	console.log(y);
-});
-

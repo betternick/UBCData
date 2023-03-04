@@ -19,6 +19,8 @@ import {
 } from "./helperFunctionsAddDataset";
 
 import {queryValidator} from "./helperFunctionsQueryChecking";
+import {readRoomsContent} from "./AddDatasetRooms";
+import {getContentFromArchives} from "../../test/TestUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -54,9 +56,8 @@ export default class InsightFacade implements IInsightFacade {
 					if (type === "sections"){
 						return readSectionsContent(content, myDataset.datasetArray);
 					} else {
-						// standin for readContentRooms
 						myDataset.kind = InsightDatasetKind.Rooms;
-						return readSectionsContent(content, myDataset.datasetArray);
+						return readRoomsContent(content, myDataset.datasetArray);
 					}
 				})
 				.then((length) => {
@@ -66,6 +67,7 @@ export default class InsightFacade implements IInsightFacade {
 					keys = [...this.map.keys()];
 					// resolve(keys);
 					// Step 5): diskWrite: write this object to data folder for persistence.
+					// console.log(myDataset);
 					return addToPersistFolder(myDataset, keys);
 				})
 				.then((keysParam) => {
@@ -202,3 +204,14 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
+
+
+// let rooms: string;
+// rooms = getContentFromArchives("campus.zip");
+// let roomsBroken = getContentFromArchives("campus9buildings.zip");
+// let dataset: JSON[] = [];
+//
+// let facade = new InsightFacade();
+// facade.addDataset("rooms2",roomsBroken,InsightDatasetKind.Rooms).then(() => {
+// 	console.log("yes");
+// });

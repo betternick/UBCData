@@ -18,7 +18,7 @@ export interface Dataset {
 }
 
 // This is the given georesponse interface for location data
-interface GeoResponse {
+export interface GeoResponse {
 	lat?: number;
 	lon?: number;
 	error?: string;
@@ -37,6 +37,16 @@ export interface Rooms {
 	type: string;
 	furniture: string;
 	href: string;
+}
+
+
+export interface Building {
+	fullname: string;
+	shortname: string;
+	address: string;
+	lat: number | undefined;
+	lon: number | undefined;
+	rooms: Rooms[];
 }
 
 export interface InsightDataset {
