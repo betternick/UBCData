@@ -9,11 +9,44 @@ export enum InsightDatasetKind {
 	Rooms = "rooms",
 }
 
+// This is our dataset interface
 export interface Dataset {
 	id: string;
 	kind: InsightDatasetKind;
 	numRows: number;
 	datasetArray: JSON[];
+}
+
+// This is the given georesponse interface for location data
+export interface GeoResponse {
+	lat?: number;
+	lon?: number;
+	error?: string;
+}
+
+// This is our rooms interface for rooms
+export interface Rooms {
+	fullname: string;
+	shortname: string;
+	number: string;
+	name: string;
+	address: string;
+	lat: number;
+	lon: number;
+	seats: number;
+	type: string;
+	furniture: string;
+	href: string;
+}
+
+
+export interface Building {
+	fullname: string;
+	shortname: string;
+	address: string;
+	lat: number | undefined;
+	lon: number | undefined;
+	rooms: Rooms[];
 }
 
 export interface InsightDataset {
