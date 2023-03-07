@@ -208,10 +208,10 @@ export default class InsightFacade implements IInsightFacade {
 
 // let rooms: string;
 // rooms = getContentFromArchives("campus.zip");
-// let roomsBroken = getContentFromArchives("campus9buildings.zip");
-// let dataset: JSON[] = [];
-//
+// // let roomsBroken = getContentFromArchives("campus9buildings.zip");
+// // let dataset: JSON[] = [];
+// //
 // let facade = new InsightFacade();
-// facade.addDataset("rooms2",roomsBroken,InsightDatasetKind.Rooms).then(() => {
+// facade.addDataset("rooms",rooms,InsightDatasetKind.Rooms).then(() => {
 // 	console.log("yes");
 // });
