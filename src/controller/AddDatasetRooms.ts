@@ -22,16 +22,23 @@ export function readRoomsContent(content: any, dataset: JSON[]): Promise<number>
 		let buildingArray: Building[] = [];
 		zip.loadAsync(content, {base64: true})
 			.then((unzip: JSZip) => {
+
 				let index = unzip.folder("")?.file("index.htm")?.async("string");
+				console.log("wooottt");
 				unzip.folder("campus/discover/buildings-and-classrooms/")?.forEach
 				(function (relativePath, file) {
 					roomsPromises.push(file.async("string"));
+
 				});
 				return index;
 			})
 			.then((index) => {
 				let indexJSON = parse(index!);
+
 				traverseIndexFile(indexJSON,buildingArray);
+				// check that geolocation errors are taken care of
+				// that the 9 building file is correctly disgested
+
 				return populateGeoLocationData(buildingArray);
 
 			})

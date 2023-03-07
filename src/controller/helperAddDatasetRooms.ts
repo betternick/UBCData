@@ -38,8 +38,8 @@ export function checkValidRoom(room: Rooms): boolean {
 		room.number !== "ImpossibleWord@$%#123" &&
 		room.name !== "ImpossibleWord@$%#123" &&
 		room.address !== "ImpossibleWord@$%#123" &&
-		// room.lat !== 1000000 &&
-		// room.lon !== 1000000 &&
+		room.lat !== 1000000 &&
+		room.lon !== 1000000 &&
 		room.seats !== 1000000 &&
 		room.type !== "ImpossibleWord@$%#123" &&
 		room.furniture !== "ImpossibleWord@$%#123" &&

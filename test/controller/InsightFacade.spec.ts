@@ -29,7 +29,7 @@ let sectionsLightSection: string;
 let noCoursesFolder: string;
 let flag: number;
 let rooms: string;
-let rooms9buildings: string;
+let rooms8buildings: string;
 
 before(function () {
 	// This block runs once and loads the datasets.
@@ -43,7 +43,7 @@ before(function () {
 	// noCoursesFolder = getContentFromArchives("noCoursesFolder.zip");
 	// Just in case there is anything hanging around from a previous run of the test suite
 	rooms = getContentFromArchives("campus.zip");
-	rooms9buildings = getContentFromArchives("campus9buildings.zip");
+	rooms8buildings = getContentFromArchives("campus8buildings.zip");
 	clearDisk();
 });
 
@@ -185,23 +185,27 @@ describe("Add/Remove/List Dataset", function () {
 				expect(len2[0].numRows).to.equals(364);
 			});
 
-			// it("second dataset should be successfully added - ROOMS", async function () {
-			// 	try {
-			// 		const result = await facade.addDataset("qw", rooms, InsightDatasetKind.Rooms);
-			// 		const len0 = await facade.listDatasets();
-			// 		expect(len0.length).to.equals(1);
-			// 		const result2 = await facade.addDataset("qw2", rooms9buildings, InsightDatasetKind.Rooms);
-			// 		expect(result2.length).to.equals(2);
-			// 		const len1 = await facade.listDatasets();
-			// 		expect(len1.length).to.equals(2);
-			// 		expect(result2[0]).to.equals("qw");
-			// 		expect(result2[1]).to.equals("qw2");
-			// 	} catch (err) {
-			// 		console.error(err);
-			// 		expect.fail("Should not have rejected!");
-			// 		//  expect(err).to.be.instanceof(TooSimple);
-			// 	}
-			// });
+			it("second dataset should be successfully added - ROOMS", async function () {
+				try {
+					const result = await facade.addDataset("qw", rooms, InsightDatasetKind.Rooms);
+					const len0 = await facade.listDatasets();
+					expect(len0.length).to.equals(1);
+					const result2 = await facade.addDataset("qw2", rooms8buildings, InsightDatasetKind.Rooms);
+					expect(result2.length).to.equals(2);
+					const len1 = await facade.listDatasets();
+					expect(len1.length).to.equals(2);
+					expect(len1[0].id).to.equals("qw");
+					expect(len1[0].numRows).to.equals(364);
+					expect(len1[1].id).to.equals("qw2");
+					expect(len1[1].numRows).to.equals(15);
+					expect(result2[0]).to.equals("qw");
+					expect(result2[1]).to.equals("qw2");
+				} catch (err) {
+					console.error(err);
+					expect.fail("Should not have rejected!");
+					//  expect(err).to.be.instanceof(TooSimple);
+				}
+			});
 
 			// it("FOUR heavy datasets added consecutively", async function () {
 			// 	try {
