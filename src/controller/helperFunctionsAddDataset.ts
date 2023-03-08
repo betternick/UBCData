@@ -7,7 +7,7 @@ const persistDir = "./data";
 const persistFile = "./data/persistFile.json";
 
 // SYED: Checks that ID param observes rules for naming and kind is of type "sections".
-function checkIdAndKind(id: string, kind: InsightDatasetKind, map: any): Promise<any> {
+function checkIdAndKind(id: string, kind: InsightDatasetKind, map: Map<string, Dataset>): Promise<any> {
 	return new Promise(function (resolve, reject) {
 		if (map.has(id)) {
 			return reject(new InsightError("ID already exists"));

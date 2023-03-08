@@ -271,11 +271,12 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		// console.info(`After: ${this.test?.parent?.title}`);
 		clearDisk();
 	});
-	// SYED: Folder test for ORDERED queries
+
+	// LINDA: Folder test for C2 queries
 	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-		"Dynamic InsightFacade PerformQuery tests",
+		"Dynamic InsightFacade PerformQuery C2 tests",
 		(input) => facade.performQuery(input),
-		"./test/resources/queries",
+		"./test/resources/c2Queries",
 		{
 			assertOnResult: (actual, expected) => {
 				expect(actual).to.deep.equal(expected);
@@ -292,85 +293,107 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 			},
 		}
 	);
+
+	// SYED: Folder test for ORDERED queries
+	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+	// 	"Dynamic InsightFacade PerformQuery tests",
+	// 	(input) => facade.performQuery(input),
+	// 	"./test/resources/queries",
+	// 	{
+	// 		assertOnResult: (actual, expected) => {
+	// 			expect(actual).to.deep.equal(expected);
+	// 		},
+	// 		errorValidator: (error): error is PQErrorKind =>
+	// 			error === "ResultTooLargeError" || error === "InsightError",
+	// 		assertOnError: (actual, expected) => {
+	// 			// SYED: Assertion to check if actual error is of the expected type
+	// 			if (expected === "InsightError") {
+	// 				expect(actual).to.be.an.instanceOf(InsightError);
+	// 			} else {
+	// 				expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+	// 			}
+	// 		},
+	// 	}
+	// );
 	// SYED: Folder test for UNORDERED queries
-	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-		"Dynamic InsightFacade PerformQuery tests",
-		(input) => facade.performQuery(input),
-		"./test/resources/unorderedQueries",
-		{
-			assertOnResult: (actual: any, expected: any) => {
-				// SYED: Assertion to check equality
-				expect(actual).to.have.deep.members(expected);
-				expect(actual.length).to.equals(expected.length);
-			},
-			errorValidator: (error): error is PQErrorKind =>
-				error === "ResultTooLargeError" || error === "InsightError",
-			assertOnError: (actual, expected) => {
-				// SYED: Assertion to check if actual error is of the expected type
-				if (expected === "InsightError") {
-					expect(actual).to.be.an.instanceOf(InsightError);
-				} else {
-					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-				}
-			},
-		}
-	);
+	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+	// 	"Dynamic InsightFacade PerformQuery tests",
+	// 	(input) => facade.performQuery(input),
+	// 	"./test/resources/unorderedQueries",
+	// 	{
+	// 		assertOnResult: (actual: any, expected: any) => {
+	// 			// SYED: Assertion to check equality
+	// 			expect(actual).to.have.deep.members(expected);
+	// 			expect(actual.length).to.equals(expected.length);
+	// 		},
+	// 		errorValidator: (error): error is PQErrorKind =>
+	// 			error === "ResultTooLargeError" || error === "InsightError",
+	// 		assertOnError: (actual, expected) => {
+	// 			// SYED: Assertion to check if actual error is of the expected type
+	// 			if (expected === "InsightError") {
+	// 				expect(actual).to.be.an.instanceOf(InsightError);
+	// 			} else {
+	// 				expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+	// 			}
+	// 		},
+	// 	}
+	// );
 });
 
 
-describe("Data Persistence test", function () {
-	let singleCourse: string;
-	let threeCourses: string;
-
-	before(function () {
-		// This block runs once and loads the datasets.
-		clearDisk();
-		singleCourse = getContentFromArchives("singleCourse.zip");
-		threeCourses = getContentFromArchives("Pair3CoursesOnly.zip");
-
-	});
-
-	// it("persistence of datasets while instantiating new InsightFacade objects", async function () {
-	// 	let datafacade = new InsightFacade();
-	// 	const result = await datafacade.addDataset("1", sections, InsightDatasetKind.Sections);
-	// 	expect(result.length).to.equals(1);
-	// 	expect(result[0]).to.equals("1");
-	// 	const len = await datafacade.listDatasets();
-	// 	expect(len.length).to.equals(1);
-	// 	expect(len[0].id).to.equals("1");
-	// 	expect(len[0].numRows).to.equals(64612);
-	// 	expect(len[0].kind).to.equals(InsightDatasetKind.Sections);
-	//
-	// 	let datafacade2 = new InsightFacade();
-	// 	const len2 = await datafacade2.listDatasets();
-	// 	expect(len2.length).to.equals(1);
-	// 	expect(len2[0].id).to.equals("1");
-	// 	expect(len2[0].numRows).to.equals(64612);
-	// 	expect(len2[0].kind).to.equals(InsightDatasetKind.Sections);
-	// 	const result2 = await datafacade.addDataset("2", sections, InsightDatasetKind.Sections);
-	//
-	// 	let datafacade3 = new InsightFacade();
-	// 	const len3 = await datafacade3.listDatasets();
-	// 	expect(len3.length).to.equals(2);
-	// 	expect(len3[1].id).to.equals("2");
-	// 	expect(len3[1].numRows).to.equals(64612);
-	// 	expect(len3[1].kind).to.equals(InsightDatasetKind.Sections);
-	//
-	// 	let datafacade4 = new InsightFacade();
-	// 	const rm = await datafacade4.removeDataset("1");
-	// 	expect(rm).to.equals("1");
-	// 	const len4 = await datafacade4.listDatasets();
-	// 	expect(len4.length).to.equals(1);
-	// 	expect(len4[0].id).to.equals("2");
-	// 	expect(len4[0].numRows).to.equals(64612);
-	// 	expect(len4[0].kind).to.equals(InsightDatasetKind.Sections);
-	// 	const bigADD = await datafacade4.addDataset("big", sections, InsightDatasetKind.Sections);
-	//
-	// 	let datafacade5 = new InsightFacade();
-	// 	const len5 = await datafacade5.listDatasets();
-	// 	expect(len5.length).to.equals(2);
-	// 	expect(len5[0].id).to.equals("2");
-	// 	expect(len5[1].id).to.equals("big");
-	// 	expect(len5[1].numRows).to.equals(64612);
-	// });
-});
+// describe("Data Persistence test", function () {
+// 	let singleCourse: string;
+// 	let threeCourses: string;
+//
+// 	before(function () {
+// 		// This block runs once and loads the datasets.
+// 		clearDisk();
+// 		singleCourse = getContentFromArchives("singleCourse.zip");
+// 		threeCourses = getContentFromArchives("Pair3CoursesOnly.zip");
+//
+// 	});
+//
+// 	// it("persistence of datasets while instantiating new InsightFacade objects", async function () {
+// 	// 	let datafacade = new InsightFacade();
+// 	// 	const result = await datafacade.addDataset("1", sections, InsightDatasetKind.Sections);
+// 	// 	expect(result.length).to.equals(1);
+// 	// 	expect(result[0]).to.equals("1");
+// 	// 	const len = await datafacade.listDatasets();
+// 	// 	expect(len.length).to.equals(1);
+// 	// 	expect(len[0].id).to.equals("1");
+// 	// 	expect(len[0].numRows).to.equals(64612);
+// 	// 	expect(len[0].kind).to.equals(InsightDatasetKind.Sections);
+// 	//
+// 	// 	let datafacade2 = new InsightFacade();
+// 	// 	const len2 = await datafacade2.listDatasets();
+// 	// 	expect(len2.length).to.equals(1);
+// 	// 	expect(len2[0].id).to.equals("1");
+// 	// 	expect(len2[0].numRows).to.equals(64612);
+// 	// 	expect(len2[0].kind).to.equals(InsightDatasetKind.Sections);
+// 	// 	const result2 = await datafacade.addDataset("2", sections, InsightDatasetKind.Sections);
+// 	//
+// 	// 	let datafacade3 = new InsightFacade();
+// 	// 	const len3 = await datafacade3.listDatasets();
+// 	// 	expect(len3.length).to.equals(2);
+// 	// 	expect(len3[1].id).to.equals("2");
+// 	// 	expect(len3[1].numRows).to.equals(64612);
+// 	// 	expect(len3[1].kind).to.equals(InsightDatasetKind.Sections);
+// 	//
+// 	// 	let datafacade4 = new InsightFacade();
+// 	// 	const rm = await datafacade4.removeDataset("1");
+// 	// 	expect(rm).to.equals("1");
+// 	// 	const len4 = await datafacade4.listDatasets();
+// 	// 	expect(len4.length).to.equals(1);
+// 	// 	expect(len4[0].id).to.equals("2");
+// 	// 	expect(len4[0].numRows).to.equals(64612);
+// 	// 	expect(len4[0].kind).to.equals(InsightDatasetKind.Sections);
+// 	// 	const bigADD = await datafacade4.addDataset("big", sections, InsightDatasetKind.Sections);
+// 	//
+// 	// 	let datafacade5 = new InsightFacade();
+// 	// 	const len5 = await datafacade5.listDatasets();
+// 	// 	expect(len5.length).to.equals(2);
+// 	// 	expect(len5[0].id).to.equals("2");
+// 	// 	expect(len5[1].id).to.equals("big");
+// 	// 	expect(len5[1].numRows).to.equals(64612);
+// 	// });
+// });
