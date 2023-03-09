@@ -5,7 +5,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError, ResultTooLargeError,
+	NotFoundError,
 } from "./IInsightFacade";
 
 import {QueryContainer} from "../model/QueryContainer";
@@ -14,12 +14,12 @@ import {
 	addToPersistFolder,
 	checkIdAndKind,
 	deleteDatasetFromPersistence,
-	readContent, readDirectory,
+	readDirectory,
+	readSectionsContent,
 } from "./helperFunctionsAddDataset";
 
-import {
-	queryValidator
-} from "./helperFunctionsQueryChecking";
+import {queryValidator} from "./helperFunctionsQueryChecking";
+import {readRoomsContent} from "./AddDatasetRooms";
 import {getContentFromArchives} from "../../test/TestUtil";
 
 
@@ -29,19 +29,19 @@ import {getContentFromArchives} from "../../test/TestUtil";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-	public static map: Map<string, Dataset>;
+	public map: Map<string, Dataset> = new Map<string, Dataset>();
 
 	public static persistDir = "./data";
 	public static persistFile = "./data/persistFile.json";
 
 	constructor() {
-		InsightFacade.map = new Map<string, Dataset>();
+		// InsightFacade.map = new Map<string, Dataset>();
 		console.log("InsightFacadeImpl::init()");
-		readDirectory(InsightFacade.persistDir, InsightFacade.map);
+		readDirectory(InsightFacade.persistDir, this.map);
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		return new Promise(function (resolve, reject) {
+		return new Promise((resolve, reject) => {
 			let keys: string[];
 			let throwFlag = 0;
 
@@ -52,19 +52,23 @@ export default class InsightFacade implements IInsightFacade {
 				datasetArray: [],
 			};
 
-			checkIdAndKind(id, kind, InsightFacade.map)
-				.then(() => {
-					return readContent(content, myDataset.datasetArray);
+			checkIdAndKind(id, kind, this.map)
+				.then((type) => {
+					if (type === "sections"){
+						return readSectionsContent(content, myDataset.datasetArray);
+					} else {
+						myDataset.kind = InsightDatasetKind.Rooms;
+						return readRoomsContent(content, myDataset.datasetArray);
+					}
 				})
-
 				.then((length) => {
 					myDataset.numRows = length;
-					InsightFacade.map.set(id, myDataset);
-
+					this.map.set(id, myDataset);
 					// ref: https://linuxhint.com/convert-map-keys-to-array-javascript/
-					keys = [...InsightFacade.map.keys()];
+					keys = [...this.map.keys()];
 					// resolve(keys);
 					// Step 5): diskWrite: write this object to data folder for persistence.
+					// console.log(myDataset);
 					return addToPersistFolder(myDataset, keys);
 				})
 				.then((keysParam) => {
@@ -77,7 +81,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return new Promise(function (resolve, reject) {
+		return new Promise((resolve, reject) => {
 			if (id.includes("_")) {
 				return reject(new InsightError("_ character is not allowed"));
 			}
@@ -86,12 +90,12 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("ID cannot have only whitespaces"));
 			}
 
-			if (!InsightFacade.map.has(id)) {
-				console.log(InsightFacade.map.has(id));
+			if (!this.map.has(id)) {
+				console.log(this.map.has(id));
 				return reject(new NotFoundError("Dataset doesn't exist"));
 			}
 
-			InsightFacade.map.delete(id);
+			this.map.delete(id);
 
 			deleteDatasetFromPersistence(InsightFacade.persistDir, id)
 				.then(() => {
@@ -119,7 +123,7 @@ export default class InsightFacade implements IInsightFacade {
 				} catch (err: any) {
 					return reject(new InsightError(err));
 				}
-				let datasetToQuery = InsightFacade.map.get(datasetID);
+				let datasetToQuery = this.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
@@ -156,10 +160,10 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return new Promise(function (resolve, reject) {
+		return new Promise((resolve, reject) => {
 			let array: InsightDataset[] = [];
 			// ref: https://www.hackinbits.com/articles/js/how-to-iterate-a-map-in-javascript---map-part-2
-			InsightFacade.map.forEach(function (value, key) {
+			this.map.forEach(function (value, key) {
 				let thing: InsightDataset = {
 					id: "a",
 					kind: InsightDatasetKind.Sections,
@@ -201,3 +205,14 @@ export default class InsightFacade implements IInsightFacade {
 		return index;
 	}
 }
+
+
+// let rooms: string;
+// rooms = getContentFromArchives("campus.zip");
+// // let roomsBroken = getContentFromArchives("campus9buildings.zip");
+// // let dataset: JSON[] = [];
+// //
+// let facade = new InsightFacade();
+// facade.addDataset("rooms",rooms,InsightDatasetKind.Rooms).then(() => {
+// 	console.log("yes");
+// });
