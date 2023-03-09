@@ -1,0 +1,44 @@
+{
+	"title": "Error-DatasetIDOnlyWhiteSpace",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"AND": [
+						{
+							"GT": {
+								" _avg": 90
+							}
+						},
+						{
+							"LT": {
+								" _avg": 25
+							}
+						}
+					]
+				},
+				{
+					"EQ": {
+						" _avg": 50
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				" _dept",
+				" _pass",
+				" _fail",
+				" _audit",
+				" _year",
+				" _id",
+				" _avg",
+				" _instructor",
+				" _title"
+			],
+			"ORDER": " _id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

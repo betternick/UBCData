@@ -1,0 +1,19 @@
+{
+	"title": "RoomsEQ-Error(stringInput)",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"rooms_seats": "50"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_seats",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

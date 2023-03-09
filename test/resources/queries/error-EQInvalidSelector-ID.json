@@ -1,0 +1,20 @@
+{
+	"title": "error-EQInvalidSelector-ID",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"sections_id": "202"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg",
+				"sections_id"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

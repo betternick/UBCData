@@ -1,0 +1,88 @@
+{
+	"title": "RoomsGTlon",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"rooms_lon": -123.245
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_lon",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_lon": -123.24494,
+			"rooms_name": "LSC_1001"
+		},
+		{
+			"rooms_lon": -123.24494,
+			"rooms_name": "LSC_1002"
+		},
+		{
+			"rooms_lon": -123.24494,
+			"rooms_name": "LSC_1003"
+		},
+		{
+			"rooms_lon": -123.24467,
+			"rooms_name": "OSBO_203A"
+		},
+		{
+			"rooms_lon": -123.24467,
+			"rooms_name": "OSBO_203B"
+		},
+		{
+			"rooms_lon": -123.24467,
+			"rooms_name": "OSBO_A"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_1101"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_1201"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3112"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3114"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3115"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3116"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3118"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3120"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3122"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3124"
+		},
+		{
+			"rooms_lon": -123.24342,
+			"rooms_name": "PHRM_3208"
+		}
+	]
+}

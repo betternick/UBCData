@@ -1,0 +1,56 @@
+{
+	"title": "RoomsIS-fullname",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"rooms_fullname": "Robert F. Osborne Centre"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_fullname",
+				"rooms_shortname",
+				"rooms_number",
+				"rooms_name",
+				"rooms_address",
+				"rooms_type",
+				"rooms_furniture",
+				"rooms_href"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_fullname": "Robert F. Osborne Centre",
+			"rooms_shortname": "OSBO",
+			"rooms_number": "203A",
+			"rooms_name": "OSBO_203A",
+			"rooms_address": "6108 Thunderbird Boulevard",
+			"rooms_type": "Small Group",
+			"rooms_furniture": "Classroom-Movable Tables & Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/OSBO-203A"
+		},
+		{
+			"rooms_fullname": "Robert F. Osborne Centre",
+			"rooms_shortname": "OSBO",
+			"rooms_number": "203B",
+			"rooms_name": "OSBO_203B",
+			"rooms_address": "6108 Thunderbird Boulevard",
+			"rooms_type": "Small Group",
+			"rooms_furniture": "Classroom-Movable Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/OSBO-203B"
+		},
+		{
+			"rooms_fullname": "Robert F. Osborne Centre",
+			"rooms_shortname": "OSBO",
+			"rooms_number": "A",
+			"rooms_name": "OSBO_A",
+			"rooms_address": "6108 Thunderbird Boulevard",
+			"rooms_type": "Open Design General Purpose",
+			"rooms_furniture": "Classroom-Movable Tables & Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/OSBO-A"
+		}
+	]
+}

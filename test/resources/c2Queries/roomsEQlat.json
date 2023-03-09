@@ -1,0 +1,40 @@
+{
+	"title": "RoomsEQlat",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"rooms_lat": 49.2699
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_lat",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_105"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_112"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_113"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_121"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_B101"
+		}
+	]
+}

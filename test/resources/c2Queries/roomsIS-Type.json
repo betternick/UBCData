@@ -1,0 +1,786 @@
+{
+	"title": "RoomsIS-type",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"rooms_type": "Tiered Large Group"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_fullname",
+				"rooms_shortname",
+				"rooms_number",
+				"rooms_name",
+				"rooms_address",
+				"rooms_type",
+				"rooms_furniture",
+				"rooms_href"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_fullname": "Aquatic Ecosystems Research Laboratory",
+			"rooms_shortname": "AERL",
+			"rooms_number": "120",
+			"rooms_name": "AERL_120",
+			"rooms_address": "2202 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/AERL-120"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "098",
+			"rooms_name": "ANGU_098",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-098"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "241",
+			"rooms_name": "ANGU_241",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-241"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "243",
+			"rooms_name": "ANGU_243",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-243"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "343",
+			"rooms_name": "ANGU_343",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-343"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "345",
+			"rooms_name": "ANGU_345",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-345"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "347",
+			"rooms_name": "ANGU_347",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-347"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "350",
+			"rooms_name": "ANGU_350",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-350"
+		},
+		{
+			"rooms_fullname": "Henry Angus",
+			"rooms_shortname": "ANGU",
+			"rooms_number": "354",
+			"rooms_name": "ANGU_354",
+			"rooms_address": "2053 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ANGU-354"
+		},
+		{
+			"rooms_fullname": "Biological Sciences",
+			"rooms_shortname": "BIOL",
+			"rooms_number": "2000",
+			"rooms_name": "BIOL_2000",
+			"rooms_address": "6270 University Boulevard",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BIOL-2000"
+		},
+		{
+			"rooms_fullname": "Biological Sciences",
+			"rooms_shortname": "BIOL",
+			"rooms_number": "2200",
+			"rooms_name": "BIOL_2200",
+			"rooms_address": "6270 University Boulevard",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BIOL-2200"
+		},
+		{
+			"rooms_fullname": "Brock Hall Annex",
+			"rooms_shortname": "BRKX",
+			"rooms_number": "2365",
+			"rooms_name": "BRKX_2365",
+			"rooms_address": "1874 East Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BRKX-2365"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "A101",
+			"rooms_name": "BUCH_A101",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-A101"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "A102",
+			"rooms_name": "BUCH_A102",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-A102"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "A103",
+			"rooms_name": "BUCH_A103",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-A103"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "A104",
+			"rooms_name": "BUCH_A104",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-A104"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "A201",
+			"rooms_name": "BUCH_A201",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-A201"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "B313",
+			"rooms_name": "BUCH_B313",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Moveable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-B313"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "B315",
+			"rooms_name": "BUCH_B315",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-B315"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "D217",
+			"rooms_name": "BUCH_D217",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-D217"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "D218",
+			"rooms_name": "BUCH_D218",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-D218"
+		},
+		{
+			"rooms_fullname": "Buchanan",
+			"rooms_shortname": "BUCH",
+			"rooms_number": "D219",
+			"rooms_name": "BUCH_D219",
+			"rooms_address": "1866 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/BUCH-D219"
+		},
+		{
+			"rooms_fullname": "Civil and Mechanical Engineering",
+			"rooms_shortname": "CEME",
+			"rooms_number": "1202",
+			"rooms_name": "CEME_1202",
+			"rooms_address": "6250 Applied Science Lane",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CEME-1202"
+		},
+		{
+			"rooms_fullname": "Chemical and Biological Engineering Building",
+			"rooms_shortname": "CHBE",
+			"rooms_number": "101",
+			"rooms_name": "CHBE_101",
+			"rooms_address": "2360 East Mall V6T 1Z3",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHBE-101"
+		},
+		{
+			"rooms_fullname": "Chemical and Biological Engineering Building",
+			"rooms_shortname": "CHBE",
+			"rooms_number": "102",
+			"rooms_name": "CHBE_102",
+			"rooms_address": "2360 East Mall V6T 1Z3",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHBE-102"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "B150",
+			"rooms_name": "CHEM_B150",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-B150"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "B250",
+			"rooms_name": "CHEM_B250",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-B250"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "C124",
+			"rooms_name": "CHEM_C124",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-C124"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "C126",
+			"rooms_name": "CHEM_C126",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-C126"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "D200",
+			"rooms_name": "CHEM_D200",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-D200"
+		},
+		{
+			"rooms_fullname": "Chemistry",
+			"rooms_shortname": "CHEM",
+			"rooms_number": "D300",
+			"rooms_name": "CHEM_D300",
+			"rooms_address": "2036 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CHEM-D300"
+		},
+		{
+			"rooms_fullname": "Centre for Interactive  Research on Sustainability",
+			"rooms_shortname": "CIRS",
+			"rooms_number": "1250",
+			"rooms_name": "CIRS_1250",
+			"rooms_address": "2260 West Mall, V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/CIRS-1250"
+		},
+		{
+			"rooms_fullname": "Hugh Dempster Pavilion",
+			"rooms_shortname": "DMP",
+			"rooms_number": "110",
+			"rooms_name": "DMP_110",
+			"rooms_address": "6245 Agronomy Road V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/DMP-110"
+		},
+		{
+			"rooms_fullname": "Hugh Dempster Pavilion",
+			"rooms_shortname": "DMP",
+			"rooms_number": "301",
+			"rooms_name": "DMP_301",
+			"rooms_address": "6245 Agronomy Road V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/DMP-301"
+		},
+		{
+			"rooms_fullname": "Hugh Dempster Pavilion",
+			"rooms_shortname": "DMP",
+			"rooms_number": "310",
+			"rooms_name": "DMP_310",
+			"rooms_address": "6245 Agronomy Road V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/DMP-310"
+		},
+		{
+			"rooms_fullname": "Earth Sciences Building",
+			"rooms_shortname": "ESB",
+			"rooms_number": "1012",
+			"rooms_name": "ESB_1012",
+			"rooms_address": "2207 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Hybrid Furniture",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ESB-1012"
+		},
+		{
+			"rooms_fullname": "Earth Sciences Building",
+			"rooms_shortname": "ESB",
+			"rooms_number": "1013",
+			"rooms_name": "ESB_1013",
+			"rooms_address": "2207 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ESB-1013"
+		},
+		{
+			"rooms_fullname": "Earth Sciences Building",
+			"rooms_shortname": "ESB",
+			"rooms_number": "2012",
+			"rooms_name": "ESB_2012",
+			"rooms_address": "2207 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/ESB-2012"
+		},
+		{
+			"rooms_fullname": "Food, Nutrition and Health",
+			"rooms_shortname": "FNH",
+			"rooms_number": "60",
+			"rooms_name": "FNH_60",
+			"rooms_address": "2205 East Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/FNH-60"
+		},
+		{
+			"rooms_fullname": "Friedman Building",
+			"rooms_shortname": "FRDM",
+			"rooms_number": "153",
+			"rooms_name": "FRDM_153",
+			"rooms_address": "2177 Wesbrook Mall V6T 1Z3",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/FRDM-153"
+		},
+		{
+			"rooms_fullname": "Forest Sciences Centre",
+			"rooms_shortname": "FSC",
+			"rooms_number": "1005",
+			"rooms_name": "FSC_1005",
+			"rooms_address": "2424 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/FSC-1005"
+		},
+		{
+			"rooms_fullname": "Forest Sciences Centre",
+			"rooms_shortname": "FSC",
+			"rooms_number": "1221",
+			"rooms_name": "FSC_1221",
+			"rooms_address": "2424 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/FSC-1221"
+		},
+		{
+			"rooms_fullname": "Geography",
+			"rooms_shortname": "GEOG",
+			"rooms_number": "100",
+			"rooms_name": "GEOG_100",
+			"rooms_address": "1984 West Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/GEOG-100"
+		},
+		{
+			"rooms_fullname": "Hebb",
+			"rooms_shortname": "HEBB",
+			"rooms_number": "100",
+			"rooms_name": "HEBB_100",
+			"rooms_address": "2045 East Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/HEBB-100"
+		},
+		{
+			"rooms_fullname": "Hennings",
+			"rooms_shortname": "HENN",
+			"rooms_number": "200",
+			"rooms_name": "HENN_200",
+			"rooms_address": "6224 Agricultural Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/HENN-200"
+		},
+		{
+			"rooms_fullname": "Hennings",
+			"rooms_shortname": "HENN",
+			"rooms_number": "201",
+			"rooms_name": "HENN_201",
+			"rooms_address": "6224 Agricultural Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/HENN-201"
+		},
+		{
+			"rooms_fullname": "Hennings",
+			"rooms_shortname": "HENN",
+			"rooms_number": "202",
+			"rooms_name": "HENN_202",
+			"rooms_address": "6224 Agricultural Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/HENN-202"
+		},
+		{
+			"rooms_fullname": "Irving K Barber Learning Centre",
+			"rooms_shortname": "IBLC",
+			"rooms_number": "182",
+			"rooms_name": "IBLC_182",
+			"rooms_address": "1961 East Mall V6T 1Z1",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/IBLC-182"
+		},
+		{
+			"rooms_fullname": "Frederic Lasserre",
+			"rooms_shortname": "LASR",
+			"rooms_number": "102",
+			"rooms_name": "LASR_102",
+			"rooms_address": "6333 Memorial Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LASR-102"
+		},
+		{
+			"rooms_fullname": "Frederic Lasserre",
+			"rooms_shortname": "LASR",
+			"rooms_number": "104",
+			"rooms_name": "LASR_104",
+			"rooms_address": "6333 Memorial Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LASR-104"
+		},
+		{
+			"rooms_fullname": "Life Sciences Centre",
+			"rooms_shortname": "LSC",
+			"rooms_number": "1001",
+			"rooms_name": "LSC_1001",
+			"rooms_address": "2350 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSC-1001"
+		},
+		{
+			"rooms_fullname": "Life Sciences Centre",
+			"rooms_shortname": "LSC",
+			"rooms_number": "1002",
+			"rooms_name": "LSC_1002",
+			"rooms_address": "2350 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSC-1002"
+		},
+		{
+			"rooms_fullname": "Life Sciences Centre",
+			"rooms_shortname": "LSC",
+			"rooms_number": "1003",
+			"rooms_name": "LSC_1003",
+			"rooms_address": "2350 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSC-1003"
+		},
+		{
+			"rooms_fullname": "Leonard S. Klinck (also known as CSCI)",
+			"rooms_shortname": "LSK",
+			"rooms_number": "200",
+			"rooms_name": "LSK_200",
+			"rooms_address": "6356 Agricultural Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSK-200"
+		},
+		{
+			"rooms_fullname": "Leonard S. Klinck (also known as CSCI)",
+			"rooms_shortname": "LSK",
+			"rooms_number": "201",
+			"rooms_name": "LSK_201",
+			"rooms_address": "6356 Agricultural Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/LSK-201"
+		},
+		{
+			"rooms_fullname": "Mathematics",
+			"rooms_shortname": "MATH",
+			"rooms_number": "100",
+			"rooms_name": "MATH_100",
+			"rooms_address": "1984 Mathematics Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MATH-100"
+		},
+		{
+			"rooms_fullname": "Mathematics Annex",
+			"rooms_shortname": "MATX",
+			"rooms_number": "1100",
+			"rooms_name": "MATX_1100",
+			"rooms_address": "1986 Mathematics Road",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MATX-1100"
+		},
+		{
+			"rooms_fullname": "MacLeod",
+			"rooms_shortname": "MCLD",
+			"rooms_number": "202",
+			"rooms_name": "MCLD_202",
+			"rooms_address": "2356 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MCLD-202"
+		},
+		{
+			"rooms_fullname": "MacLeod",
+			"rooms_shortname": "MCLD",
+			"rooms_number": "228",
+			"rooms_name": "MCLD_228",
+			"rooms_address": "2356 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Fixed Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MCLD-228"
+		},
+		{
+			"rooms_fullname": "MacMillan",
+			"rooms_shortname": "MCML",
+			"rooms_number": "158",
+			"rooms_name": "MCML_158",
+			"rooms_address": "2357 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MCML-158"
+		},
+		{
+			"rooms_fullname": "MacMillan",
+			"rooms_shortname": "MCML",
+			"rooms_number": "166",
+			"rooms_name": "MCML_166",
+			"rooms_address": "2357 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/MCML-166"
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_number": "1101",
+			"rooms_name": "PHRM_1101",
+			"rooms_address": "2405 Wesbrook Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/PHRM-1101"
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_number": "1201",
+			"rooms_name": "PHRM_1201",
+			"rooms_address": "2405 Wesbrook Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/PHRM-1201"
+		},
+		{
+			"rooms_fullname": "Neville Scarfe",
+			"rooms_shortname": "SCRF",
+			"rooms_number": "100",
+			"rooms_name": "SCRF_100",
+			"rooms_address": "2125 Main Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SCRF-100"
+		},
+		{
+			"rooms_fullname": "West Mall Swing Space",
+			"rooms_shortname": "SWNG",
+			"rooms_number": "121",
+			"rooms_name": "SWNG_121",
+			"rooms_address": "2175 West Mall V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SWNG-121"
+		},
+		{
+			"rooms_fullname": "West Mall Swing Space",
+			"rooms_shortname": "SWNG",
+			"rooms_number": "122",
+			"rooms_name": "SWNG_122",
+			"rooms_address": "2175 West Mall V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SWNG-122"
+		},
+		{
+			"rooms_fullname": "West Mall Swing Space",
+			"rooms_shortname": "SWNG",
+			"rooms_number": "221",
+			"rooms_name": "SWNG_221",
+			"rooms_address": "2175 West Mall V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SWNG-221"
+		},
+		{
+			"rooms_fullname": "West Mall Swing Space",
+			"rooms_shortname": "SWNG",
+			"rooms_number": "222",
+			"rooms_name": "SWNG_222",
+			"rooms_address": "2175 West Mall V6T 1Z4",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/SWNG-222"
+		},
+		{
+			"rooms_fullname": "Wesbrook",
+			"rooms_shortname": "WESB",
+			"rooms_number": "100",
+			"rooms_name": "WESB_100",
+			"rooms_address": "6174 University Boulevard",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WESB-100"
+		},
+		{
+			"rooms_fullname": "Wesbrook",
+			"rooms_shortname": "WESB",
+			"rooms_number": "201",
+			"rooms_name": "WESB_201",
+			"rooms_address": "6174 University Boulevard",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WESB-201"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "1",
+			"rooms_name": "WOOD_1",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-1"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "2",
+			"rooms_name": "WOOD_2",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-2"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "3",
+			"rooms_name": "WOOD_3",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-3"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "4",
+			"rooms_name": "WOOD_4",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-4"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "5",
+			"rooms_name": "WOOD_5",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tables/Movable Chairs",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-5"
+		},
+		{
+			"rooms_fullname": "Woodward (Instructional Resources Centre-IRC)",
+			"rooms_shortname": "WOOD",
+			"rooms_number": "6",
+			"rooms_name": "WOOD_6",
+			"rooms_address": "2194 Health Sciences Mall",
+			"rooms_type": "Tiered Large Group",
+			"rooms_furniture": "Classroom-Fixed Tablets",
+			"rooms_href": "http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/WOOD-6"
+		}
+	]
+}

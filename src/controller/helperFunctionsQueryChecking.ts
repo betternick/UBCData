@@ -71,7 +71,7 @@ function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string, comparat
 	}
 	let objectKey = objectKeys[0];
 	let allowableFields: string[] = [datasetID + "_audit", datasetID + "_year", datasetID + "_pass",
-		datasetID + "_fail", datasetID + "_avg"];
+		datasetID + "_fail", datasetID + "_avg", datasetID + "_lat", datasetID + "_lon", datasetID + "_seats"];
 	if (!allowableFields.includes(objectKey)) {
 		throw new InsightError("Invalid key type for " + comparator);
 	}
@@ -106,7 +106,9 @@ function queryCheckerForColumns(queryWhole: any, datasetID: string) {
 	if (arrayInsideColumns.length === 0 || undefined || null) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
-	let allowableKeys: string[] = ["dept", "avg", "id", "audit", "pass", "year", "fail", "uuid", "title", "instructor"];
+	let allowableKeys: string[] = ["dept", "avg", "id", "audit", "pass", "year", "fail", "uuid", "title", "instructor",
+								   "lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type",
+								   "furniture", "href"];
 	let validDatasetSeen = 0;
 	for (let element of arrayInsideColumns) {
 		if (typeof element !== "string" || !element.includes("_")) {

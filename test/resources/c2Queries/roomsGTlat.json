@@ -1,0 +1,64 @@
+{
+	"title": "RoomsGTlat",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"rooms_lat": 49.269
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_lat",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_105"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_112"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_113"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_121"
+		},
+		{
+			"rooms_lat": 49.2699,
+			"rooms_name": "ALRD_B101"
+		},
+		{
+			"rooms_lat": 49.26958,
+			"rooms_name": "ANSO_202"
+		},
+		{
+			"rooms_lat": 49.26958,
+			"rooms_name": "ANSO_203"
+		},
+		{
+			"rooms_lat": 49.26958,
+			"rooms_name": "ANSO_205"
+		},
+		{
+			"rooms_lat": 49.26958,
+			"rooms_name": "ANSO_207"
+		},
+		{
+			"rooms_lat": 49.27106,
+			"rooms_name": "IONA_301"
+		},
+		{
+			"rooms_lat": 49.27106,
+			"rooms_name": "IONA_633"
+		}
+	]
+}

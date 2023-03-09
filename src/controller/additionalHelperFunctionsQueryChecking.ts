@@ -37,7 +37,9 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string) {
 	let objectKey = objectKeys[0];
 	// console.log(objectKey);
 	let allowableFields: string[] = [datasetID + "_dept", datasetID + "_instructor", datasetID + "_title",
-		datasetID + "_id", datasetID + "_uuid"];
+		datasetID + "_id", datasetID + "_uuid", datasetID + "_fullname", datasetID + "_shortname",
+		datasetID + "_number", datasetID + "_name", datasetID + "_address", datasetID + "_type",
+		datasetID + "_furniture", datasetID + "_href"];
 	if (!allowableFields.includes(objectKey)) {
 		throw new InsightError("Invalid key type for " + whereBlockKey + ": " +
 			objectKey.substring(datasetID.length + 1));
@@ -64,6 +66,5 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string) {
 	}
 }
 
-// comment to add a line without ESLint losing it
 export {JSONchecker, queryCheckerForIs,
 };

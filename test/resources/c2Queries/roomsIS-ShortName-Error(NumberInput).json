@@ -1,0 +1,19 @@
+{
+	"title": "RoomsIS-ShortName-Error(numberInput)",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"rooms_shortname": -123.25364
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_shortname",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

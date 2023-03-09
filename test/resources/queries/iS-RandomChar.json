@@ -1,0 +1,20 @@
+{
+	"title": "IS-randomChar",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_title": "/"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg",
+				"sections_id"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": false,
+	"expected": []
+}

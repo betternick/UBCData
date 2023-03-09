@@ -1,0 +1,32 @@
+{
+	"title": "RoomsGTseats",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"rooms_seats": 400
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_seats",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_seats": 426,
+			"rooms_name": "CIRS_1250"
+		},
+		{
+			"rooms_seats": 442,
+			"rooms_name": "OSBO_A"
+		},
+		{
+			"rooms_seats": 503,
+			"rooms_name": "WOOD_2"
+		}
+	]
+}
