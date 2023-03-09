@@ -1,0 +1,18 @@
+{
+	"title": "RoomsIS-Name-Error(numberInput)",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"rooms_name": -123.25364
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

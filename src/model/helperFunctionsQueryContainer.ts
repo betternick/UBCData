@@ -32,7 +32,7 @@ export function transformQueryToDatasetConvention(field: string): string {
 		field = "Pass";
 	} else if (field === "fail") {
 		field = "Fail";
-	} else {
+	} else if (field === "audit") {
 		field = "Audit";
 	}
 	return field;
@@ -57,7 +57,7 @@ export function transformDatasetToQueryConvention(field: string): string {
 		field = "pass";
 	} else if (field === "Fail") {
 		field = "fail";
-	} else {
+	} else if (field === "Audit") {
 		field = "audit";
 	}
 	return field;

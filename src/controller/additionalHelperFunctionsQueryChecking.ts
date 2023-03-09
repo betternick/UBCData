@@ -28,8 +28,6 @@ function JSONchecker(query: unknown): any{
 }
 // checks query for IS
 function queryCheckerForIs(queryWhereBlock: any, datasetID: string) {
-	// let whereString: string = "WHERE";
-	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
 	let whereBlockKey: string = "IS";
 	let objectDeepest = queryWhereBlock[whereBlockKey];
 	let objectKeys = Object.keys(objectDeepest);
@@ -39,7 +37,9 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string) {
 	let objectKey = objectKeys[0];
 	// console.log(objectKey);
 	let allowableFields: string[] = [datasetID + "_dept", datasetID + "_instructor", datasetID + "_title",
-		datasetID + "_id", datasetID + "_uuid"];
+		datasetID + "_id", datasetID + "_uuid", datasetID + "_fullname", datasetID + "_shortname",
+		datasetID + "_number", datasetID + "_name", datasetID + "_address", datasetID + "_type",
+		datasetID + "_furniture", datasetID + "_href"];
 	if (!allowableFields.includes(objectKey)) {
 		throw new InsightError("Invalid key type for " + whereBlockKey + ": " +
 			objectKey.substring(datasetID.length + 1));
@@ -55,19 +55,16 @@ function queryCheckerForIs(queryWhereBlock: any, datasetID: string) {
 		if (positionOfAsterisk !== 0 && positionOfAsterisk !== lengthOfStringVal - 1){
 			throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
 		}
-	}
-	if (count === 2) {
+	} else if (count === 2) {
 		let firstPositionOfAsterisk = stringVal.indexOf("*");
 		let lastPositionOfAsterisk = stringVal.lastIndexOf("*");
 		if (firstPositionOfAsterisk !== 0 || lastPositionOfAsterisk !== lengthOfStringVal - 1){
 			throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
 		}
-	}
-	if (count === 3) {
+	} else if (count === 3) {
 		throw new InsightError("Asterisks (*) can only be the first or last characters of input strings");
 	}
 }
 
-// comment to add a line without ESLint losing it
 export {JSONchecker, queryCheckerForIs,
 };

@@ -1,0 +1,20 @@
+{
+	"title": "MultipleDatasetsReferenced",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"ORDER": "sections_id",
+			"COLUMNS": [
+				"sections_dept",
+				"sec_avg",
+				"sections_id"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

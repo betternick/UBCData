@@ -4,10 +4,10 @@ import {JSONchecker, queryCheckerForIs} from "./additionalHelperFunctionsQueryCh
 function whereChecker (queryWhole: any, datasetID: string): boolean {
 	const queryWhereBlock = queryWhole["WHERE" as keyof typeof queryWhole];
 	let keys = Object.keys(queryWhereBlock);
-	if (queryWhereBlock === undefined || null) {
+	if (queryWhereBlock === undefined || queryWhereBlock === null) {
 		throw new InsightError("Missing WHERE");
 	} else if (keys.length > 1) {
-		throw new InsightError("WHERE should only have 1 key, has " + Object.keys(queryWhereBlock).length);
+		throw new InsightError("WHERE should only have 1 key, has " + keys.length);
 	} else if (keys.length === 0) {
 		return true;
 	} else if (keys[0] === "LT" || keys[0] === "GT" || keys[0] === "EQ") {
@@ -19,7 +19,7 @@ function whereChecker (queryWhole: any, datasetID: string): boolean {
 	} else if (keys[0] === "NOT") {
 		queryCheckerForNot(queryWhereBlock,datasetID);
 	} else {
-		throw new InsightError("Invalid filter key: " + Object.keys(queryWhereBlock) );
+		throw new InsightError("Invalid filter key: " + keys );
 	}
 	return true;
 }
@@ -45,8 +45,7 @@ function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
 }
 // checks query for OR
 function queryCheckerForOrAnd(queryWhereBlock: any, datasetID: string, comparator: string) {
-	let whereBlockKey: string = comparator;
-	let objectDeepest = queryWhereBlock[whereBlockKey];
+	let objectDeepest = queryWhereBlock[comparator];
 	for (const element of objectDeepest) {
 		let key = Object.keys(element);
 		if (key[0] === "LT" || key[0] === "GT" || key[0] === "EQ") {
@@ -65,37 +64,23 @@ function queryCheckerForOrAnd(queryWhereBlock: any, datasetID: string, comparato
 
 // returns true if the query does not violate EQ/LT/GT rules
 function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string, comparator: string) {
-	// let whereString: string = "WHERE";
-	// const queryWhereBlock  = queryWhole[whereString as keyof typeof queryWhole];
-	let whereBlockKey: string = "INITIALIZED";
-	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "LT")) {
-		whereBlockKey = "LT";
-	};
-	if	(Object.prototype.hasOwnProperty.call(queryWhereBlock, "GT")) {
-		whereBlockKey = "GT";
-	};
-	if (Object.prototype.hasOwnProperty.call(queryWhereBlock, "EQ")) {
-		whereBlockKey = "EQ";
-	};
-	let objectDeepest = queryWhereBlock[whereBlockKey];
+	let objectDeepest = queryWhereBlock[comparator];
 	let objectKeys = Object.keys(objectDeepest);
 	if (objectKeys.length > 1) {
 		throw new InsightError("this field can only have 1 key");
 	}
 	let objectKey = objectKeys[0];
-	// console.log(objectKey);
 	let allowableFields: string[] = [datasetID + "_audit", datasetID + "_year", datasetID + "_pass",
-		datasetID + "_fail", datasetID + "_avg"];
+		datasetID + "_fail", datasetID + "_avg", datasetID + "_lat", datasetID + "_lon", datasetID + "_seats"];
 	if (!allowableFields.includes(objectKey)) {
-		throw new InsightError("Invalid key type for " + whereBlockKey);
+		throw new InsightError("Invalid key type for " + comparator);
 	}
 	if (typeof (objectDeepest[objectKey]) !== "number"){
-		throw new InsightError("invalid Value type for " + whereBlockKey + ", should be number");
+		throw new InsightError("invalid Value type for " + comparator + ", should be number");
 	}
 }
-// comment to add a line without ESLint losing it
+
 function queryCheckerForColumns(queryWhole: any, datasetID: string) {
-	// let some: string = "OPTIONS";
 	const queryOptionsBlock = queryWhole["OPTIONS" as keyof typeof queryWhole];
 	if (queryOptionsBlock === undefined || null) {
 		throw new InsightError("Missing OPTIONS");
@@ -121,14 +106,15 @@ function queryCheckerForColumns(queryWhole: any, datasetID: string) {
 	if (arrayInsideColumns.length === 0 || undefined || null) {
 		throw new InsightError("COLUMNS must be a non-empty array");
 	}
-	let allowableKeys: string[] = ["dept", "avg", "id", "audit", "pass", "year", "fail", "uuid", "title", "instructor"];
+	let allowableKeys: string[] = ["dept", "avg", "id", "audit", "pass", "year", "fail", "uuid", "title", "instructor",
+								   "lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type",
+								   "furniture", "href"];
 	let validDatasetSeen = 0;
 	for (let element of arrayInsideColumns) {
 		if (typeof element !== "string" || !element.includes("_")) {
 			throw new InsightError("Invalid type of COLUMN key: " + element);
 		}
 		let splitArray = element.split("_");
-		// console.log(splitArray[0]," ",splitArray[1]);
 		if (splitArray[0] !== datasetID) {
 			if (validDatasetSeen === 0) {
 				throw new InsightError("Reference dataset not added yet");
@@ -167,13 +153,13 @@ function getDatasetID(query: unknown): string {
 	result = queryString.substring(indexStartOfID, indexUnderscore);
 	return result;
 }
-// comment to add a line without ESLint losing it
+
 function queryValidator(queryMy: unknown) {
 	let queryWhole = JSONchecker(queryMy);
 	let datasetID: string = getDatasetID(queryMy);
 	whereChecker(queryWhole,datasetID);
 	queryCheckerForColumns(queryWhole,datasetID);
 }
-// comment to add a line without ESLint losing it
+
 export {getDatasetID, queryCheckerForLtGtEq, queryCheckerForColumns, queryValidator,
 };

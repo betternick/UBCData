@@ -1,7 +1,6 @@
-import {Dataset, InsightError, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {Dataset,  InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
 import {
-	returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention,
-	singleDatasetID, wildcardMatcher
+	returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention, wildcardMatcher
 } from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
@@ -39,6 +38,8 @@ export class QueryContainer {
 						}
 					} else if (keyCol === datasetID + "_uuid") {
 						keyVal = valOfSection.toString();	// need to convert uuid to string
+					} else if (keyCol === datasetID + "_seats") {
+						keyVal = Number(valOfSection);		// need to convert seats to number
 					} else {
 						keyVal = valOfSection;
 					}
@@ -127,6 +128,9 @@ export class QueryContainer {
 				valOfSection = Number(valOfSection);
 			}
 		}
+		if (identifier === "seats") {
+			valOfSection = Number(valOfSection);
+		}
 		if (comparator === "EQ") {
 			return valOfSection === value;
 		} else if (comparator === "GT") {
@@ -145,7 +149,7 @@ export class QueryContainer {
 	// handles the OPTIONS block in a query
 	// throws InsightError("multiple datasets referenced") if any dataset ID's
 	// found in the OPTIONS block do not match the datasetID parameter
-	public handleOptions(query: any, datasetID: string) {
+	public handleOptions(query: any) {
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
 			this.order = query.ORDER;

@@ -1,0 +1,48 @@
+{
+	"title": "RoomsEQseats",
+	"input": {
+		"WHERE": {
+			"EQ": {
+				"rooms_seats": 50
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_seats",
+				"rooms_name"
+			],
+			"ORDER": "rooms_name"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_seats": 50,
+			"rooms_name": "ALRD_121"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "BUCH_D316"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "BUCH_D317"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "BUCH_D322"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "EOSM_135"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "IBLC_155"
+		},
+		{
+			"rooms_seats": 50,
+			"rooms_name": "IONA_633"
+		}
+	]
+}

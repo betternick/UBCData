@@ -1,0 +1,20 @@
+{
+	"title": "error-ISValNotAString",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": 2020
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg",
+				"sections_id"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

@@ -1,0 +1,20 @@
+{
+	"title": "error-ISInvalidSelector-fail",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_fail": 2
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg",
+				"sections_id"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

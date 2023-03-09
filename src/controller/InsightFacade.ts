@@ -22,6 +22,7 @@ import {queryValidator} from "./helperFunctionsQueryChecking";
 import {readRoomsContent} from "./AddDatasetRooms";
 import {getContentFromArchives} from "../../test/TestUtil";
 
+
 /**
  * This is the main programmatic entry point for the project.
  * Method documentation is in IInsightFacade
@@ -134,7 +135,7 @@ export default class InsightFacade implements IInsightFacade {
 						let queryObject = new QueryContainer();
 						// handleOptions
 						try {
-							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON], datasetID);
+							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
 						} catch (error) {
 							return reject(error);
 						}

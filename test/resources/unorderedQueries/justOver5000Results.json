@@ -1,0 +1,56 @@
+{
+	"title": "justOver5000Results",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"AND": [
+						{
+							"GT": {
+								"sections_avg": 78.15
+							}
+						},
+						{
+							"IS": {
+								"sections_dept": "c*"
+							}
+						}
+					]
+				},
+				{
+					"EQ": {
+						"sections_avg": 95
+					}
+				},
+				{
+					"EQ": {
+						"sections_avg": 97
+					}
+				},
+				{
+					"EQ": {
+						"sections_avg": 51
+					}
+				},
+				{
+					"EQ": {
+						"sections_avg": 52
+					}
+				},
+				{
+					"EQ": {
+						"sections_avg": 96.5
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "ResultTooLargeError"
+}

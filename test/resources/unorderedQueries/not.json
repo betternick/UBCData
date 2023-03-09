@@ -1,0 +1,82 @@
+{
+	"title": "not",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"IS": {
+							"sections_dept": "math"
+						}
+					}
+				},
+				{
+					"GT": {
+						"sections_avg": 98.7
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_avg"
+			],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "nurs",
+			"sections_id": "509",
+			"sections_avg": 98.71
+		},
+		{
+			"sections_dept": "nurs",
+			"sections_id": "509",
+			"sections_avg": 98.71
+		},
+		{
+			"sections_dept": "eece",
+			"sections_id": "541",
+			"sections_avg": 98.75
+		},
+		{
+			"sections_dept": "eece",
+			"sections_id": "541",
+			"sections_avg": 98.75
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "449",
+			"sections_avg": 98.76
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "449",
+			"sections_avg": 98.76
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "449",
+			"sections_avg": 98.8
+		},
+		{
+			"sections_dept": "spph",
+			"sections_id": "300",
+			"sections_avg": 98.98
+		},
+		{
+			"sections_dept": "spph",
+			"sections_id": "300",
+			"sections_avg": 98.98
+		},
+		{
+			"sections_dept": "cnps",
+			"sections_id": "574",
+			"sections_avg": 99.19
+		}
+	]
+}
