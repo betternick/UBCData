@@ -135,7 +135,7 @@ export default class InsightFacade implements IInsightFacade {
 						let queryObject = new QueryContainer();
 						// handleOptions
 						try {
-							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON], datasetID);
+							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
 						} catch (error) {
 							return reject(error);
 						}
