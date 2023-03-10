@@ -136,12 +136,10 @@ export default class InsightFacade implements IInsightFacade {
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 					) {
 						let queryObject = new QueryContainer();
+
 						// handleOptions
-						try {
-							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
-						} catch (error) {
-							return reject(error);
-						}
+						queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
+
 						// handleWhere
 						let results: InsightResult[] = [];
 						try {
