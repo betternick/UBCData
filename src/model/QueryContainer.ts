@@ -14,9 +14,6 @@ export class QueryContainer {
 		this.dir = 1;		// UP = ascending = 1      DOWN = descending = -1
 	}
 
-	// handles the WHERE block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
-	// otherwise, returns the InsightResult[] that corresponds to the query
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
@@ -133,9 +130,6 @@ export class QueryContainer {
 		}
 	}
 
-	// handles the OPTIONS block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's
-	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: any) {
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
@@ -163,6 +157,7 @@ export class QueryContainer {
 		return this.sort(array, this.order, this.dir);
 	}
 
+	// sorts array by string of keys, using sortByThenBy logic, in ascending or descending order based on dir
 	public sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
 		// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
 		// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a

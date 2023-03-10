@@ -1,0 +1,222 @@
+{
+	"title": "Transformation-Apply-CountMultipleRules",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"sections_avg": 60
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"countNumDiffSections",
+				"countInstructor"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_dept"
+			],
+			"APPLY": [
+				{
+					"countInstructor": {
+						"COUNT": "sections_instructor"
+					}
+				},
+				{
+					"countNumDiffSections": {
+						"COUNT": "sections_uuid"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "apbi",
+			"countNumDiffSections": 3,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "apsc",
+			"countNumDiffSections": 3,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "asia",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "biol",
+			"countNumDiffSections": 8,
+			"countInstructor": 4
+		},
+		{
+			"sections_dept": "busi",
+			"countNumDiffSections": 89,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "chbe",
+			"countNumDiffSections": 9,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "chem",
+			"countNumDiffSections": 24,
+			"countInstructor": 13
+		},
+		{
+			"sections_dept": "civl",
+			"countNumDiffSections": 7,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "comm",
+			"countNumDiffSections": 10,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "dhyg",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "educ",
+			"countNumDiffSections": 3,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "elec",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "engl",
+			"countNumDiffSections": 4,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "enph",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "eosc",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "fopr",
+			"countNumDiffSections": 2,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "fre",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "frst",
+			"countNumDiffSections": 16,
+			"countInstructor": 5
+		},
+		{
+			"sections_dept": "germ",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "hist",
+			"countNumDiffSections": 15,
+			"countInstructor": 4
+		},
+		{
+			"sections_dept": "japn",
+			"countNumDiffSections": 5,
+			"countInstructor": 5
+		},
+		{
+			"sections_dept": "lfs",
+			"countNumDiffSections": 2,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "ling",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "lled",
+			"countNumDiffSections": 39,
+			"countInstructor": 11
+		},
+		{
+			"sections_dept": "math",
+			"countNumDiffSections": 124,
+			"countInstructor": 55
+		},
+		{
+			"sections_dept": "mech",
+			"countNumDiffSections": 3,
+			"countInstructor": 3
+		},
+		{
+			"sections_dept": "medg",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "mtrl",
+			"countNumDiffSections": 12,
+			"countInstructor": 5
+		},
+		{
+			"sections_dept": "musc",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "phar",
+			"countNumDiffSections": 5,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "phil",
+			"countNumDiffSections": 6,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "phys",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "poli",
+			"countNumDiffSections": 2,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "psyc",
+			"countNumDiffSections": 8,
+			"countInstructor": 4
+		},
+		{
+			"sections_dept": "vant",
+			"countNumDiffSections": 1,
+			"countInstructor": 1
+		},
+		{
+			"sections_dept": "wood",
+			"countNumDiffSections": 3,
+			"countInstructor": 2
+		},
+		{
+			"sections_dept": "wrds",
+			"countNumDiffSections": 6,
+			"countInstructor": 3
+		}
+	]
+}

@@ -1,0 +1,687 @@
+{
+	"title": "Transformation-Apply-multipleApplyRules",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"sections_avg": 60
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"overallAvg",
+				"totalFail"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_dept",
+				"sections_id"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "sections_avg"
+					}
+				},
+				{
+					"totalFail": {
+						"SUM": "sections_fail"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "apbi",
+			"sections_id": "200",
+			"overallAvg": 59.31,
+			"totalFail": 33
+		},
+		{
+			"sections_dept": "apbi",
+			"sections_id": "351",
+			"overallAvg": 52.08,
+			"totalFail": 10
+		},
+		{
+			"sections_dept": "apsc",
+			"sections_id": "201",
+			"overallAvg": 58.24,
+			"totalFail": 30
+		},
+		{
+			"sections_dept": "asia",
+			"sections_id": "101",
+			"overallAvg": 57.33,
+			"totalFail": 10
+		},
+		{
+			"sections_dept": "biol",
+			"sections_id": "121",
+			"overallAvg": 59.45,
+			"totalFail": 35
+		},
+		{
+			"sections_dept": "biol",
+			"sections_id": "200",
+			"overallAvg": 58.1,
+			"totalFail": 38
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "100",
+			"overallAvg": 56.76,
+			"totalFail": 63
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "111",
+			"overallAvg": 57.7,
+			"totalFail": 32
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "121",
+			"overallAvg": 58.78,
+			"totalFail": 148
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "221",
+			"overallAvg": 55.81,
+			"totalFail": 18
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "294",
+			"overallAvg": 58.7,
+			"totalFail": 25
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "300",
+			"overallAvg": 57.85,
+			"totalFail": 143
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "330",
+			"overallAvg": 37.11,
+			"totalFail": 125
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "331",
+			"overallAvg": 58.62,
+			"totalFail": 25
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "344",
+			"overallAvg": 56.07,
+			"totalFail": 396
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "398",
+			"overallAvg": 50.9,
+			"totalFail": 48
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "441",
+			"overallAvg": 55.89,
+			"totalFail": 15
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "444",
+			"overallAvg": 54.94,
+			"totalFail": 17
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "445",
+			"overallAvg": 51.19,
+			"totalFail": 6
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "450",
+			"overallAvg": 52.4,
+			"totalFail": 7
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "451",
+			"overallAvg": 58.52,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "460",
+			"overallAvg": 55.91,
+			"totalFail": 130
+		},
+		{
+			"sections_dept": "busi",
+			"sections_id": "499",
+			"overallAvg": 56.73,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "chbe",
+			"sections_id": "241",
+			"overallAvg": 58.16,
+			"totalFail": 128
+		},
+		{
+			"sections_dept": "chbe",
+			"sections_id": "474",
+			"overallAvg": 50,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "chbe",
+			"sections_id": "477",
+			"overallAvg": 51.62,
+			"totalFail": 18
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "121",
+			"overallAvg": 58.54,
+			"totalFail": 117
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "123",
+			"overallAvg": 58.16,
+			"totalFail": 44
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "233",
+			"overallAvg": 58.24,
+			"totalFail": 510
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "312",
+			"overallAvg": 55.31,
+			"totalFail": 78
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "315",
+			"overallAvg": 54.73,
+			"totalFail": 10
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "330",
+			"overallAvg": 59.2,
+			"totalFail": 48
+		},
+		{
+			"sections_dept": "chem",
+			"sections_id": "417",
+			"overallAvg": 59.83,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "civl",
+			"sections_id": "215",
+			"overallAvg": 58.62,
+			"totalFail": 24
+		},
+		{
+			"sections_dept": "civl",
+			"sections_id": "311",
+			"overallAvg": 55.75,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "civl",
+			"sections_id": "403",
+			"overallAvg": 44.75,
+			"totalFail": 3
+		},
+		{
+			"sections_dept": "civl",
+			"sections_id": "406",
+			"overallAvg": 49.25,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "civl",
+			"sections_id": "410",
+			"overallAvg": 57.68,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "comm",
+			"sections_id": "293",
+			"overallAvg": 55.15,
+			"totalFail": 35
+		},
+		{
+			"sections_dept": "dhyg",
+			"sections_id": "405",
+			"overallAvg": 58.4,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "educ",
+			"sections_id": "172",
+			"overallAvg": 39.03,
+			"totalFail": 68
+		},
+		{
+			"sections_dept": "educ",
+			"sections_id": "240",
+			"overallAvg": 58,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "elec",
+			"sections_id": "465",
+			"overallAvg": 52.67,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "engl",
+			"sections_id": "112",
+			"overallAvg": 58.73,
+			"totalFail": 6
+		},
+		{
+			"sections_dept": "engl",
+			"sections_id": "321",
+			"overallAvg": 58.43,
+			"totalFail": 7
+		},
+		{
+			"sections_dept": "engl",
+			"sections_id": "358",
+			"overallAvg": 53.5,
+			"totalFail": 2
+		},
+		{
+			"sections_dept": "enph",
+			"sections_id": "352",
+			"overallAvg": 58,
+			"totalFail": 2
+		},
+		{
+			"sections_dept": "eosc",
+			"sections_id": "114",
+			"overallAvg": 57,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "fopr",
+			"sections_id": "362",
+			"overallAvg": 32.09,
+			"totalFail": 5
+		},
+		{
+			"sections_dept": "fre",
+			"sections_id": "295",
+			"overallAvg": 57.2,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "frst",
+			"sections_id": "202",
+			"overallAvg": 0,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "frst",
+			"sections_id": "231",
+			"overallAvg": 53.62,
+			"totalFail": 50
+		},
+		{
+			"sections_dept": "frst",
+			"sections_id": "311",
+			"overallAvg": 55.6,
+			"totalFail": 10
+		},
+		{
+			"sections_dept": "frst",
+			"sections_id": "319",
+			"overallAvg": 58,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "germ",
+			"sections_id": "110",
+			"overallAvg": 59.61,
+			"totalFail": 3
+		},
+		{
+			"sections_dept": "hist",
+			"sections_id": "102",
+			"overallAvg": 50.85,
+			"totalFail": 37
+		},
+		{
+			"sections_dept": "hist",
+			"sections_id": "103",
+			"overallAvg": 58.47,
+			"totalFail": 14
+		},
+		{
+			"sections_dept": "hist",
+			"sections_id": "104",
+			"overallAvg": 58.24,
+			"totalFail": 5
+		},
+		{
+			"sections_dept": "hist",
+			"sections_id": "432",
+			"overallAvg": 53.9,
+			"totalFail": 3
+		},
+		{
+			"sections_dept": "japn",
+			"sections_id": "100",
+			"overallAvg": 58.27,
+			"totalFail": 21
+		},
+		{
+			"sections_dept": "japn",
+			"sections_id": "101",
+			"overallAvg": 55.04,
+			"totalFail": 8
+		},
+		{
+			"sections_dept": "lfs",
+			"sections_id": "100",
+			"overallAvg": 0,
+			"totalFail": 2
+		},
+		{
+			"sections_dept": "ling",
+			"sections_id": "201",
+			"overallAvg": 59.06,
+			"totalFail": 14
+		},
+		{
+			"sections_dept": "lled",
+			"sections_id": "200",
+			"overallAvg": 54.37,
+			"totalFail": 114
+		},
+		{
+			"sections_dept": "lled",
+			"sections_id": "201",
+			"overallAvg": 58.13,
+			"totalFail": 35
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "100",
+			"overallAvg": 57.35,
+			"totalFail": 9
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "101",
+			"overallAvg": 58.69,
+			"totalFail": 315
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "102",
+			"overallAvg": 57.56,
+			"totalFail": 16
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "103",
+			"overallAvg": 55.3,
+			"totalFail": 27
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "105",
+			"overallAvg": 56.59,
+			"totalFail": 156
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "110",
+			"overallAvg": 57.46,
+			"totalFail": 290
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "152",
+			"overallAvg": 58.82,
+			"totalFail": 17
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "180",
+			"overallAvg": 56.61,
+			"totalFail": 708
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "184",
+			"overallAvg": 55.92,
+			"totalFail": 281
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "200",
+			"overallAvg": 58.22,
+			"totalFail": 80
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "215",
+			"overallAvg": 59.18,
+			"totalFail": 5
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "220",
+			"overallAvg": 58.18,
+			"totalFail": 244
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "255",
+			"overallAvg": 57.4,
+			"totalFail": 67
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "257",
+			"overallAvg": 56.89,
+			"totalFail": 55
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "264",
+			"overallAvg": 58.89,
+			"totalFail": 19
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "300",
+			"overallAvg": 59.78,
+			"totalFail": 16
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "310",
+			"overallAvg": 57.78,
+			"totalFail": 16
+		},
+		{
+			"sections_dept": "math",
+			"sections_id": "312",
+			"overallAvg": 58.24,
+			"totalFail": 28
+		},
+		{
+			"sections_dept": "mech",
+			"sections_id": "224",
+			"overallAvg": 59.4,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "mech",
+			"sections_id": "260",
+			"overallAvg": 57.35,
+			"totalFail": 26
+		},
+		{
+			"sections_dept": "mech",
+			"sections_id": "431",
+			"overallAvg": 53.86,
+			"totalFail": 0
+		},
+		{
+			"sections_dept": "medg",
+			"sections_id": "410",
+			"overallAvg": 54.43,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "mtrl",
+			"sections_id": "350",
+			"overallAvg": 59.64,
+			"totalFail": 8
+		},
+		{
+			"sections_dept": "mtrl",
+			"sections_id": "365",
+			"overallAvg": 59.55,
+			"totalFail": 26
+		},
+		{
+			"sections_dept": "mtrl",
+			"sections_id": "378",
+			"overallAvg": 59.73,
+			"totalFail": 40
+		},
+		{
+			"sections_dept": "mtrl",
+			"sections_id": "494",
+			"overallAvg": 57.4,
+			"totalFail": 16
+		},
+		{
+			"sections_dept": "musc",
+			"sections_id": "103",
+			"overallAvg": 59,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "musc",
+			"sections_id": "241",
+			"overallAvg": 58.33,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "phar",
+			"sections_id": "342",
+			"overallAvg": 59.5,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "phar",
+			"sections_id": "352",
+			"overallAvg": 51.25,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "phar",
+			"sections_id": "430",
+			"overallAvg": 59.29,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "phar",
+			"sections_id": "435",
+			"overallAvg": 53.43,
+			"totalFail": 2
+		},
+		{
+			"sections_dept": "phil",
+			"sections_id": "120",
+			"overallAvg": 52.61,
+			"totalFail": 14
+		},
+		{
+			"sections_dept": "phys",
+			"sections_id": "157",
+			"overallAvg": 55.25,
+			"totalFail": 12
+		},
+		{
+			"sections_dept": "poli",
+			"sections_id": "100",
+			"overallAvg": 56.12,
+			"totalFail": 52
+		},
+		{
+			"sections_dept": "psyc",
+			"sections_id": "218",
+			"overallAvg": 57.9,
+			"totalFail": 13
+		},
+		{
+			"sections_dept": "psyc",
+			"sections_id": "314",
+			"overallAvg": 43.33,
+			"totalFail": 1
+		},
+		{
+			"sections_dept": "psyc",
+			"sections_id": "315",
+			"overallAvg": 50.9,
+			"totalFail": 8
+		},
+		{
+			"sections_dept": "psyc",
+			"sections_id": "320",
+			"overallAvg": 54.27,
+			"totalFail": 11
+		},
+		{
+			"sections_dept": "vant",
+			"sections_id": "148",
+			"overallAvg": 56.77,
+			"totalFail": 3
+		},
+		{
+			"sections_dept": "wood",
+			"sections_id": "282",
+			"overallAvg": 57.04,
+			"totalFail": 4
+		},
+		{
+			"sections_dept": "wood",
+			"sections_id": "475",
+			"overallAvg": 1,
+			"totalFail": 2
+		},
+		{
+			"sections_dept": "wrds",
+			"sections_id": "150",
+			"overallAvg": 57.32,
+			"totalFail": 15
+		}
+	]
+}
