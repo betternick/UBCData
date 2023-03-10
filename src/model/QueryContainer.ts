@@ -5,11 +5,13 @@ import {
 
 export class QueryContainer {
 	public columns: string[];
-	public order: string;
+	public order: string[];
+	public dir: number;
 
 	constructor() {
 		this.columns = [];
-		this.order = "";
+		this.order = [];
+		this.dir = 1;		// UP = ascending = 1      DOWN = descending = -1
 	}
 
 	// handles the WHERE block in a query
@@ -99,21 +101,6 @@ export class QueryContainer {
 		}
 	}
 
-
-	// sorts the array based on this.order
-	public handleSort (array: InsightResult[]): InsightResult[] {
-		// sorting array of arrays by string property value, dynamically: ref: https://stackoverflow.com/questions/
-		// 1129216/sort-array-of-objects-by-string-property-value
-		function dynamicSort(property: string) {
-			let sortOrder = 1;
-			return function (a: InsightResult, b: InsightResult) {
-				let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-				return result * sortOrder;
-			};
-		}
-		return array.sort(dynamicSort(this.order));
-	}
-
 	// checks if the given section matches the values from the query for the
 	// given comparator. Returns true if it matches, false otherwise
 	public doesThisSectionMatch(section: any, identifier: string, value: any, comparator: string): boolean {
@@ -152,7 +139,12 @@ export class QueryContainer {
 	public handleOptions(query: any) {
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
-			this.order = query.ORDER;
+			if (typeof query.ORDER === "string") {
+				this.order.push(query.ORDER);
+			} else {
+				this.order = query.ORDER.key;
+				this.dir = (query.ORDER.dir === "UP") ? 1 : -1;
+			}
 		}
 		// creates a object that contains only the columns
 		let columnsJSON = query.COLUMNS;
@@ -165,6 +157,40 @@ export class QueryContainer {
 		for (let col in this.columns) {
 			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
 		}
+	}
+
+	public handleSort (array: InsightResult[]): InsightResult[] {
+		return this.sort(array, this.order, this.dir);
+	}
+
+	// sorts the array based on this.order
+	// public sort (array: InsightResult[]): InsightResult[] {
+	// 	// sorting array of arrays by string property value, dynamically: ref: https://stackoverflow.com/questions/
+	// 	// 1129216/sort-array-of-objects-by-string-property-value
+	// 	function dynamicSort(property: string) {
+	// 		let sortOrder = 1;
+	// 		return function (a: InsightResult, b: InsightResult) {
+	// 			let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+	// 			return result * sortOrder;
+	// 		};
+	// 	}
+	// 	return array.sort(dynamicSort(this.order[0]));
+	// }
+
+	public sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
+		// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
+		// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a
+		// apply custom sort function on array
+		return array.sort(function(a, b) {
+			// generate compare function return value by iterating over the properties array
+			return keys.reduce(function(bool, k) {
+				// if previous compare result is `0` then compare with the next property value and return result
+				let result = (a[k] < b[k]) ? -1 : (a[k] > b[k]) ? 1 : 0;
+				result = result * dir;
+				let r = bool || result;
+				return r;
+			}, 0);   // set initial value as 0
+		});
 	}
 
 }

@@ -117,12 +117,15 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("query is null?"));
 			} else {
 				let datasetID = this.getDatasetID(query);
-			//	SYED: checking for invalid queries
-				try {
-					queryValidator(query);
-				} catch (err: any) {
-					return reject(new InsightError(err));
-				}
+
+				// TODO: uncomment to do query validation
+				//	SYED: checking for invalid queries
+				// try {
+				// 	queryValidator(query);
+				// } catch (err: any) {
+				// 	return reject(new InsightError(err));
+				// }
+
 				let datasetToQuery = this.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
