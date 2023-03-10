@@ -163,20 +163,6 @@ export class QueryContainer {
 		return this.sort(array, this.order, this.dir);
 	}
 
-	// sorts the array based on this.order
-	// public sort (array: InsightResult[]): InsightResult[] {
-	// 	// sorting array of arrays by string property value, dynamically: ref: https://stackoverflow.com/questions/
-	// 	// 1129216/sort-array-of-objects-by-string-property-value
-	// 	function dynamicSort(property: string) {
-	// 		let sortOrder = 1;
-	// 		return function (a: InsightResult, b: InsightResult) {
-	// 			let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-	// 			return result * sortOrder;
-	// 		};
-	// 	}
-	// 	return array.sort(dynamicSort(this.order[0]));
-	// }
-
 	public sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
 		// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
 		// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a
