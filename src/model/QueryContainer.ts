@@ -142,7 +142,7 @@ export class QueryContainer {
 			if (typeof query.ORDER === "string") {
 				this.order.push(query.ORDER);
 			} else {
-				this.order = query.ORDER.key;
+				this.order = query.ORDER.keys;
 				this.dir = (query.ORDER.dir === "UP") ? 1 : -1;
 			}
 		}
@@ -180,7 +180,7 @@ export class QueryContainer {
 	public sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
 		// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
 		// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a
-		// apply custom sort function on array
+
 		return array.sort(function(a, b) {
 			// generate compare function return value by iterating over the properties array
 			return keys.reduce(function(bool, k) {
