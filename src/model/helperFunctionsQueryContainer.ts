@@ -35,7 +35,7 @@ export function transformQueryToDatasetConvention(field: string): string {
 	} else if (field === "audit") {
 		field = "Audit";
 	}
-	return field;
+	return field;					// used for rooms keys and applyKeys
 }
 // transform field from naming convention in dataset to naming convention in query
 export function transformDatasetToQueryConvention(field: string): string {
@@ -60,20 +60,7 @@ export function transformDatasetToQueryConvention(field: string): string {
 	} else if (field === "Audit") {
 		field = "audit";
 	}
-	return field;
-}
-// checks whether only a single ID is referenced
-export function singleDatasetID(query: string, datasetID: string) {
-	for (let i = 0; i < query.length; i++) {
-		if (query[i] === "_") {
-			let indexStartOfID = query.lastIndexOf('"', i) + 1;
-			let result = query.substring(indexStartOfID, i);
-			if (result !== datasetID) {
-				throw new InsightError("multiple datasets referenced");
-			}
-		}
-	}
-	return;
+	return field;						// used for rooms keys and applyKeys
 }
 
 export function wildcardMatcher (stringToCheck: string, queryString: string): boolean {

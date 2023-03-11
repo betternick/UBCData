@@ -4,57 +4,69 @@ import {
 } from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
-	public columns: string[];
+	public columns: string[];			// columns to be added to the InsightResult
+	public group: string[];
+	public applyRules: JSON[];
+	public fieldsToExtract: string[];	// keys needed, either for grouping or applying rules
 	public order: string[];
 	public dir: number;
 
 	constructor() {
 		this.columns = [];
+		this.group = [];
+		this.applyRules = [];
+		this.fieldsToExtract = [];
 		this.order = [];
 		this.dir = 1;		// UP = ascending = 1      DOWN = descending = -1
 	}
 
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
+		let tempArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
 		for (let sec in sections) {
 			let mySection = sections[sec];
 			if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
-				// add this section to result, based on columns
-				let myInsightResult: InsightResult = {};
-				for (let col in this.columns) {
-					let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
-					let valOfSection = getValue(mySection, this.columns[col]);
-
-					let keyVal: string | number = "";
-					if (keyCol === datasetID + "_year") {
-						// need to check if sections = overall, if yes, year = 1900
-						let secField = getValue(mySection, "Section");
-						if (secField === "overall") {
-							keyVal = 1900;
-						} else {
-							keyVal = Number(valOfSection); 	// need to year to number
-						}
-					} else if (keyCol === datasetID + "_uuid") {
-						keyVal = valOfSection.toString();	// need to convert uuid to string
-					} else if (keyCol === datasetID + "_seats") {
-						keyVal = Number(valOfSection);		// need to convert seats to number
-					} else {
-						keyVal = valOfSection;
-					}
-					myInsightResult[keyCol] = keyVal;
-				}
-				resultArray.push(myInsightResult);
-
-				if (resultArray.length > 5000) {
-					throw new ResultTooLargeError("Exceeded over 5000 results");
+				if (this.group.length === 0) {
+					let myInsightResult = this.createInsightResult(datasetID, mySection, this.columns);
+					resultArray.push(myInsightResult);
+				} else {
+					// do something
 				}
 			}
 		}
 		return resultArray;
 	}
 
-	// Applies the filters in the query to the given section and returns
+	private createInsightResult(datasetID: string, mySection: JSON, fieldsArray: string[]): InsightResult {
+		// add this section to result, based on columns - IF THERE ARE NO Transformations
+		let myInsightResult: InsightResult = {};
+		for (let col in fieldsArray) {
+			let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(fieldsArray[col]));
+			let valOfSection = getValue(mySection, fieldsArray[col]);
+
+			let keyVal: string | number = "";
+			if (keyCol === datasetID + "_year") {
+				// need to check if sections = overall, if yes, year = 1900
+				let secField = getValue(mySection, "Section");
+				if (secField === "overall") {
+					keyVal = 1900;
+				} else {
+					keyVal = Number(valOfSection); 	// need to convert year to number
+				}
+			} else if (keyCol === datasetID + "_uuid") {
+				keyVal = valOfSection.toString();	// need to convert uuid to string
+			} else if (keyCol === datasetID + "_seats") {
+				keyVal = Number(valOfSection);		// need to convert seats to number
+			} else {
+				keyVal = valOfSection;
+			}
+			myInsightResult[keyCol] = keyVal;
+		}
+		return myInsightResult;
+	}
+
+// Applies the filters in the query to the given section and returns
 	// true if the section matches all filters, false otherwise
 	public applyFilters(query: any, datasetID: string, section: any): boolean {
 		let result: boolean = false;
@@ -140,16 +152,49 @@ export class QueryContainer {
 				this.dir = (query.ORDER.dir === "UP") ? 1 : -1;
 			}
 		}
-		// creates a object that contains only the columns
+		// creates an object that contains only the columns
 		let columnsJSON = query.COLUMNS;
 
 		// extracts all the column identifiers and puts them into the columns array
 		for (let col in columnsJSON) {
 			this.columns.push(returnIdentifier(columnsJSON[col]));
 		}
-		this.columns.sort(); // sort columns alphabetically
+
 		for (let col in this.columns) {
 			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
+		}
+	}
+
+	public handleTransformations(query: any) {
+		// if the query does not have a transformation block, simply return
+		if (query === undefined) {
+			return;
+		}
+
+		// extracts all the group identifiers and puts them into the group array
+		let groupJSON = query.GROUP;
+		for (let col in groupJSON) {
+			this.group.push(returnIdentifier(groupJSON[col]));
+		}
+
+		// extracts all the applyKeys and puts them into the applyKeys array
+		this.applyRules = query.APPLY;
+
+		// extracts all the fields that need to be collected from a section and puts them into the fieldsToExtract array
+		this.fieldsToExtract = this.group;
+		for (let col in this.applyRules){
+			let applyRule = this.applyRules[col];
+			let applyKey = Object.keys(applyRule)[0];
+			let applyKeyObj = applyRule[applyKey as keyof typeof applyRule];
+			let token = Object.keys(applyKeyObj)[0];
+			this.fieldsToExtract.push(returnIdentifier(applyKeyObj[token as keyof typeof applyKeyObj]));
+		}
+
+		for (let col in this.group) {
+			this.group[col] = transformQueryToDatasetConvention(this.group[col]);
+		}
+		for (let col in this.fieldsToExtract) {
+			this.fieldsToExtract[col] = transformQueryToDatasetConvention(this.fieldsToExtract[col]);
 		}
 	}
 
@@ -158,6 +203,7 @@ export class QueryContainer {
 	}
 
 	// sorts array by string of keys, using sortByThenBy logic, in ascending or descending order based on dir
+	// Order of keys determines how ties are broken
 	public sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
 		// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
 		// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a

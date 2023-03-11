@@ -140,6 +140,9 @@ export default class InsightFacade implements IInsightFacade {
 						// handleOptions
 						queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
 
+						// handleTransformations
+						queryObject.handleTransformations(queryJSON["TRANSFORMATIONS" as keyof typeof queryJSON]);
+
 						// handleWhere
 						let results: InsightResult[] = [];
 						try {
