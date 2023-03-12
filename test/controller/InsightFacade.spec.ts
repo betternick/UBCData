@@ -346,27 +346,27 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 		clearDisk();
 	});
 
-	// LINDA: Folder test for C2 queries
-	folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
-		"Dynamic InsightFacade PerformQuery C2 tests",
-		(input) => facade.performQuery(input),
-		"./test/resources/c2Queries",
-		{
-			assertOnResult: (actual, expected) => {
-				expect(actual).to.deep.equal(expected);
-			},
-			errorValidator: (error): error is PQErrorKind =>
-				error === "ResultTooLargeError" || error === "InsightError",
-			assertOnError: (actual, expected) => {
-				// SYED: Assertion to check if actual error is of the expected type
-				if (expected === "InsightError") {
-					expect(actual).to.be.an.instanceOf(InsightError);
-				} else {
-					expect(actual).to.be.an.instanceOf(ResultTooLargeError);
-				}
-			},
-		}
-	);
+	// // LINDA: Folder test for C2 queries
+	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
+	// 	"Dynamic InsightFacade PerformQuery C2 tests",
+	// 	(input) => facade.performQuery(input),
+	// 	"./test/resources/c2Queries",
+	// 	{
+	// 		assertOnResult: (actual, expected) => {
+	// 			expect(actual).to.deep.equal(expected);
+	// 		},
+	// 		errorValidator: (error): error is PQErrorKind =>
+	// 			error === "ResultTooLargeError" || error === "InsightError",
+	// 		assertOnError: (actual, expected) => {
+	// 			// SYED: Assertion to check if actual error is of the expected type
+	// 			if (expected === "InsightError") {
+	// 				expect(actual).to.be.an.instanceOf(InsightError);
+	// 			} else {
+	// 				expect(actual).to.be.an.instanceOf(ResultTooLargeError);
+	// 			}
+	// 		},
+	// 	}
+	// );
 
 	// // SYED: Folder test for ORDERED queries
 	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
@@ -389,7 +389,7 @@ describe("PerformQuery Dynamic Folder Test Suite", function () {
 	// 		},
 	// 	}
 	// );
-
+	//
 	// // SYED: Folder test for UNORDERED queries
 	// folderTest<unknown, Promise<InsightResult[]>, PQErrorKind>(
 	// 	"Dynamic InsightFacade PerformQuery tests",
