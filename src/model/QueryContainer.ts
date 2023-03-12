@@ -1,11 +1,11 @@
-import {Dataset,  InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {Dataset,  InsightResult} from "../controller/IInsightFacade";
 import {
 	returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention, wildcardMatcher
 } from "./helperFunctionsQueryContainer";
 
 export class QueryContainer {
-	public columns: string[];			// columns to be added to the InsightResult
-	public group: string[];
+	public columns: string[];			// columns to be added to the final InsightResult
+	public group: string[];				// keys used to group sections together
 	public applyRules: JSON[];
 	public fieldsToExtract: string[];	// keys needed, either for grouping or applying rules
 	public order: string[];
@@ -22,16 +22,61 @@ export class QueryContainer {
 
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
-		let tempArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
-		for (let sec in sections) {
-			let mySection = sections[sec];
-			if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
-				if (this.group.length === 0) {
+		if (this.group.length === 0) {
+			for (let sec in sections) {
+				let mySection = sections[sec];
+				if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
 					let myInsightResult = this.createInsightResult(datasetID, mySection, this.columns);
 					resultArray.push(myInsightResult);
+				}
+			}
+		} else {
+			let tempArray: InsightResult[] = [];
+			for (let sec in sections) {
+				let mySection = sections[sec];
+				if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
+					let myInsightResult = this.createInsightResult(datasetID, mySection, this.fieldsToExtract);
+					tempArray.push(myInsightResult);
+				}
+			}
+			tempArray = this.sort(tempArray, this.group, 1);
+			let indivGroup: InsightResult[] = []; // all insight results in a single group
+			let firstRes: InsightResult = tempArray[0];
+			indivGroup.push(firstRes);
+			let lastGroupVals: Array<string|number> = [];
+			for (let prop in this.group) {
+				lastGroupVals.push(firstRes[this.group[prop]]);
+			}
+			let index: number = 1;
+			while (index !== tempArray.length){
+				let currGroupVals: Array<string|number> = [];
+				let thisRes: InsightResult = tempArray[index];
+				for (let prop in this.group) {
+					currGroupVals.push(thisRes[this.group[prop]]);
+				}
+				let match = lastGroupVals.every((val, idx) =>
+					val === currGroupVals[idx]);
+				if (match) {
+					indivGroup.push(thisRes);
+					index++;
 				} else {
-					// do something
+					// TODO: finish this!
+					let myInsightResult: InsightResult = {};
+					for (let col in this.columns) {
+						// do smth
+					}
+					// 1) create new InsightResult with this.columns
+					// 	- can just use values from the current InsightResult (aka tempArray[index])
+					//				- create new InsightResult
+					//				- for each col in this.columns, add the value from the current InsightResult to
+					//				  the new InsightResult
+					//				- for any applyrules, do them (probs another function), then add to new Insight Results
+					// 2) push new InsightResult to resultArray
+					// 3) lastGroupVals = currGroupVals
+					// 4) indivGroup = [];
+					// 5) indivGroup.push(tempArray[index])  <- start of new indivGroup
+					// 6) index++
 				}
 			}
 		}
@@ -39,7 +84,6 @@ export class QueryContainer {
 	}
 
 	private createInsightResult(datasetID: string, mySection: JSON, fieldsArray: string[]): InsightResult {
-		// add this section to result, based on columns - IF THERE ARE NO Transformations
 		let myInsightResult: InsightResult = {};
 		for (let col in fieldsArray) {
 			let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(fieldsArray[col]));
