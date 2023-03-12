@@ -1,0 +1,179 @@
+{
+	"title": "Transformation-Apply-Count2",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"sections_avg": 60
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"countDept"
+			]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_dept"
+			],
+			"APPLY": [
+				{
+					"countDept": {
+						"COUNT": "sections_dept"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "apbi",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "apsc",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "asia",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "biol",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "busi",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "chbe",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "chem",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "civl",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "comm",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "dhyg",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "educ",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "elec",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "engl",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "enph",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "eosc",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "fopr",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "fre",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "frst",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "germ",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "hist",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "japn",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "lfs",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "ling",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "lled",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "math",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "mech",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "medg",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "mtrl",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "musc",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "phar",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "phil",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "phys",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "poli",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "psyc",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "vant",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "wood",
+			"countDept": 1
+		},
+		{
+			"sections_dept": "wrds",
+			"countDept": 1
+		}
+	]
+}

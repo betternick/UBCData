@@ -14,7 +14,7 @@ function JSONchecker(query: unknown): any{
 		throw new InsightError("Invalid query string");
 	}
 	let objectKeys = Object.keys(queryReturn);
-	let allowedKeys = ["WHERE", "ORDER", "OPTIONS"];
+	let allowedKeys = ["WHERE", "ORDER", "OPTIONS", "TRANSFORMATIONS"];
 	let disallowedKeyFlag = false;
 	for (const key of objectKeys) {
 		if (!allowedKeys.includes(key)){

@@ -1,61 +1,154 @@
-import {Dataset,  InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
+import {Dataset, InsightResult, ResultTooLargeError} from "../controller/IInsightFacade";
 import {
-	returnIdentifier, getValue, transformQueryToDatasetConvention, transformDatasetToQueryConvention, wildcardMatcher
+	returnIdentifier, transformQueryToDatasetConvention, transformDatasetToQueryConvention, wildcardMatcher,
+	sort, createIResWhereHelper
 } from "./helperFunctionsQueryContainer";
+import Decimal from "decimal.js";
 
 export class QueryContainer {
-	public columns: string[];
-	public order: string;
+
+	public fieldsToExtract: string[];	// keys needed to create InsightResult
+	public group: string[];				// keys used to group sections together
+	public applyRules: {[key: string]: object};
+	public columns: string[];			// only used if there are TRANSFORMATIONS
+	public order: string[];
+	public dir: number;
 
 	constructor() {
+		this.fieldsToExtract = [];
+		this.group = [];
+		this.applyRules = {};
 		this.columns = [];
-		this.order = "";
+		this.order = [];
+		this.dir = 1;		// UP = ascending = 1      DOWN = descending = -1
 	}
 
-	// handles the WHERE block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's in WHERE block don't match
-	// otherwise, returns the InsightResult[] that corresponds to the query
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
-		for (let sec in sections) {
-			let mySection = sections[sec];
-			if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
-				// add this section to result, based on columns
-				let myInsightResult: InsightResult = {};
-				for (let col in this.columns) {
-					let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(this.columns[col]));
-					let valOfSection = getValue(mySection, this.columns[col]);
-
-					let keyVal: string | number = "";
-					if (keyCol === datasetID + "_year") {
-						// need to check if sections = overall, if yes, year = 1900
-						let secField = getValue(mySection, "Section");
-						if (secField === "overall") {
-							keyVal = 1900;
-						} else {
-							keyVal = Number(valOfSection); 	// need to year to number
-						}
-					} else if (keyCol === datasetID + "_uuid") {
-						keyVal = valOfSection.toString();	// need to convert uuid to string
-					} else if (keyCol === datasetID + "_seats") {
-						keyVal = Number(valOfSection);		// need to convert seats to number
-					} else {
-						keyVal = valOfSection;
-					}
-					myInsightResult[keyCol] = keyVal;
-				}
-				resultArray.push(myInsightResult);
-
-				if (resultArray.length > 5000) {
-					throw new ResultTooLargeError("Exceeded over 5000 results");
+		if (this.group.length === 0) {
+			for (let sec in sections) {
+				let mySection = sections[sec];
+				if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
+					let myInsightResult = createIResWhereHelper(datasetID, mySection, this.fieldsToExtract);
+					resultArray.push(myInsightResult);
 				}
 			}
+		} else {
+			let tempArray: InsightResult[] = [];
+			for (let sec in sections) {
+				let mySection = sections[sec];
+				if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
+					let myInsightResult = createIResWhereHelper(datasetID, mySection, this.fieldsToExtract);
+					tempArray.push(myInsightResult);
+				}
+			}
+			tempArray = sort(tempArray, this.group, 1);
+			resultArray = this.applyGroupAndRules(tempArray, datasetID);
 		}
+
+		if (resultArray.length > 5000) {
+			throw new ResultTooLargeError("Too many results!");
+		}
+
 		return resultArray;
 	}
 
-	// Applies the filters in the query to the given section and returns
+	private applyGroupAndRules(tempArray: InsightResult[], datasetID: string): InsightResult[] {
+		let result: InsightResult[] = [];
+		let indivGroup: InsightResult[] = []; // all insight results in a single group
+		let firstRes: InsightResult = tempArray[0];
+		indivGroup.push(firstRes);
+		let lastGroupVals: Array<string | number> = [];
+		for (let prop in this.group) {
+			lastGroupVals.push(firstRes[this.group[prop]]);
+		}
+		let index: number = 1;
+		while (index !== tempArray.length) {
+			let thisRes: InsightResult = tempArray[index];
+			let currGroupVals: Array<string | number> = [];
+			for (let prop in this.group) {
+				currGroupVals.push(thisRes[this.group[prop]]);
+			}
+			let match = lastGroupVals.every((val, i) => val === currGroupVals[i]);
+			if (match) {
+				indivGroup.push(thisRes);
+				index++;
+			} else {
+				let myInsightResult = this.createIResApplyHelper(datasetID, indivGroup[0], indivGroup);
+				result.push(myInsightResult);
+				lastGroupVals = currGroupVals;
+				indivGroup = [];
+				indivGroup.push(tempArray[index]);
+				index++;
+			}
+		}
+		let myInsightResult: InsightResult = this.createIResApplyHelper(datasetID, tempArray[tempArray.length - 1],
+			indivGroup);
+		result.push(myInsightResult);
+		return result;
+	}
+
+	private createIResApplyHelper(datasetID: string, insRes: InsightResult, group: InsightResult[]): InsightResult {
+		let myInsightResult: InsightResult = {};
+		for (let col in this.columns) {
+			let key = this.columns[col];
+			let val: string | number;
+			if (key.includes(datasetID)) {
+				val = insRes[key];
+			} else {
+				let rule = this.applyRules[key];
+				let token = Object.keys(rule)[0];
+				let field = rule[token as keyof typeof rule];
+				val = this.applyTheRule(token, field, group); // apply the rule!!!
+			}
+			myInsightResult[key] = val;
+		}
+		return myInsightResult;
+	}
+
+	private applyTheRule(token: string, field: string, group: InsightResult[]): number {
+		let result = 0;
+		if (token === "MAX") {
+			for (let res in group) {
+				if (group[res][field] > result) {
+					result = group[res][field] as typeof result;
+				}
+			}
+		} else if (token === "MIN") {
+			result = Infinity;
+			for (let res in group) {
+				if (group[res][field] < result) {
+					result = group[res][field] as typeof result;
+				}
+			}
+		} else if (token === "AVG") {
+			let total = new Decimal(0);
+			let count = 0;
+			for (let res in group){
+				let val = new Decimal(group[res][field] as typeof result);
+				total = Decimal.add(total, val);
+				count++;
+			}
+			let avg = total.toNumber() / count;
+			result = Number(avg.toFixed(2));
+		} else if (token === "SUM") {
+			for (let res in group) {
+				result += group[res][field] as typeof result;
+			}
+			result = Number(result.toFixed(2));
+		} else { // (token === "COUNT")
+			let valArray = [];
+			for (let res in group) {
+				valArray.push(group[res][field]);
+			}
+			result = new Set(valArray).size;
+		}
+		return result;
+	}
+
+
+// Applies the filters in the query to the given section and returns
 	// true if the section matches all filters, false otherwise
 	public applyFilters(query: any, datasetID: string, section: any): boolean {
 		let result: boolean = false;
@@ -93,25 +186,9 @@ export class QueryContainer {
 				}
 			}
 			return result;
-		} else {
-			// empty where block -> return all sections
+		} else { // empty where block -> return all sections
 			return true;
 		}
-	}
-
-
-	// sorts the array based on this.order
-	public handleSort (array: InsightResult[]): InsightResult[] {
-		// sorting array of arrays by string property value, dynamically: ref: https://stackoverflow.com/questions/
-		// 1129216/sort-array-of-objects-by-string-property-value
-		function dynamicSort(property: string) {
-			let sortOrder = 1;
-			return function (a: InsightResult, b: InsightResult) {
-				let result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-				return result * sortOrder;
-			};
-		}
-		return array.sort(dynamicSort(this.order));
 	}
 
 	// checks if the given section matches the values from the query for the
@@ -146,27 +223,59 @@ export class QueryContainer {
 		}
 	}
 
-	// handles the OPTIONS block in a query
-	// throws InsightError("multiple datasets referenced") if any dataset ID's
-	// found in the OPTIONS block do not match the datasetID parameter
 	public handleOptions(query: any) {
 		// if there is an ORDER section, extract the order
 		if (Object.prototype.hasOwnProperty.call(query, "ORDER")) {
-			this.order = query.ORDER;
+			if (typeof query.ORDER === "string") {
+				this.order.push(query.ORDER);
+			} else {
+				this.order = query.ORDER.keys;
+				this.dir = (query.ORDER.dir === "UP") ? 1 : -1;
+			}
 		}
-		// creates a object that contains only the columns
-		let columnsJSON = query.COLUMNS;
+		this.columns = query.COLUMNS;
+	}
 
-		// extracts all the column identifiers and puts them into the columns array
-		for (let col in columnsJSON) {
-			this.columns.push(returnIdentifier(columnsJSON[col]));
+	public handleTransformations(query: any) {
+		// if the query does not have a transformation block
+		if (query === undefined) {
+			for (let col in this.columns) {
+				this.fieldsToExtract.push(transformQueryToDatasetConvention(returnIdentifier(this.columns[col])));
+			}
+			return;
 		}
-		this.columns.sort(); // sort columns alphabetically
-		for (let col in this.columns) {
-			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
+
+		// extracts all the group identifiers and puts them into the group array
+		this.group = query.GROUP;
+
+		// extracts all the fields from group, and add to fieldsToExtract array
+		for (let col in this.group) {
+			this.fieldsToExtract.push(transformQueryToDatasetConvention(returnIdentifier(this.group[col])));
+		}
+
+		// extract apply rules, add them to applyRules Object, and add appropriate fields to fieldsToExtract array
+		let ruleArray = query.APPLY;
+		for (let col in ruleArray){
+			let applyRule = ruleArray[col];
+			let applyKey = Object.keys(applyRule)[0];
+			let applyKeyObj = applyRule[applyKey as keyof typeof applyRule];
+
+			// add rule to applyRules Object
+			this.applyRules[applyKey] = applyKeyObj;
+
+			// extract fields from the applyRules and add to fieldsToExtract array
+			let token = Object.keys(applyKeyObj)[0];
+			this.fieldsToExtract.push(returnIdentifier(applyKeyObj[token as keyof typeof applyKeyObj]));
+		}
+
+		for (let col in this.fieldsToExtract) {
+			this.fieldsToExtract[col] = transformQueryToDatasetConvention(this.fieldsToExtract[col]);
 		}
 	}
 
+	public handleSort (array: InsightResult[]): InsightResult[] {
+		return sort(array, this.order, this.dir);
+	}
 }
 
 

@@ -117,12 +117,15 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("query is null?"));
 			} else {
 				let datasetID = this.getDatasetID(query);
-			//	SYED: checking for invalid queries
-				try {
-					queryValidator(query);
-				} catch (err: any) {
-					return reject(new InsightError(err));
-				}
+
+				// TODO: uncomment to do query validation
+				//	SYED: checking for invalid queries
+				// try {
+				// 	queryValidator(query);
+				// } catch (err: any) {
+				// 	return reject(new InsightError(err));
+				// }
+
 				let datasetToQuery = this.map.get(datasetID);
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
@@ -133,12 +136,13 @@ export default class InsightFacade implements IInsightFacade {
 						Object.prototype.hasOwnProperty.call(query, "OPTIONS")
 					) {
 						let queryObject = new QueryContainer();
+
 						// handleOptions
-						try {
-							queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
-						} catch (error) {
-							return reject(error);
-						}
+						queryObject.handleOptions(queryJSON["OPTIONS" as keyof typeof queryJSON]);
+
+						// handleTransformations
+						queryObject.handleTransformations(queryJSON["TRANSFORMATIONS" as keyof typeof queryJSON]);
+
 						// handleWhere
 						let results: InsightResult[] = [];
 						try {

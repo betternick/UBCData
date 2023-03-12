@@ -1,0 +1,21 @@
+{
+	"title": "TooManyResults",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"sections_dept",
+					"sections_id"
+				]
+			}
+		}
+	},
+	"errorExpected": true,
+	"expected": "ResultTooLargeError"
+}

@@ -43,7 +43,7 @@ function queryCheckerForNot(queryWhereBlock: any, datasetID: string) {
 		throw new InsightError("Invalid filter key: " + key[0]);
 	}
 }
-// checks query for OR
+// checks query for OR/AND
 function queryCheckerForOrAnd(queryWhereBlock: any, datasetID: string, comparator: string) {
 	let objectDeepest = queryWhereBlock[comparator];
 	for (const element of objectDeepest) {
@@ -80,7 +80,7 @@ function queryCheckerForLtGtEq(queryWhereBlock: any, datasetID: string, comparat
 	}
 }
 
-function queryCheckerForColumns(queryWhole: any, datasetID: string) {
+function columnsChecker(queryWhole: any, datasetID: string) {
 	const queryOptionsBlock = queryWhole["OPTIONS" as keyof typeof queryWhole];
 	if (queryOptionsBlock === undefined || null) {
 		throw new InsightError("Missing OPTIONS");
@@ -129,6 +129,43 @@ function queryCheckerForColumns(queryWhole: any, datasetID: string) {
 	}
 	orderFieldChecker(queryWhole);
 }
+
+
+function transformationsChecker(queryWhole: any, datasetID: string) {
+	const queryTransBlock = queryWhole["TRANSFORMATIONS" as keyof typeof queryWhole];
+	let queryTransBlockKeys = Object.keys(queryTransBlock);
+	if (queryTransBlockKeys == null || undefined) {
+		throw new InsightError("TRANSFORMATIONS blocks missing");
+	}
+	if (!queryTransBlockKeys.includes("GROUP")) {
+		throw new InsightError("TRANSFORMATIONS missing GROUP");
+	}
+	if (!queryTransBlockKeys.includes("APPLY")) {
+		throw new InsightError("TRANSFORMATIONS missing APPLY");
+	}
+	let allowableKeysForTransformations = ["GROUP", "APPLY"];
+	let disallowedKeyFlag = false;
+	for (const key of queryTransBlockKeys) {
+		if (!allowableKeysForTransformations.includes(key)) {
+			disallowedKeyFlag = true;
+		}
+	}
+	if (disallowedKeyFlag) {
+		throw new InsightError("Invalid keys in TRANSFORMATIONS");
+	}
+	groupChecker(queryTransBlock["GROUP" as keyof typeof queryTransBlock], datasetID);
+	applyChecker(queryTransBlock["APPLY" as keyof typeof queryTransBlock], datasetID);
+}
+
+function groupChecker(group: string[], datasetID: string) {
+	// TODO: for GROUP block of TRANSFORMATIONS
+}
+
+function applyChecker(apply: any, datasetID: string) {
+	// TODO: for APPLY block of TRANSFORMATIONS
+}
+
+
 // Had to refactor this out of querycheckerForColumns due to exceeeding 50 line limit
 function orderFieldChecker (queryWhole: any) {
 	const queryOptionsBlock = queryWhole["OPTIONS" as keyof typeof queryWhole];
@@ -158,8 +195,9 @@ function queryValidator(queryMy: unknown) {
 	let queryWhole = JSONchecker(queryMy);
 	let datasetID: string = getDatasetID(queryMy);
 	whereChecker(queryWhole,datasetID);
-	queryCheckerForColumns(queryWhole,datasetID);
+	columnsChecker(queryWhole,datasetID);
+	transformationsChecker(queryWhole, datasetID);
 }
 
-export {getDatasetID, queryCheckerForLtGtEq, queryCheckerForColumns, queryValidator,
+export {getDatasetID, queryCheckerForLtGtEq, columnsChecker, queryValidator,
 };
