@@ -23,11 +23,12 @@ export class QueryContainer {
 	public handleWhere (query: any, datasetID: string, dataset: Dataset): InsightResult[] {
 		let resultArray: InsightResult[] = [];
 		let sections = dataset.datasetArray;
+
 		if (this.group.length === 0) {
 			for (let sec in sections) {
 				let mySection = sections[sec];
 				if (this.applyFilters(query, datasetID, dataset.datasetArray[sec])) {
-					let myInsightResult = this.createInsightResult(datasetID, mySection, this.columns);
+					let myInsightResult = this.createInsightResult(datasetID, mySection, this.fieldsToExtract);
 					resultArray.push(myInsightResult);
 				}
 			}
@@ -196,22 +197,16 @@ export class QueryContainer {
 				this.dir = (query.ORDER.dir === "UP") ? 1 : -1;
 			}
 		}
-		// creates an object that contains only the columns
-		let columnsJSON = query.COLUMNS;
 
-		// extracts all the column identifiers and puts them into the columns array
-		for (let col in columnsJSON) {
-			this.columns.push(returnIdentifier(columnsJSON[col]));
-		}
-
-		for (let col in this.columns) {
-			this.columns[col] = transformQueryToDatasetConvention(this.columns[col]);
-		}
+		this.columns = query.COLUMNS;
 	}
 
 	public handleTransformations(query: any) {
 		// if the query does not have a transformation block, simply return
 		if (query === undefined) {
+			for (let col in this.columns) {
+				this.fieldsToExtract.push(transformQueryToDatasetConvention(returnIdentifier(this.columns[col])));
+			}
 			return;
 		}
 
