@@ -89,3 +89,47 @@ export function wildcardMatcher (stringToCheck: string, queryString: string): bo
 	}
 	return false;
 }
+
+export function createIResWhereHelper(datasetID: string, mySection: JSON, fieldsArray: string[]): InsightResult {
+	let myInsightResult: InsightResult = {};
+	for (let col in fieldsArray) {
+		let keyCol = datasetID.concat("_", transformDatasetToQueryConvention(fieldsArray[col]));
+		let valOfSection = getValue(mySection, fieldsArray[col]);
+		let keyVal: string | number = "";
+		if (keyCol === datasetID + "_year") {
+			// need to check if sections = overall, if yes, year = 1900
+			let secField = getValue(mySection, "Section");
+			if (secField === "overall") {
+				keyVal = 1900;
+			} else {
+				keyVal = Number(valOfSection); 	// need to convert year to number
+			}
+		} else if (keyCol === datasetID + "_uuid") {
+			keyVal = valOfSection.toString();	// need to convert uuid to string
+		} else if (keyCol === datasetID + "_seats") {
+			keyVal = Number(valOfSection);		// need to convert seats to number
+		} else {
+			keyVal = valOfSection;
+		}
+		myInsightResult[keyCol] = keyVal;
+	}
+	return myInsightResult;
+}
+
+// sorts array by string of keys, using sortByThenBy logic, in ascending or descending order based on dir
+// Order of keys determines how ties are broken
+export function sort (array: InsightResult[], keys: string[], dir: number): InsightResult[] {
+	// sorting array of objects by list of keys, dynamically: https://stackoverflow.com/questions/41808710/
+	// sort-an-array-of-objects-by-dynamically-provided-list-of-object-properties-in-a
+
+	return array.sort(function(a, b) {
+		// generate compare function return value by iterating over the properties array
+		return keys.reduce(function(bool, k) {
+			// if previous compare result is `0` then compare with the next property value and return result
+			let result = (a[k] < b[k]) ? -1 : (a[k] > b[k]) ? 1 : 0;
+			result = result * dir;
+			let r = bool || result;
+			return r;
+		}, 0);   // set initial value as 0
+	});
+}
