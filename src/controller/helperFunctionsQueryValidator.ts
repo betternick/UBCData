@@ -1,5 +1,4 @@
 import {Dataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {queryCheckerForLtGtEq} from "./helperFunctionsQueryChecking";
 // comment to add a line without ESLint losing it
 function JSONchecker(query: unknown): any{
 	let queryReturn;

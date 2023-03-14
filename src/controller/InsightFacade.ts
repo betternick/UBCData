@@ -18,7 +18,7 @@ import {
 	readSectionsContent,
 } from "./helperFunctionsAddDataset";
 
-import {queryValidator} from "./helperFunctionsQueryChecking";
+import {QueryValidator} from "./queryValidator";
 import {readRoomsContent} from "./AddDatasetRooms";
 import {getContentFromArchives} from "../../test/TestUtil";
 
@@ -113,18 +113,17 @@ export default class InsightFacade implements IInsightFacade {
 			// console.log("Does this query NOT violate LT/EQ/GT rules?: Answer: " + g);
 			if (typeof query !== "object") {
 				return reject(new InsightError("Not a valid JSON object"));
-			} else if (query == null) {
-				return reject(new InsightError("query is null?"));
+			} else if (query === null || query === undefined) {
+				return reject(new InsightError("query is null or undefined"));
 			} else {
 				let datasetID = this.getDatasetID(query);
 
-				// TODO: uncomment to do query validation
-				//	SYED: checking for invalid queries
-				// try {
-				// 	queryValidator(query);
-				// } catch (err: any) {
-				// 	return reject(new InsightError(err));
-				// }
+				try {
+					let validator = new QueryValidator();
+					validator.validateQuery(query, datasetID);
+				} catch (err: any) {
+					return reject(new InsightError(err));
+				}
 
 				let datasetToQuery = this.map.get(datasetID);
 				if (datasetToQuery === undefined) {
@@ -184,10 +183,6 @@ export default class InsightFacade implements IInsightFacade {
 
 	// ------------------  HELPER FUNCTIONS ------------------
 
-	// determines if the ID is valid
-	public datasetIDValid(datasetID: string): boolean {
-		return !datasetID.includes("_");
-	}
 
 	// finds the first dataset ID from a query
 	public getDatasetID(query: object): string {
