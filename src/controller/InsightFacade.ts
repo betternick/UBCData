@@ -117,18 +117,19 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new InsightError("query is null or undefined"));
 			} else {
 				let datasetID = this.getDatasetID(query);
-
-				try {
-					let validator = new QueryValidator();
-					validator.validateQuery(query, datasetID);
-				} catch (err: any) {
-					return reject(new InsightError(err));
-				}
-
 				let datasetToQuery = this.map.get(datasetID);
+
 				if (datasetToQuery === undefined) {
 					return reject(new InsightError("the dataset you are looking for has not been added"));
 				} else {
+
+					try {
+						let validator = new QueryValidator();
+						validator.validateQuery(query, datasetID, datasetToQuery.kind);
+					} catch (err: any) {
+						return reject(new InsightError(err));
+					}
+
 					let queryJSON = query;
 					// check that query object has BOTH OPTIONS and WHERE
 					if (Object.prototype.hasOwnProperty.call(query, "WHERE") &&
