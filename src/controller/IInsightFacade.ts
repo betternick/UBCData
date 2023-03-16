@@ -31,8 +31,8 @@ export interface Rooms {
 	number: string;
 	name: string;
 	address: string;
-	lat: number;
-	lon: number;
+	lat: number | string | undefined;
+	lon: number | string | undefined;
 	seats: number;
 	type: string;
 	furniture: string;
@@ -44,9 +44,8 @@ export interface Building {
 	fullname: string;
 	shortname: string;
 	address: string;
-	lat: number | undefined;
-	lon: number | undefined;
-	rooms: Rooms[];
+	lat: number | string | undefined;
+	lon: number | string | undefined;
 }
 
 export interface InsightDataset {

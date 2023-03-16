@@ -25,8 +25,7 @@ export function initializeDefaultBuilding(): Building {
 		shortname : "ImpossibleWord@$%#123",
 		address : "ImpossibleWord@$%#123",
 		lat : 1000000,
-		lon : 1000000,
-		rooms : []
+		lon : 1000000
 	};
 	return building;
 }
@@ -40,6 +39,10 @@ export function checkValidRoom(room: Rooms): boolean {
 		room.address !== "ImpossibleWord@$%#123" &&
 		room.lat !== 1000000 &&
 		room.lon !== 1000000 &&
+		typeof (room.lat) !== "string" &&
+		typeof (room.lon) !== "string" &&
+		typeof (room.lat) !== "undefined" &&
+		typeof (room.lon) !== "undefined" &&
 		room.seats !== 1000000 &&
 		room.type !== "ImpossibleWord@$%#123" &&
 		room.furniture !== "ImpossibleWord@$%#123" &&
