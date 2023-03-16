@@ -1,5 +1,5 @@
 import {InsightDatasetKind, InsightError} from "./IInsightFacade";
-import {JSONchecker, queryCheckerForIs} from "./helperFunctionsQueryValidator";
+import {JSONchecker} from "./helperFunctionsQueryValidator";
 
 
 export class QueryValidator {
@@ -68,6 +68,9 @@ export class QueryValidator {
 		let queryKeys = Object.keys(query);
 		let allowableKeysForQuery = ["WHERE", "OPTIONS", "TRANSFORMATIONS"];
 		this.areKeysValid(queryKeys, allowableKeysForQuery, "the query");
+		if (!queryKeys.includes("WHERE") || (!queryKeys.includes("OPTIONS"))) {
+			throw new InsightError("query must have both WHERE and OPTIONS");
+		}
 	}
 
 	public whereChecker() {
@@ -98,9 +101,8 @@ export class QueryValidator {
 					this.checkFilters(query[queryKey][i]);
 				}
 			} else if (queryKey === "NOT") {
-				let notBlock = query[queryKey as keyof typeof query];
-				if (typeof notBlock !== "object") {
-					throw new InsightError("NOT must be an object, currently: type is: " + typeof notBlock);
+				if (typeof query[queryKey as keyof typeof query] !== "object") {
+					throw new InsightError("NOT must be an object");
 				}
 				this.checkFilters(query[queryKey]);
 			} else if (queryKey === "LT" || queryKey === "GT" || queryKey === "EQ") {
@@ -108,17 +110,47 @@ export class QueryValidator {
 				if (keys.length !== 1) {
 					throw new InsightError(queryKey + "must have only have 1 key");
 				}
-				let key = keys[0];
-				if (!this.allowableFieldKeys.includes(key)) {
-					throw new InsightError("Invalid key type for " + queryKey);
+				if (this.datasetKind === InsightDatasetKind.Sections) {
+					this.areKeysValid(keys, this.mkeysSections, "IS");
+				} else if (this.datasetKind === InsightDatasetKind.Rooms) {
+					this.areKeysValid(keys, this.mkeysRooms, "IS");
 				}
-				if (typeof (query[queryKey][key]) !== "number") {
+				if (typeof (query[queryKey][keys[0]]) !== "number") {
 					throw new InsightError("invalid Value type for " + queryKey + ", should be number");
 				}
 			} else {
-				queryCheckerForIs(query, this.datasetID);
-				return;
+				let keys = Object.keys(query[queryKey]);
+				if (keys.length !== 1) {
+					throw new InsightError(queryKey + "must have only have 1 key");
+				}
+				if (this.datasetKind === InsightDatasetKind.Sections) {
+					this.areKeysValid(keys, this.skeysSections, "IS");
+				} else if (this.datasetKind === InsightDatasetKind.Rooms) {
+					this.areKeysValid(keys, this.skeysRooms, "IS");
+				}
+				if (typeof (query[queryKey][keys[0]]) !== "string") {
+					throw new InsightError("invalid Value type for " + queryKey + ", should be string");
+				}
+				let val: string = query[queryKey][keys[0]];
+				this.asteriskChecker(val);
 			}
+		}
+	}
+
+	public asteriskChecker(val: string) {
+		let asteriskCount = val.split("*").length - 1;
+		let firstPositionOfAsterisk = val.indexOf("*");
+		if (asteriskCount === 1) {
+			if (firstPositionOfAsterisk !== 0 && firstPositionOfAsterisk !== val.length - 1){
+				throw new InsightError("Asterisks can only be the first or last characters of input strings");
+			}
+		} else if (asteriskCount === 2) {
+			let lastPositionOfAsterisk = val.lastIndexOf("*");
+			if (firstPositionOfAsterisk !== 0 || lastPositionOfAsterisk !== val.length - 1){
+				throw new InsightError("Asterisks can only be the first or last characters of input strings");
+			}
+		} else if (asteriskCount > 2) {
+			throw new InsightError("Asterisks can only be the first or last characters of input strings");
 		}
 	}
 
@@ -133,9 +165,8 @@ export class QueryValidator {
 			let transformationsKeys = Object.keys(this.transformationsBlock);
 			let allowableKeysForTransformations = ["GROUP", "APPLY"];
 			this.areKeysValid(transformationsKeys, allowableKeysForTransformations, "TRANSFORMATIONS");
-			if (!transformationsKeys.includes("GROUP") || !transformationsKeys.includes("APPLY")) {
-				throw new InsightError("TRANSFORMATIONS missing GROUP or APPLY blocks");
-			}
+			this.areKeysValid(allowableKeysForTransformations, transformationsKeys, "TRANSFORMATIONS");
+
 			this.groupChecker(this.transformationsBlock["GROUP" as keyof typeof this.transformationsBlock]);
 			this.applyChecker(this.transformationsBlock["APPLY" as keyof typeof this.transformationsBlock]);
 		}
@@ -233,9 +264,7 @@ export class QueryValidator {
 				let orderKeys = Object.keys(order);
 				let allowedOrderKeys = ["dir", "keys"];
 				this.areKeysValid(orderKeys, allowedOrderKeys, "ORDER");
-				if (!orderKeys.includes("dir") || !orderKeys.includes("keys")) {
-					throw new InsightError("Order must include 'dir' and 'keys'");
-				}
+				this.areKeysValid(allowedOrderKeys, orderKeys, "ORDER");
 				if (orderKeys.length !== 2) {
 					throw new InsightError("Order must have 2 keys");
 				}
