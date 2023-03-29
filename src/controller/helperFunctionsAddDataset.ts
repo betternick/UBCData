@@ -92,7 +92,7 @@ function readSectionsContent(content: any, dataset: JSON[]): Promise<number> {
 				}
 			})
 			.catch(function (err: any) {
-				return reject(new InsightError("there is an error in readContent function???"));
+				return reject(new InsightError("there is an error in readContent function???" + err));
 			});
 	});
 }

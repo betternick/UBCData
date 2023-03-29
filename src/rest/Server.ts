@@ -1,16 +1,20 @@
 import express, {Application, Request, Response} from "express";
 import * as http from "http";
 import cors from "cors";
+import InsightFacade from "../controller/InsightFacade";
+import {InsightDatasetKind, InsightResult} from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
+	private static facade: InsightFacade;
 
 	constructor(port: number) {
 		console.info(`Server::<init>( ${port} )`);
 		this.port = port;
 		this.express = express();
+		Server.facade = new InsightFacade();
 
 		this.registerMiddleware();
 		this.registerRoutes();
@@ -84,9 +88,8 @@ export default class Server {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
 		// http://localhost:4321/echo/hello
 		this.express.get("/echo/:msg", Server.echo);
-
-		// TODO: your other endpoints should go here
-
+		this.express.put("/dataset/:id/:kind", Server.addDataset);
+		this.express.post("/query", Server.query);
 	}
 
 	/**
@@ -111,4 +114,31 @@ export default class Server {
 			return "Message not provided";
 		}
 	}
+
+	private static query(req: Request, res: Response) {
+		console.log(`Server::query(..) - params: ${JSON.stringify(req.params)}`);
+		return Server.facade.performQuery(req.body)
+			.then((results: InsightResult[]) => {
+				res.status(200).send(results);
+			}).catch((error) => {
+				console.log("Error in Server.query: " + error);
+				res.status(400).send(error);
+			});
+	}
+
+	private static addDataset(req: Request, res: Response) {
+		console.log(`Server::addDataset(..) - params: ${JSON.stringify(req.params)}`);
+		let id: string = req.params.id;
+		let content: string = req.body.toString("base64");
+		let kind: InsightDatasetKind;
+		kind = (req.params.kind === "sections" ? InsightDatasetKind.Sections : InsightDatasetKind.Rooms);
+		return Server.facade.addDataset(id, content, kind)
+			.then((results: string[]) => {
+				res.status(200).send(results);
+			}).catch((error) => {
+				console.log("Error in Server.addDataset: " + error);
+				res.status(400).send(error);
+			});
+	}
+
 }
