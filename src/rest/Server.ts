@@ -130,7 +130,7 @@ export default class Server {
 				res.status(200).send(results);
 			}).catch((error) => {
 				console.log("Error in Server.addDataset: " + error);
-				res.status(400).send(error);
+				res.status(400).send(error.message);
 			});
 	}
 
@@ -143,9 +143,9 @@ export default class Server {
 			}).catch((error) => {
 				console.log("Error in Server.removeDataset: " + error);
 				if (error instanceof InsightError) {
-					res.status(400).send(error);
+					res.status(400).send(error.message);
 				} else {
-					res.status(404).send(error);
+					res.status(404).send(error.message);
 				}
 			});
 	}
@@ -165,7 +165,7 @@ export default class Server {
 				res.status(200).send(results);
 			}).catch((error) => {
 				console.log("Error in Server.query: " + error);
-				res.status(400).send(error);
+				res.status(400).send(error.message);
 			});
 	}
 }
