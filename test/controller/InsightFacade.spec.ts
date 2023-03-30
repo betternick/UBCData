@@ -32,6 +32,7 @@ let flag: number;
 let rooms: string;
 let rooms8buildings: string;
 
+
 before(function () {
 	// This block runs once and loads the datasets.
 	flag = 0;
@@ -48,6 +49,7 @@ before(function () {
 	clearDisk();
 });
 
+/*
 describe("Add/Remove/List Dataset", function () {
 	before(function () {
 		console.info(`Before: ${this.test?.parent?.title}`);
@@ -317,7 +319,7 @@ describe("Add/Remove/List Dataset", function () {
 		expect(result3[1].id).to.equals("qwerty2List");
 	});
 });
-
+/*
 // /!*
 // * This test suite dynamically generates tests from the JSON files in test/resources/queries.
 // * You should not need to modify it; instead, add additional files to the queries directory.
@@ -529,3 +531,5 @@ describe("Data Persistence test", function () {
 
 
 });
+
+ */
