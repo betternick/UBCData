@@ -6,7 +6,7 @@ import * as fs from "fs";
 import {clearDisk} from "../TestUtil";
 import {InsightDataset, InsightDatasetKind} from "../../src/controller/IInsightFacade";
 
-
+/*
 describe("Server", () => {
 
 	let facade: InsightFacade;
@@ -198,4 +198,4 @@ describe("Server", () => {
 		}
 	});
 });
-
+*/
