@@ -6,7 +6,7 @@ import * as fs from "fs";
 import {clearDisk} from "../TestUtil";
 import {InsightDataset, InsightDatasetKind} from "../../src/controller/IInsightFacade";
 
-/*
+
 describe("Server", () => {
 
 	let facade: InsightFacade;
@@ -105,7 +105,7 @@ describe("Server", () => {
 				.delete("/dataset/sections3Course")
 				.then((res: Response) => {
 					expect(res.status).to.be.equal(200);
-					expect(res.text).to.be.equal("sections3Course");
+					expect(res.body.result).to.be.equal("sections3Course");
 				}).catch((err) => {
 					expect.fail(err);
 				});
@@ -187,7 +187,7 @@ describe("Server", () => {
 						numRows: 64612};
 					let expectedArr: InsightDataset[] = [expected];
 					expect(res.status).to.be.equal(200);
-					expect(res.body).to.deep.equal(expectedArr);
+					expect(res.body.result).to.deep.equal(expectedArr);
 
 				})
 				.catch((err) => {
@@ -198,4 +198,4 @@ describe("Server", () => {
 		}
 	});
 });
-*/
+

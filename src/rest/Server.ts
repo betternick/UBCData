@@ -127,10 +127,10 @@ export default class Server {
 		return Server.facade.addDataset(id, content, kind)
 			.then((results: string[]) => {
 				console.log("Dataset '" + id + "' successfully added to server");
-				res.status(200).send(results);
+				res.status(200).json({result: results});
 			}).catch((error) => {
 				console.log("Error in Server.addDataset: " + error);
-				res.status(400).send(error.message);
+				res.status(400).json({error: error.message});
 			});
 	}
 
@@ -139,13 +139,13 @@ export default class Server {
 		let id: string = req.params.id;
 		return Server.facade.removeDataset(id)
 			.then((results: string) => {
-				res.status(200).send(results);
+				res.status(200).json({result: results});
 			}).catch((error) => {
 				console.log("Error in Server.removeDataset: " + error);
 				if (error instanceof InsightError) {
-					res.status(400).send(error.message);
+					res.status(400).json({error: error.message});
 				} else {
-					res.status(404).send(error.message);
+					res.status(404).json({error: error.message});
 				}
 			});
 	}
@@ -154,7 +154,7 @@ export default class Server {
 		console.log(`Server::listDataset(..) - params: ${JSON.stringify(req.params)}`);
 		return Server.facade.listDatasets()
 			.then((results: InsightDataset[]) => {
-				res.status(200).send(results);
+				res.status(200).json({result: results});
 			});
 	}
 
@@ -162,10 +162,10 @@ export default class Server {
 		console.log(`Server::query(..) - params: ${JSON.stringify(req.params)}`);
 		return Server.facade.performQuery(req.body)
 			.then((results: InsightResult[]) => {
-				res.status(200).send(results);
+				res.status(200).json({result: results});
 			}).catch((error) => {
 				console.log("Error in Server.query: " + error);
-				res.status(400).send(error.message);
+				res.status(400).json({error: error.message});
 			});
 	}
 }
