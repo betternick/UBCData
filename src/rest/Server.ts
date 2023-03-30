@@ -2,7 +2,7 @@ import express, {Application, Request, Response} from "express";
 import * as http from "http";
 import cors from "cors";
 import InsightFacade from "../controller/InsightFacade";
-import {InsightDatasetKind, InsightResult} from "../controller/IInsightFacade";
+import {InsightDataset, InsightDatasetKind, InsightError, InsightResult} from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
@@ -87,9 +87,12 @@ export default class Server {
 	private registerRoutes() {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
 		// http://localhost:4321/echo/hello
+		console.log("in register Routes");
 		this.express.get("/echo/:msg", Server.echo);
 		this.express.put("/dataset/:id/:kind", Server.addDataset);
-		this.express.post("/query", Server.query);
+		this.express.delete("/dataset/:id", Server.removeDataset);
+		this.express.get("/datasets", Server.listDatasets);
+		this.express.post("/query", Server.performQuery);
 	}
 
 	/**
@@ -115,7 +118,47 @@ export default class Server {
 		}
 	}
 
-	private static query(req: Request, res: Response) {
+	private static addDataset(req: Request, res: Response) {
+		console.log(`Server::addDataset(..) - params: ${JSON.stringify(req.params)}`);
+		let id: string = req.params.id;
+		let content: string = req.body.toString("base64");
+		let kind: InsightDatasetKind;
+		kind = (req.params.kind === "sections" ? InsightDatasetKind.Sections : InsightDatasetKind.Rooms);
+		return Server.facade.addDataset(id, content, kind)
+			.then((results: string[]) => {
+				console.log("Dataset '" + id + "' successfully added to server");
+				res.status(200).send(results);
+			}).catch((error) => {
+				console.log("Error in Server.addDataset: " + error);
+				res.status(400).send(error);
+			});
+	}
+
+	private static removeDataset(req: Request, res: Response) {
+		console.log(`Server::removeDataset(..) - params: ${JSON.stringify(req.params)}`);
+		let id: string = req.params.id;
+		return Server.facade.removeDataset(id)
+			.then((results: string) => {
+				res.status(200).send(results);
+			}).catch((error) => {
+				console.log("Error in Server.removeDataset: " + error);
+				if (error instanceof InsightError) {
+					res.status(400).send(error);
+				} else {
+					res.status(404).send(error);
+				}
+			});
+	}
+
+	private static listDatasets(req: Request, res: Response) {
+		console.log(`Server::listDataset(..) - params: ${JSON.stringify(req.params)}`);
+		return Server.facade.listDatasets()
+			.then((results: InsightDataset[]) => {
+				res.status(200).send(results);
+			});
+	}
+
+	private static performQuery(req: Request, res: Response) {
 		console.log(`Server::query(..) - params: ${JSON.stringify(req.params)}`);
 		return Server.facade.performQuery(req.body)
 			.then((results: InsightResult[]) => {
@@ -125,20 +168,4 @@ export default class Server {
 				res.status(400).send(error);
 			});
 	}
-
-	private static addDataset(req: Request, res: Response) {
-		console.log(`Server::addDataset(..) - params: ${JSON.stringify(req.params)}`);
-		let id: string = req.params.id;
-		let content: string = req.body.toString("base64");
-		let kind: InsightDatasetKind;
-		kind = (req.params.kind === "sections" ? InsightDatasetKind.Sections : InsightDatasetKind.Rooms);
-		return Server.facade.addDataset(id, content, kind)
-			.then((results: string[]) => {
-				res.status(200).send(results);
-			}).catch((error) => {
-				console.log("Error in Server.addDataset: " + error);
-				res.status(400).send(error);
-			});
-	}
-
 }

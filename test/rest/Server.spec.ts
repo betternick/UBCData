@@ -3,7 +3,8 @@ import InsightFacade from "../../src/controller/InsightFacade";
 import {expect} from "chai";
 import request, {Response} from "supertest";
 import * as fs from "fs";
-import {query} from "express";
+import {clearDisk} from "../TestUtil";
+import {InsightDataset, InsightDatasetKind} from "../../src/controller/IInsightFacade";
 
 describe("Server", () => {
 
@@ -11,10 +12,12 @@ describe("Server", () => {
 	let server: Server;
 	let serverURL: string;
 	let sections: any;
+	let sections3Course: any;
 	let jsonQuery: object;
 
 	before(async () => {
 		sections = fs.readFileSync("./test/resources/archives/pair.zip");
+		sections3Course = fs.readFileSync("./test/resources/archives/pair3CoursesOnly.zip");
 		serverURL = "http://localhost:4321";
 		jsonQuery = {
 			WHERE: {
@@ -33,7 +36,6 @@ describe("Server", () => {
 
 		facade = new InsightFacade();
 		server = new Server(4321);
-		// TODO: start server here once and handle errors properly
 		server.start().then(() => {
 			console.log("Server Started");
 		}).catch((error: Error) => {
@@ -42,7 +44,6 @@ describe("Server", () => {
 	});
 
 	after(async () => {
-		// TODO: stop server here once!
 		server.stop().then(() => {
 			console.log("Server stopped");
 		});
@@ -50,13 +51,12 @@ describe("Server", () => {
 
 	beforeEach(() => {
 		// might want to add some process logging here to keep track of what's going on
+		clearDisk();
 	});
 
 	afterEach(() => {
 		// might want to add some process logging here to keep track of what's going on
 	});
-
-	// Sample on how to format PUT requests
 
 	it("Successful PUT test for courses dataset", async () => {
 		try {
@@ -66,11 +66,75 @@ describe("Server", () => {
 				.set("Content-Type", "application/x-zip-compressed")
 				.then((res: Response) => {
 					expect(res.status).to.be.equal(200);
+				})
+				.catch((err) => {
+					expect.fail(err);
+				});
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
+	it("Failure PUT test for courses dataset - wrong kind", async () => {
+		try {
+			return request(serverURL)
+				.put("/dataset/sections2/sec")
+				.send(sections)
+				.set("Content-Type", "application/x-zip-compressed")
+				.then((res: Response) => {
+					expect(res.status).to.be.equal(400);
 					// more assertions here
 				})
 				.catch((err) => {
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
+				});
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
+	it("Successful DEL test for courses dataset", async () => {
+		try {
+			await request(serverURL)
+				.put("/dataset/sections3Course/sections")
+				.send(sections3Course)
+				.set("Content-Type", "application/x-zip-compressed");
+
+			return request(serverURL)
+				.delete("/dataset/sections3Course")
+				.then((res: Response) => {
+					expect(res.status).to.be.equal(200);
+					expect(res.text).to.be.equal("sections3Course");
+				}).catch((err) => {
+					expect.fail(err);
+				});
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
+	it("Failure (InsightError) DEL test for courses dataset", async () => {
+		try {
+			return request(serverURL)
+				.delete("/dataset/sections_3Course")
+				.then((res: Response) => {
+					expect(res.status).to.be.equal(400);
+				}).catch((err) => {
+					expect.fail(err);
+				});
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
+	it("Failure (NotFoundError) DEL test for courses dataset", async () => {
+		try {
+			return request(serverURL)
+				.delete("/dataset/sections3Course")
+				.then((res: Response) => {
+					expect(res.status).to.be.equal(404);
+				}).catch((err) => {
+					expect.fail(err);
 				});
 		} catch (err) {
 			console.log(err);
@@ -87,8 +151,7 @@ describe("Server", () => {
 					// more assertions here
 				})
 				.catch((err) => {
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
 				});
 		} catch (err) {
 			console.log(err);
@@ -105,8 +168,29 @@ describe("Server", () => {
 					// more assertions here
 				})
 				.catch((err) => {
-					console.log(err);
-					expect.fail();
+					expect.fail(err);
+				});
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
+	it("Successful GET test for courses dataset", async () => {
+		try {
+			return request(serverURL)
+				.get("/datasets")
+				.then((res: Response) => {
+					let expected: InsightDataset = {
+						id: "sections",
+						kind: InsightDatasetKind.Sections,
+						numRows: 64612};
+					let expectedArr: InsightDataset[] = [expected];
+					expect(res.status).to.be.equal(200);
+					expect(res.body).to.deep.equal(expectedArr);
+
+				})
+				.catch((err) => {
+					expect.fail(err);
 				});
 		} catch (err) {
 			console.log(err);
