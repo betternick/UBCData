@@ -9,7 +9,7 @@
 	font-size: 16px;
 }
 
-.container {
+.myTitle {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -83,3 +83,17 @@ img {
 	right: 5px;
 	background-color: rgba(1, 36, 77, 0.24);
 }
+
+
+.titleBox {
+/*Ref: https://stackoverflow.com/questions/5681813/transparent-background-image-with-a-gradient*/
+/*	https://www.freecodecamp.org/news/how-to-add-an-image-url-to-your-div/*/
+	background: linear-gradient(to right, rgba(255,255,255,0) 0%,
+	rgba(255,255,255,1)), url(img2.png);
+	background-repeat: no-repeat, no-repeat;
+	background-position: right, left;
+	height: 80px;
+	width: 100%;
+
+}
+

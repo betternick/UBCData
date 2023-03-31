@@ -49,7 +49,7 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 
 		if (document.getElementById('GreaterThan').checked ||
 			document.getElementById('LessThan').checked) {
-			alert("Seating capacity must be entered when searching by Greater/Less Than");
+			alert("Room capacity must be specified when Less than/Greater than are selected");
 		}
 	} else {
 		if (document.getElementById('GreaterThan').checked) {
