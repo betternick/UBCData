@@ -3,11 +3,63 @@
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 		<title>310 Frontend</title>
-		<link href="/style.css" rel="stylesheet" />
+		<link href="style.css" rel="stylesheet" />
+
 	</head>
 	<body>
-		<button id="click-me-button" class="button" >Click Me!</button>
 
-		<script type="text/javascript" src="/frontend.js"></script>
+	<div class="split left">
+
+		<div class="titleBox">
+		<div class="myTitle">
+		<img src="img.png" class= "logo" alt="Logo">
+		<h1>InsightUBC</h1>
+	</div>
+		</div>
+
+
+	<h2>User Story 1</h2>
+	<p>As a student registering for courses, I want to be able to search for a department and see the overall 5-year
+		average for the most recent 5 school years for every 400-level course in that department, so that I can see
+		what courses are easiest so that I can register them as my electives. </p>
+	<p>Click the "Search" button below to display these courses.</p>
+	<form id="UserStory1Form">
+		<label for="Department">Department:</label>
+		<input type="text" id="Department" name="Department" placeholder="Enter Department Code" maxlength = "4"> <br>
+		<input type="submit" value="Search">
+	</form>
+
+
+
+	<h2>User Story 2</h2>
+	<p>As a professor, I want to search for rooms according to seating capacity, so that I know which rooms are suitable
+		for me to hold my class in.
+	</p>
+	<!--
+	Learn HTML Forms In 25 Minutes
+	Ref: https://www.youtube.com/watch?v=fNcJuPIZ2WE&ab_channel=WebDevSimplified
+	-->
+	<form id="UserStory2Form">
+		<label for="Building">Building Code:</label>
+		<input type="text" id="Building" name="Building" placeholder="Enter Building Code" required> <br>
+		<label for="SeatingCapacity">Seating Capacity:</label>
+		<input type="number" id="SeatingCapacity" name="SeatingCapacity" placeholder="Enter Seating Capacity" min="1"
+			   step="1"><br>
+		<label for="GreaterThan">Greater Than:</label>
+		<input type="radio" id="GreaterThan" name="GreaterThan" value="greater"><br>
+		<label for="LessThan">Less Than:</label>
+		<input type="radio" id="LessThan" name="LessThan" value="less"><br>
+		<input type="submit" value="Search">
+	</form>
+	</div>
+
+	<div class="split right">
+		<div id="container"></div>
+		<input type="button" value="Load Data" onclick="aloadBuildings();">
+	</div>
+
+
+
+		<script type="text/javascript" src="frontend.js"></script>
 	</body>
 </html>
