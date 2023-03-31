@@ -1,12 +1,12 @@
-import {
-	IInsightFacade,
-	InsightDatasetKind,
-	InsightError,
-	InsightResult,
-	NotFoundError,
-	ResultTooLargeError,
-} from "../../src/controller/IInsightFacade";
-import InsightFacade from "../../src/controller/InsightFacade";
+// import {
+// 	IInsightFacade,
+// 	InsightDatasetKind,
+// 	InsightError,
+// 	InsightResult,
+// 	NotFoundError,
+// 	ResultTooLargeError,
+// } from "../../src/controller/IInsightFacade";
+// import InsightFacade from "../../src/controller/InsightFacade";
 
 // import {folderTest} from "@ubccpsc310/folder-test";
 // import {expect, use} from "chai";
