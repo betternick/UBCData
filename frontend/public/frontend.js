@@ -40,7 +40,7 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 	let seatingCapacityOrDefault;
 	let buildingCodeValue = buildingCode.value;
 
-
+// df
 
 	console.log(buildingCode.value,seatingCapacity.value,greaterThan.value,lessThan.value);
 
