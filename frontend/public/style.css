@@ -1,7 +1,7 @@
 .button {
-	background-color: #3f51b5;
+	background-color: #bdc4e8;
 	border: none;
-	color: white;
+	color: black;
 	padding: 15px 32px;
 	text-align: center;
 	text-decoration: none;
@@ -9,6 +9,91 @@
 	font-size: 16px;
 }
 
+.myTitle {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 10vh;
+}
+
+h1 {
+	font-size: 48px;
+	color: #01244d;
+	text-align: center;
+}
+
 .button:hover {
 	cursor: pointer;
 }
+
+img {
+	margin-right: 10px;
+}
+
+.logo {
+	max-width: 50px;
+	max-height: 50px;
+	float: left;
+	margin-right: 10px;
+}
+
+/* Styling taken from https://www.w3schools.com/css/css_table.asp */
+
+#mytable {
+	font-family: Arial, Helvetica, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+#mytable td, #mytable th {
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+#mytable tr:nth-child(even){background-color: #f2f2f2;}
+
+#mytable tr:hover {background-color: #ddd;}
+
+#mytable th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	background-color: #01244d;
+	color: white;
+}
+
+
+/*https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_split_screen */
+.split {
+	height: 100%;
+	width: 50%;
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	overflow-x: hidden;
+	padding-top: 20px;
+}
+
+.left {
+	left: 5px;
+	background-color: #ffffff;
+}
+
+.right {
+	right: 5px;
+	background-color: rgba(1, 36, 77, 0.24);
+}
+
+
+.titleBox {
+/*Ref: https://stackoverflow.com/questions/5681813/transparent-background-image-with-a-gradient*/
+/*	https://www.freecodecamp.org/news/how-to-add-an-image-url-to-your-div/*/
+	background: linear-gradient(to right, rgba(255,255,255,0) 0%,
+	rgba(255,255,255,1)), url(img2.png);
+	background-repeat: no-repeat, no-repeat;
+	background-position: right, left;
+	height: 80px;
+	width: 100%;
+
+}
+
