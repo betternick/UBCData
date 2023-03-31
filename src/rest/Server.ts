@@ -87,7 +87,6 @@ export default class Server {
 	private registerRoutes() {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
 		// http://localhost:4321/echo/hello
-		console.log("in register Routes");
 		this.express.get("/echo/:msg", Server.echo);
 		this.express.put("/dataset/:id/:kind", Server.addDataset);
 		this.express.delete("/dataset/:id", Server.removeDataset);
@@ -120,16 +119,18 @@ export default class Server {
 
 	private static addDataset(req: Request, res: Response) {
 		console.log(`Server::addDataset(..) - params: ${JSON.stringify(req.params)}`);
+
 		let id: string = req.params.id;
 		let content: string = req.body.toString("base64");
 		let kind: InsightDatasetKind;
 		kind = (req.params.kind === "sections" ? InsightDatasetKind.Sections : InsightDatasetKind.Rooms);
+
 		return Server.facade.addDataset(id, content, kind)
 			.then((results: string[]) => {
 				console.log("Dataset '" + id + "' successfully added to server");
 				res.status(200).json({result: results});
 			}).catch((error) => {
-				console.log("Error in Server.addDataset: " + error);
+				console.log("Error adding dataset to server: " + error);
 				res.status(400).json({error: error.message});
 			});
 	}
@@ -139,9 +140,10 @@ export default class Server {
 		let id: string = req.params.id;
 		return Server.facade.removeDataset(id)
 			.then((results: string) => {
+				console.log("Dataset '" + id + "' successfully removed from server");
 				res.status(200).json({result: results});
 			}).catch((error) => {
-				console.log("Error in Server.removeDataset: " + error);
+				console.log("Error removing dataset from server: " + error);
 				if (error instanceof InsightError) {
 					res.status(400).json({error: error.message});
 				} else {
@@ -159,12 +161,12 @@ export default class Server {
 	}
 
 	private static performQuery(req: Request, res: Response) {
-		console.log(`Server::query(..) - params: ${JSON.stringify(req.params)}`);
+		console.log(`Server::performQuery(..) - params: ${JSON.stringify(req.params)}`);
 		return Server.facade.performQuery(req.body)
 			.then((results: InsightResult[]) => {
 				res.status(200).json({result: results});
 			}).catch((error) => {
-				console.log("Error in Server.query: " + error);
+				console.log("Error in performing query on server: " + error);
 				res.status(400).json({error: error.message});
 			});
 	}
