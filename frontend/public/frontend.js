@@ -151,6 +151,9 @@ function coursesQueryBuilder(departmentCode){
 function aloadBuildings(data) {
 	var table = "<table id=mytable>";
 	table += `<tr><th>Building Name</th><th>Room Name</th><th>Seating Capacity</th></tr>`;
+	if (data.result.length !== 0) {
+		table += `<tr><td></td><td style="color: red;">There are ${data.result.length} results.</td><td></td></tr>`;
+	}
 	let array = data.result;
 	for (let element of array) {
 		table += `<tr  class=fade-in-text><td>${element.rooms_shortname}</td><td>${element.rooms_name}</td>
@@ -167,6 +170,9 @@ function aloadBuildings(data) {
 function aloadCourses(data) {
 	var table = "<table id=mytable>";
 	table += `<tr><th>Department</th><th>Course No.</th><th>Average</th></tr>`;
+	if (data.result.length !== 0) {
+		table += `<tr><td></td><td style="color: red;">There are ${data.result.length} results.</td><td></td></tr>`;
+	}
 	console.log(data);
 	console.log(data.result);
 	let array = data.result;
