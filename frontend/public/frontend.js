@@ -160,7 +160,7 @@ function aloadBuildings(data) {
 <td>${element.rooms_seats}</td></tr>`;
 	}
 	if (data.result.length === 0){
-		table += `<tr  class=fade-in-text><td></td><td>0 Results</td><td></td></tr>`;
+		table += `<tr  class=fade-in-text><td></td><td style="color: red;">0 Results</td><td></td></tr>`;
 	}
 	table += "</table>";
 	document.getElementById("container").innerHTML = table;
@@ -181,7 +181,7 @@ function aloadCourses(data) {
 <td>${element.overallAvg}</td></tr>`;
 	}
 	if (data.result.length === 0){
-		table += `<tr  class=fade-in-text><td></td><td>0 Results</td><td></td></tr>`;
+		table += `<tr  class=fade-in-text><td></td><td style="color: red;">0 Results</td><td></td></tr>`;
 	}
 	table += "</table>";
 	document.getElementById("container").innerHTML = table;
