@@ -9,6 +9,7 @@ userStory1.addEventListener("submit", (e) => {
 	// Input Validation for User Story 1
 	if (department.value == "") {
 		alert("Some required fields are missing. Please check inputs and try again.");
+		return;
 	}
 	let departmentValue = department.value.toLowerCase();
 	let JSONQuery = coursesQueryBuilder(departmentValue);
@@ -32,6 +33,7 @@ userStory2.addEventListener("submit", (e) => {
 	let comparatorCode;
 	let seatingCapacityOrDefault;
 	let buildingCodeValue = buildingCode.value.toUpperCase();
+	const DEFAULT = 10000;
 
 // abc
 
@@ -43,25 +45,28 @@ userStory2.addEventListener("submit", (e) => {
 		if (document.getElementById('GreaterThan').checked ||
 			document.getElementById('LessThan').checked) {
 			alert("Room capacity must be specified when Less than/Greater than are selected");
+			return;
+		}
+
+		if (!document.getElementById('GreaterThan').checked &&
+			!document.getElementById('LessThan').checked) {
+			seatingCapacityOrDefault = DEFAULT;
+			comparatorCode = "LT"
 		}
 	} else {
 
 		if (document.getElementById('GreaterThan').checked) {
 			comparatorCode = "GT"
-		} else {
+		} else if (document.getElementById('LessThan').checked) {
 			comparatorCode = "LT"
 		}
-
-		if (seatingCapacity.value == "") {
-			seatingCapacityOrDefault = 10000;
-		} else {
-			seatingCapacityOrDefault = seatingCapacity.value;
-		}
+		seatingCapacityOrDefault = seatingCapacity.value;
+	}
 
 		let JSONQuery = buildingQueryBuilder(seatingCapacityOrDefault,buildingCodeValue,comparatorCode)
 		sendRequest(JSONQuery,"building");
 
-	}
+
 });
 
 function buildingQueryBuilder(seatingCapacity,buildingCode,comparatorCode){
@@ -169,7 +174,7 @@ function aloadBuildings(data) {
 
 function aloadCourses(data) {
 	var table = "<table id=mytable>";
-	table += `<tr><th>Department</th><th>Course No.</th><th>Average</th></tr>`;
+	table += `<tr><th>Department</th><th>Course No.</th><th>5-Year Average</th></tr>`;
 	if (data.result.length !== 0) {
 		table += `<tr><td></td><td style="color: red;">There are ${data.result.length} results.</td><td></td></tr>`;
 	}
