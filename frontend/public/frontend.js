@@ -59,6 +59,8 @@ userStory2.addEventListener("submit", (e) => {
 			comparatorCode = "GT"
 		} else if (document.getElementById('LessThan').checked) {
 			comparatorCode = "LT"
+		} else {
+			comparatorCode = "EQ"
 		}
 		seatingCapacityOrDefault = seatingCapacity.value;
 	}
