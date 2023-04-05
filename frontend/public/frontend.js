@@ -288,7 +288,7 @@ function aloadCourses () {
 	function sendRequest(JSONQuery,func) {
 		const httpRequest = new XMLHttpRequest();
 		httpRequest.onreadystatechange = handler;
-		httpRequest.open("POST", "http://www.example.org/some.file", true);
+		httpRequest.open("POST", "/query", true);
 		httpRequest.setRequestHeader(
 			"Content-Type",
 			"application/json"
