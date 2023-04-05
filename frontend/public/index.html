@@ -1,39 +1,52 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-		<title>310 Frontend</title>
-		<link href="style.css" rel="stylesheet" />
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+	<title>310 Frontend</title>
+	<link href="style.css" rel="stylesheet" />
 
-	</head>
-	<body>
+</head>
+<body>
 
-	<div class="split left">
+<div class="split left">
 
-		<div class="titleBox">
+	<div class="titleBox">
 		<div class="myTitle">
-		<img src="img.png" class= "logo" alt="Logo">
-		<h1>InsightUBC</h1>
-	</div>
+			<img src="img.png" class= "logo" alt="Logo">
+			<h1>InsightUBC</h1>
 		</div>
+	</div>
 
+	<div>
+		<h2>User Story 1 <a onClick="openModal(myModal)"><img src ="img3.png"  style="object-fit:cover;
+     		object-position: right;
+            width:15px;
+            height:15px;
+            border: solid 1px #CCC" id="Modal1"/></a></h2>
+		<p>As a student registering for courses, I want to be able to search for a department and see the overall 5-year
+			average for the most recent 5 school years for every 400-level course in that department, so that I can see
+			what courses are easiest so that I can register them as my electives. </p>
 
-	<h2>User Story 1</h2>
-	<p>As a student registering for courses, I want to be able to search for a department and see the overall 5-year
-		average for the most recent 5 school years for every 400-level course in that department, so that I can see
-		what courses are easiest so that I can register them as my electives. </p>
-	<p>Click the "Search" button below to display these courses.</p>
+		<p>Enter the department code and click the "Search" button below to display these courses.</p>
+	</div>
 	<form id="UserStory1Form">
 		<label for="Department">Department:</label>
-		<input type="text" id="Department" name="Department" placeholder="Enter Department Code" maxlength = "4"> <br>
+		<input type="text" id="Department" name="Department" placeholder="Enter Department Code" maxlength = "4">  <br>
 		<input type="submit" value="Search">
 	</form>
 
+	<p>
+		&nbsp;
+		&nbsp;
+	</p>
 
-
-	<h2>User Story 2</h2>
+	<h2>User Story 2 <a onClick="openModal(myModal)"><img src ="img3.png"  style="object-fit:cover;
+     		object-position: right;
+            width:15px;
+            height:15px;
+            border: solid 1px #CCC" id="Modal1"/></a></h2>
 	<p>As a professor, I want to search for rooms according to seating capacity, so that I know which rooms are suitable
-		for me to hold my class in.
+		for my class.
 	</p>
 	<!--
 	Learn HTML Forms In 25 Minutes
@@ -46,20 +59,32 @@
 		<input type="number" id="SeatingCapacity" name="SeatingCapacity" placeholder="Enter Seating Capacity" min="1"
 			   step="1"><br>
 		<label for="GreaterThan">Greater Than:</label>
-		<input type="radio" id="GreaterThan" name="GreaterThan" value="greater"><br>
+		<input type="radio" id="GreaterThan" name="answer" value="greater"><br>
 		<label for="LessThan">Less Than:</label>
-		<input type="radio" id="LessThan" name="LessThan" value="less"><br>
+		<input type="radio" id="LessThan" name="answer" value="less"><br>
 		<input type="submit" value="Search">
 	</form>
+</div>
+
+
+
+<div class="split right">
+	<div id="container"></div>
+</div>
+
+
+
+<script type="text/javascript" src="frontend.js"></script>
+
+<!--	Reference-->
+<div id="myModal" class="modal">
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<p>Sample Department codes: cpsc, math, chem, adhe, aanb</p>
+		<p>Sample Building codes: ICCS, CHAN, BUCH, BIOL, FSC, HEBB</p>
 	</div>
-
-	<div class="split right">
-		<div id="container"></div>
-		<input type="button" value="Load Data" onclick="aloadBuildings();">
-	</div>
+</div>
 
 
-
-		<script type="text/javascript" src="frontend.js"></script>
-	</body>
+</body>
 </html>

@@ -1,10 +1,3 @@
-// document.getElementById("click-me-button").addEventListener("click", handleClickMe);
-//
-// function handleClickMe() {
-// 	alert("Button Clicked!");
-// }
-
-
 
 userStory1 = document.getElementById("UserStory1Form");
 
@@ -16,10 +9,11 @@ userStory1.addEventListener("submit", (e) => {
 	// Input Validation for User Story 1
 	if (department.value == "") {
 		alert("Some required fields are missing. Please check inputs and try again.");
-		}
-
-	let JSONQuery = coursesQueryBuilder(department.value);
-	sendRequest(JSONQuery,aloadCourses());
+		return;
+	}
+	let departmentValue = department.value.toLowerCase();
+	let JSONQuery = coursesQueryBuilder(departmentValue);
+	sendRequest(JSONQuery,"course");
 });
 
 
@@ -29,7 +23,7 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 	// let userStory2;
 	userStory2 = document.getElementById("UserStory2Form");
 
-	userStory2.addEventListener("submit", (e) => {
+userStory2.addEventListener("submit", (e) => {
 	e.preventDefault();
 
 	let buildingCode = document.getElementById("Building");
@@ -38,7 +32,8 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 	let lessThan = document.getElementById("LessThan");
 	let comparatorCode;
 	let seatingCapacityOrDefault;
-	let buildingCodeValue = buildingCode.value;
+	let buildingCodeValue = buildingCode.value.toUpperCase();
+	const DEFAULT = 10000;
 
 // abc
 
@@ -50,25 +45,35 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 		if (document.getElementById('GreaterThan').checked ||
 			document.getElementById('LessThan').checked) {
 			alert("Room capacity must be specified when Less than/Greater than are selected");
+			return;
 		}
-	} else {
-		if (document.getElementById('GreaterThan').checked) {
-			comparatorCode = "GT"
-		} else {
+
+		if (!document.getElementById('GreaterThan').checked &&
+			!document.getElementById('LessThan').checked) {
+			seatingCapacityOrDefault = DEFAULT;
 			comparatorCode = "LT"
 		}
+	} else {
 
-		if (seatingCapacity.value == "") {
-			seatingCapacityOrDefault = 10000;
+		if (document.getElementById('GreaterThan').checked) {
+			comparatorCode = "GT"
+		} else if (document.getElementById('LessThan').checked) {
+			comparatorCode = "LT"
+		} else {
+			comparatorCode = "EQ"
 		}
+		seatingCapacityOrDefault = seatingCapacity.value;
+	}
 
 		let JSONQuery = buildingQueryBuilder(seatingCapacityOrDefault,buildingCodeValue,comparatorCode)
-		sendRequest(JSONQuery,aloadBuildings());
-	}
+		sendRequest(JSONQuery,"building");
+
+
 });
 
-	function buildingQueryBuilder(seatingCapacity,buildingCode,comparatorCode){
-		let JSONQuery = `{
+function buildingQueryBuilder(seatingCapacity,buildingCode,comparatorCode){
+	// console.log(seatingCapacity);
+	let JSONQuery = `{
 			"WHERE": {
 				"AND":
 					[
@@ -90,7 +95,7 @@ Reference: https://www.freecodecamp.org/news/how-to-submit-a-form-with-javascrip
 				"ORDER": "rooms_seats"
 			}
 		}`;
-		return JSONQuery;
+	return JSONQuery;
 }
 
 
@@ -148,171 +153,105 @@ function coursesQueryBuilder(departmentCode){
 // <div id="container"></div>
 // <input type="button" value="Load Data" onclick="aload();">
 
-	<!-- (B) AJAX LOAD JSON DATA -->
+<!-- (B) AJAX LOAD JSON DATA -->
 
-		function aloadBuildings (data) {
-				// let data = [
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_C124",
-				// 		"rooms_seats": 90
-				// 	},
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_C126",
-				// 		"rooms_seats": 90
-				// 	},
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_D200",
-				// 		"rooms_seats": 114
-				// 	},
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_D300",
-				// 		"rooms_seats": 114
-				// 	},
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_B250",
-				// 		"rooms_seats": 240
-				// 	},
-				// 	{
-				// 		"rooms_shortname": "CHEM",
-				// 		"rooms_name": "CHEM_B150",
-				// 		"rooms_seats": 265
-				// 	}
-				// ];
-				var table = "<table id=mytable>";
-				table += `<tr><th>Building Name</th><th>Room Name</th><th>Seating Capacity</th></tr>`;
-				for (let element of data) {
-					table += `<tr><td>${element.rooms_shortname}</td><td>${element.rooms_name}</td>
-<td>${element.rooms_seats}</td></tr>`;
-				}
-				table += "</table>";
-				document.getElementById("container").innerHTML = table;
-
-	}
-
-
-function aloadCourses () {
-	// let data = [
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "404",
-	//         "overallAvg": 75.33
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "410",
-	//         "overallAvg": 77.51
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "411",
-	//         "overallAvg": 79.74
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "415",
-	//         "overallAvg": 71.63
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "416",
-	//         "overallAvg": 75.73
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "418",
-	//         "overallAvg": 80.51
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "420",
-	//         "overallAvg": 72.94
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "421",
-	//         "overallAvg": 75.86
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "422",
-	//         "overallAvg": 74.46
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "425",
-	//         "overallAvg": 74.06
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "430",
-	//         "overallAvg": 77.49
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "444",
-	//         "overallAvg": 78.38
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "445",
-	//         "overallAvg": 82.91
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "449",
-	//         "overallAvg": 92.41
-	//     },
-	//     {
-	//         "sections_dept": "cpsc",
-	//         "sections_id": "490",
-	//         "overallAvg": 89.28
-	//     }
-	// ]
+function aloadBuildings(data) {
 	var table = "<table id=mytable>";
-	table += `<tr><th>Department</th><th>Course No.</th><th>Average</th></tr>`;
-	for (let element of data) {
-		table += `<tr><td>${element.sections_dept}</td><td>${element.sections_id}</td>
+	table += `<tr><th>Building Name</th><th>Room Name</th><th>Seating Capacity</th></tr>`;
+	if (data.result.length !== 0) {
+		table += `<tr><td></td><td style="color: red;">There are ${data.result.length} results.</td><td></td></tr>`;
+	}
+	let array = data.result;
+	for (let element of array) {
+		table += `<tr  class=fade-in-text><td>${element.rooms_shortname}</td><td>${element.rooms_name}</td>
+<td>${element.rooms_seats}</td></tr>`;
+	}
+	if (data.result.length === 0){
+		table += `<tr  class=fade-in-text><td></td><td style="color: red;">0 Results</td><td></td></tr>`;
+	}
+	table += "</table>";
+	document.getElementById("container").innerHTML = table;
+}
+
+
+function aloadCourses(data) {
+	var table = "<table id=mytable>";
+	table += `<tr><th>Department</th><th>Course No.</th><th>5-Year Average</th></tr>`;
+	if (data.result.length !== 0) {
+		table += `<tr><td></td><td style="color: red;">There are ${data.result.length} results.</td><td></td></tr>`;
+	}
+	console.log(data);
+	console.log(data.result);
+	let array = data.result;
+	for (let element of array) {
+		table += `<tr  class=fade-in-text><td>${element.sections_dept}</td><td>${element.sections_id}</td>
 <td>${element.overallAvg}</td></tr>`;
+	}
+	if (data.result.length === 0){
+		table += `<tr  class=fade-in-text><td></td><td style="color: red;">0 Results</td><td></td></tr>`;
 	}
 	table += "</table>";
 	document.getElementById("container").innerHTML = table;
 
 }
 
-	// https://developer.mozilla.org/en-US/docs/Web/Guide/AJAX/Getting_Started
-	function sendRequest(JSONQuery,func) {
-		const httpRequest = new XMLHttpRequest();
-		httpRequest.onreadystatechange = handler;
-		httpRequest.open("POST", "/query", true);
-		httpRequest.setRequestHeader(
-			"Content-Type",
-			"application/json"
-		);
-		httpRequest.send(JSONQuery);
+// https://developer.mozilla.org/en-US/docs/Web/Guide/AJAX/Getting_Started
+function sendRequest(JSONQuery,queryType) {
+	const httpRequest = new XMLHttpRequest();
+	console.log("aaaaaa");
+	httpRequest.onreadystatechange = handler;
+	httpRequest.open("POST", "http://localhost:4321/query", true);
+	httpRequest.setRequestHeader(
+		"Content-Type",
+		"application/json"
+	);
+	console.log(JSONQuery);
+	httpRequest.send(JSONQuery);
 
-		function handler() {
-			try {
-				if (httpRequest.readyState === XMLHttpRequest.DONE) {
-					if (httpRequest.status === 200) {
-						const response = JSON.parse(httpRequest.responseText);
-						func(response);
-					} else {
-						alert("There was a problem with the request.");
+	function handler() {
+		try {
+			if (httpRequest.readyState === XMLHttpRequest.DONE) {
+				if (httpRequest.status === 200) {
+					const response = JSON.parse(httpRequest.responseText);
+					if (queryType === "building"){
+						aloadBuildings(response);
+					} else if (queryType === "course") {
+						console.log("right before call to aloadCpurse");
+						aloadCourses(response);
 					}
+				} else {
+					alert("There was a problem with the request.");
 				}
-			} catch (e) {
-				alert(`Caught Exception: ${e.description}`);
 			}
+		} catch (e) {
+			alert(`Caught Exception: ${e.description}`);
 		}
 	}
+}
 
 
+// Reference: https://www.w3schools.com/howto/howto_css_modals.asp
+function openModal() {
+	var modal = document.getElementById("myModal");
+	modal.style.display = "block";
 
+	var closeBtn = document.querySelector(".close");
+	closeBtn.addEventListener("click", function() {
+		closeModal();
+	});
+}
+
+function closeModal() {
+	var modal = document.getElementById("myModal");
+	modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+	var modal = document.getElementById("myModal");
+	if (event.target == modal) {
+		modal.style.display = "none";
+	}
+}
 
 
 
