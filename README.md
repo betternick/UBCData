@@ -4,7 +4,7 @@
 ## C3 User Stories
 
 ### Front End Demo 
-https://vimeo.com/814837183
+https://vimeo.com/814843715
 
 ### User Story 1
 As a student registering for courses, I want to be able to search for a department and see the overall 5-year average for the most recent 5 school years for every 400-level course in that department, so that I can see what courses are easiest so that I can register them as my electives.
