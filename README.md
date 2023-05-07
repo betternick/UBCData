@@ -1,7 +1,7 @@
 # UBC Data Project Repository
 
 
-## C3 User Stories
+## User Stories
 
 ### Front End Demo 
 
