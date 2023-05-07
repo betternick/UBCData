@@ -42,11 +42,6 @@ Then: The application displays an error message that says, “Room capacity must
 
 
 ----------------------------------------------
-## Basic Information
-This repository contains starter code for the class project.
-Please keep your repository private.
-
-For information about the project, autotest, and the checkpoints, see the course webpage.
 
 ## Configuring your environment
 
