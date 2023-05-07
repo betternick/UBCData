@@ -1,4 +1,4 @@
-# CPSC 310 Project Repository
+# UBC Data Project Repository
 
 
 ## C3 User Stories
