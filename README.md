@@ -69,7 +69,7 @@ In the project folder:
 
 1. `yarn pretty` to prettify the project code.
 
-2. 'yarn start' to run the server. Then open the 'index.html' file and everything should work.
+2. `yarn start` to run the server. Then open the 'index.html' file in your browser and everything should work.
 
 ### License
 
