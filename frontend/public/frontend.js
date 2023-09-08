@@ -200,7 +200,8 @@ function sendRequest(JSONQuery,queryType) {
 	const httpRequest = new XMLHttpRequest();
 	console.log("aaaaaa");
 	httpRequest.onreadystatechange = handler;
-	httpRequest.open("POST", "http://localhost:4321/query", true);
+	// httpRequest.open("POST", "http://localhost:4321/query", true);
+	httpRequest.open("POST", "https://ubcdata-backend.onrender.com:4321/query", true);
 	httpRequest.setRequestHeader(
 		"Content-Type",
 		"application/json"
