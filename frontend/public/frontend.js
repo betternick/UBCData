@@ -208,7 +208,7 @@ function sendRequest(JSONQuery,queryType) {
 	);
 	console.log(JSONQuery);
 	httpRequest.send(JSONQuery);
-
+//testing
 	function handler() {
 		try {
 			if (httpRequest.readyState === XMLHttpRequest.DONE) {
