@@ -24,7 +24,8 @@ export default class Server {
 		 * accessible at http://localhost:<port>/
 		 */
 		// this.express.use(express.static("./frontend/public"));
-		this.express.use(cors({origin: "https://ubcdata.onrender.com"}));
+		// this.express.use(cors({origin: "https://ubcdata.onrender.com"}));
+
 
 	}
 
