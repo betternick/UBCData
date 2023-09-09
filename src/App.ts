@@ -34,7 +34,5 @@ export class App {
 console.info("App - starting");
 const app = new App();
 (async () => {
-	// await app.initServer(4321);
 	await app.initServer();
 })();
-
